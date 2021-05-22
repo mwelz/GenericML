@@ -54,7 +54,7 @@ proportion.in.main.set   <- 0.5 # argument
 Z.clan                   <- NULL # argument. The matrix of variables that shall be considered in CLAN
 learners.genericML       <- c('glm', 'mlr3::lrn("ranger", num.trees = 100)')
 learner.propensity.score <- 'mlr3::lrn("glmnet", lambda = 0, alpha = 1)' # non-penalized logistic regression
-num.splits               <- 50
+num.splits               <- 3
 significance.level       <- 0.05
 store.splits             <- FALSE
 store.learners           <- FALSE
