@@ -83,11 +83,49 @@ genML <- genericML(Z = Z, D = D, Y = Y,
 # save relevant objects
 save(genML, ATE, Y, D, Z, file = paste0(getwd(), "/examples/GenericML-example.Rdata"))
 
-# if you don't want to run the genericML() function above (runtime: 55 seconds on Max' machine)
+# if you don't want to run the genericML() function above, uncomment the line below
+# load(file = paste0(getwd(), "/examples/GenericML-example.Rdata"))
 
-# TODO: store the median lambdas for all learners
 
-### 4. analyze the 
+### 4. analyze the output ----
+# the genericML object contains two main lists: 
+# 1. "best.learners" for information on finding the best learner,
+# 2. "VEIN" for information on the VEIN analysis
+
+## 4.1. "best.learners": performance of the different learners ----
+# the line below returns the medians of the estimated  \Lambda and \bar{\Lambda}
+genML$best.learners$lambda.overview
+# we can see that SVM maximizes both lambda criteria, hence it is the best learner for both CATE and GATES:
+genML$best.learners$best.learner.for.CATE
+genML$best.learners$best.learner.for.GATES
+
+## 4.2. "VEIN" for the VEIN analysis ----
+# we can specify which learner's VEIN we want to return. Choose the best here.
+# we can return BLP, GATES, and CLAN objects. All have same structure and contain information on the point estimates, confidence bounds, as well as the raw and adjusted p-values. Since the significance level was set to 5%, the confidence bounds are at 90% confidence level (due to uncertainty from sample splitting).
+
+## 4.2.1. VEIN of BLP ----
+genML$VEIN$best.learners$BLP
+# beta.1 (the ATE) is estimated at ~1.895. True ATE is 2, which is contained in the 90% CBs.
+# beta.2 is clearly not significant (adjusted p-value of ~0.98). Hence, there is (correctly) no indication of treatment effect heterogeneity
+
+## 4.2.2. VEIN of GATES ----
+genML$VEIN$best.learners$GATES
+# all point estimates for the gamma coefficients are close to each other. Difference between most and least affected group is insignificant (adjusted p-value of ~0.92). Hence, there is (correctly) no indication of treatment effect heterogeneity
+
+## 4.2.3. VEIN of CLAN ----
+# VEIN is performed for all variables in the object Z.clan
+genML$VEIN$best.learners$CLAN$z1
+genML$VEIN$best.learners$CLAN$z2
+genML$VEIN$best.learners$CLAN$z3
+genML$VEIN$best.learners$CLAN$z4
+genML$VEIN$best.learners$CLAN$z5
+genML$VEIN$best.learners$CLAN$random
+# there does not seem to be heterogeneity along any variable in Z.clan (and rightfully so)
+
+## 5. Visualization of the output ----
+library(ggplot2)
+# the function genericML.plot() visualizes each of the VEIN analyses
+genericML.plot(genML, type = "GATES") # no hetero
 
 
 # analyze

@@ -1,3 +1,5 @@
+library(ggplot2)
+
 #' Estimates the BLP parameters based on the main sample M. 
 #' 
 #' @param D a binary vector of treatment status of length _|M|_
@@ -46,8 +48,8 @@ get.BLP.params.classic <- function(D, Y, propensity.scores,
   ci.lo <- generic.targets[,"Estimate"] - qnorm(1-significance.level/2) * generic.targets[,"Std. Error"]
   ci.up <- generic.targets[,"Estimate"] + qnorm(1-significance.level/2) * generic.targets[,"Std. Error"]
   generic.targets <- cbind(generic.targets, ci.lo, ci.up)
-  colnames(generic.targets) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)", "CI lower", "CI upper")
-  generic.targets <- generic.targets[,c("Estimate", "CI lower", "CI upper", 
+  colnames(generic.targets) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)", "CB lower", "CB upper")
+  generic.targets <- generic.targets[,c("Estimate", "CB lower", "CB upper", 
                                         "Std. Error", "z value", "Pr(>|z|)")]
   
 
@@ -109,8 +111,8 @@ get.GATES.params.classic <- function(D, Y,
   ci.lo <- coefficients.temp[,"Estimate"] - qnorm(1-significance.level/2) * coefficients.temp[,"Std. Error"]
   ci.up <- coefficients.temp[,"Estimate"] + qnorm(1-significance.level/2) * coefficients.temp[,"Std. Error"]
   coefficients.temp <- cbind(coefficients.temp, ci.lo, ci.up)
-  colnames(coefficients.temp) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)", "CI lower", "CI upper")
-  coefficients.temp <- coefficients.temp[,c("Estimate", "CI lower", "CI upper", 
+  colnames(coefficients.temp) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)", "CB lower", "CB upper")
+  coefficients.temp <- coefficients.temp[,c("Estimate", "CB lower", "CB upper", 
                                             "Std. Error", "z value", "Pr(>|z|)")]
   
   # prepare generic target parameters for the difference
@@ -184,7 +186,7 @@ get.CLAN.parameters <- function(Z.clan.main.sample,
     pval        <- 2 * pnorm(abs(diff.ttest), lower.tail = FALSE)
     out.mat[3,] <- c(diff, ci.lo, ci.up, diff.se, diff.ttest, pval)
     
-    colnames(out.mat)     <- c("Estimate", "CI lower", "CI upper", "Std. Error", "z value", "Pr(>|z|)")
+    colnames(out.mat)     <- c("Estimate", "CB lower", "CB upper", "Std. Error", "z value", "Pr(>|z|)")
     rownames(out.mat)     <- c("delta.1", "delta.K", "delta.K-delta.1")
     generic.targets[[j]]  <- out.mat
     clan.coefficients[,j] <- out.mat[,1] 
@@ -257,18 +259,18 @@ initializer.for.splits <- function(Z, Z.clan, learners,
   
   clan <- array(NA_real_, dim = c(3, 6, num.splits), 
                 dimnames = list(c("delta.1", "delta.K", "delta.K-delta.1"), 
-                                c("Estimate", "CI lower", "CI upper", "Std. Error", "z value", "Pr(>|z|)"),
+                                c("Estimate", "CB lower", "CB upper", "Std. Error", "z value", "Pr(>|z|)"),
                                 NULL))
   
   gates <- array(NA_real_, dim = c(length(quantile.cutoffs)+2, 6, num.splits),
                  dimnames = list(
                    c(paste0("gamma.", 1:(length(quantile.cutoffs)+1)), "gamma.K-gamma.1"),
-                   c("Estimate", "CI lower", "CI upper", "Std. Error", "z value", "Pr(>|z|)"), 
+                   c("Estimate", "CB lower", "CB upper", "Std. Error", "z value", "Pr(>|z|)"), 
                    NULL))
   
   blp <- array(NA_real_, dim = c(2, 6, num.splits),
                dimnames = list(c("beta.1", "beta.2"), 
-                               c("Estimate", "CI lower", "CI upper", "Std. Error", "z value", "Pr(>|z|)"),
+                               c("Estimate", "CB lower", "CB upper", "Std. Error", "z value", "Pr(>|z|)"),
                                NULL))
   
   best <- array(NA_real_, dim = c(1, 2, num.splits), 
@@ -416,15 +418,15 @@ initialize.gen.ml <- function(generic.ml.across.learners.obj){
   
   blp.mat <- matrix(NA_real_, nrow = 2, ncol = 5, 
                     dimnames = list(c("beta.1", "beta.2"), 
-                                    c("Estimate", "CI lower", "CI upper", "p-value adjusted", "p-value raw")))
+                                    c("Estimate", "CB lower", "CB upper", "p-value adjusted", "p-value raw")))
   
   gates.mat <- matrix(NA_real_, nrow = length(gates.nam), ncol = 5, 
                       dimnames = list(gates.nam, 
-                                      c("Estimate", "CI lower", "CI upper", "p-value adjusted", "p-value raw")))
+                                      c("Estimate", "CB lower", "CB upper", "p-value adjusted", "p-value raw")))
   
   clan.mat <- matrix(NA_real_, nrow = length(clan.nam), ncol = 5, 
                      dimnames = list(clan.nam, 
-                                     c("Estimate", "CI lower", "CI upper", "p-value adjusted", "p-value raw")))
+                                     c("Estimate", "CB lower", "CB upper", "p-value adjusted", "p-value raw")))
   
   
   gates.ls <- lapply(learners, function(...) gates.mat)
@@ -502,13 +504,13 @@ genericML.plot <- function(genericML.obj,
   
   if(is.null(limits) & type != "BLP"){
     
-    limits <- c(min(c(data[, "CI lower"], data.blp["beta.1", "CI lower"])),
-                max(c(data[, "CI upper"], data.blp["beta.1", "CI upper"])))
+    limits <- c(min(c(data[, "CB lower"], data.blp["beta.1", "CB lower"])),
+                max(c(data[, "CB upper"], data.blp["beta.1", "CB upper"])))
     
   } else if(is.null(limits) & type == "BLP"){
     
-    limits <- c(min(data[, "CI lower"]),
-                max(data[, "CI upper"]))
+    limits <- c(min(data[, "CB lower"]),
+                max(data[, "CB upper"]))
     
   } # IF
   
@@ -522,8 +524,8 @@ genericML.plot <- function(genericML.obj,
     
     K  <- nrow(data) - 1
     df <- data.frame(point.estimate = data[, "Estimate"],
-                     ci.lower = data[, "CI lower"],
-                     ci.upper = data[, "CI upper"],
+                     ci.lower = data[, "CB lower"],
+                     ci.upper = data[, "CB upper"],
                      group = c(paste0("G", 1:K), paste0("G", K, "-G1")))
     
     p <- ggplot(mapping = aes(x = group,
@@ -533,10 +535,10 @@ genericML.plot <- function(genericML.obj,
       geom_hline(aes(yintercept = data.blp["beta.1", "Estimate"],
                      color = "ATE"),
                  linetype = "dashed") +
-      geom_hline(aes(yintercept = data.blp["beta.1", "CI lower"],
+      geom_hline(aes(yintercept = data.blp["beta.1", "CB lower"],
                      color = paste0(100*confidence.level, "% CB (ATE)")),
                  linetype = "dashed")  +
-      geom_hline(yintercept = data.blp["beta.1", "CI upper"],
+      geom_hline(yintercept = data.blp["beta.1", "CB upper"],
                  linetype = "dashed", color = "red") +
       geom_point(aes(color = paste0(type, " with ",  100*confidence.level, "% CB")), size = 3) +
       geom_errorbar(mapping = aes(ymin = ci.lower,
@@ -558,8 +560,8 @@ genericML.plot <- function(genericML.obj,
     
     ## 1.2 make plot for BLP ----
     df <- data.frame(point.estimate = data[, "Estimate"],
-                     ci.lower = data[, "CI lower"],
-                     ci.upper = data[, "CI upper"],
+                     ci.lower = data[, "CB lower"],
+                     ci.upper = data[, "CB upper"],
                      group = c("beta.1 (ATE)", "beta.2 (HTE)"))
     
     p <- ggplot(mapping = aes(x = group,

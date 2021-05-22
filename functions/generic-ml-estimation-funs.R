@@ -361,10 +361,10 @@ VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
       
       gen.ml.ls[[type]][[learner]][,"Estimate"] <- 
         apply(generic.ml.across.learners.obj[[learner]][[type]][,"Estimate",], 1, function(z) Med(z)$Med)
-      gen.ml.ls[[type]][[learner]][,"CI lower"] <- 
-        apply(generic.ml.across.learners.obj[[learner]][[type]][,"CI lower",], 1, function(z) Med(z)$upper.median)
-      gen.ml.ls[[type]][[learner]][,"CI upper"] <- 
-        apply(generic.ml.across.learners.obj[[learner]][[type]][,"CI upper",], 1, function(z) Med(z)$lower.median)
+      gen.ml.ls[[type]][[learner]][,"CB lower"] <- 
+        apply(generic.ml.across.learners.obj[[learner]][[type]][,"CB lower",], 1, function(z) Med(z)$upper.median)
+      gen.ml.ls[[type]][[learner]][,"CB upper"] <- 
+        apply(generic.ml.across.learners.obj[[learner]][[type]][,"CB upper",], 1, function(z) Med(z)$lower.median)
       pval <- 
         apply(generic.ml.across.learners.obj[[learner]][[type]][,"Pr(>|z|)",], 1, function(z) Med(z)$lower.median)
       gen.ml.ls[[type]][[learner]][,"p-value raw"] <- pval
@@ -382,10 +382,10 @@ VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
       
       gen.ml.ls$CLAN[[learner]][[z.clan]][,"Estimate"] <- 
         apply(generic.ml.across.learners.obj[[learner]][["CLAN"]][[z.clan]][,"Estimate",], 1, function(z) Med(z)$Med)
-      gen.ml.ls$CLAN[[learner]][[z.clan]][,"CI lower"] <- 
-        apply(generic.ml.across.learners.obj[[learner]][["CLAN"]][[z.clan]][,"CI lower",], 1, function(z) Med(z)$upper.median)
-      gen.ml.ls$CLAN[[learner]][[z.clan]][,"CI upper"] <- 
-        apply(generic.ml.across.learners.obj[[learner]][["CLAN"]][[z.clan]][,"CI upper",], 1, function(z) Med(z)$upper.median)
+      gen.ml.ls$CLAN[[learner]][[z.clan]][,"CB lower"] <- 
+        apply(generic.ml.across.learners.obj[[learner]][["CLAN"]][[z.clan]][,"CB lower",], 1, function(z) Med(z)$upper.median)
+      gen.ml.ls$CLAN[[learner]][[z.clan]][,"CB upper"] <- 
+        apply(generic.ml.across.learners.obj[[learner]][["CLAN"]][[z.clan]][,"CB upper",], 1, function(z) Med(z)$upper.median)
       pval <- 
         apply(generic.ml.across.learners.obj[[learner]][["CLAN"]][[z.clan]][,"Pr(>|z|)",], 1, function(z) Med(z)$lower.median)
       gen.ml.ls$CLAN[[learner]][[z.clan]][,"p-value raw"] <- pval
