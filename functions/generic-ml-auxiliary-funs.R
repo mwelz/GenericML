@@ -378,7 +378,8 @@ get.best.learners <- function(generic.ml.across.learners.obj){
   rownames(best.analysis) <- c("lambda", "lambda.bar")
   
   return(list(best.learner.for.CATE  = learners[which.max(best.analysis["lambda", ])],
-              best.learner.for.GATES = learners[which.max(best.analysis["lambda.bar", ])]))
+              best.learner.for.GATES = learners[which.max(best.analysis["lambda.bar", ])],
+              lambda.overview = t(best.analysis)))
   
 } # END FUN
 
@@ -591,7 +592,7 @@ quantile.group <- function(x,
   # cutoffs are the quantile cutoffs (like c(0.25, 0.5, 0.75))
   q         <- quantile(x, cutoffs)
   q         <- c(-Inf, q, Inf)
-  groups    <- as.character(cut(x, breaks = q, include.lowest = FALSE, right = TRUE, dig.lab = 3))
+  groups    <- as.character(cut(x, breaks = q, include.lowest = TRUE, right = FALSE, dig.lab = 3))
   group.nam <- unique(groups)
   group.nam <- group.nam[order(
     as.numeric(substr(sub("\\,.*", "", group.nam), 2, stop = 1e8L)), 
@@ -601,11 +602,11 @@ quantile.group <- function(x,
   
   for(j in 1:length(group.nam)){
     if(j == 1){
-      nam[j] <- paste0("<=", 100*cutoffs[j], "% quantile")
+      nam[j] <- paste0("<", 100*cutoffs[j], "% quantile")
     } else if (j == length(group.nam)){
-      nam[j] <- paste0(">", 100*cutoffs[j-1], "% quantile")
+      nam[j] <- paste0(">=", 100*cutoffs[j-1], "% quantile")
     } else{
-      nam[j] <- paste0("(", 100*cutoffs[j-1], ",", 100*cutoffs[j], "]% quantile")
+      nam[j] <- paste0("[", 100*cutoffs[j-1], ",", 100*cutoffs[j], ")% quantile")
     }
     group.mat[,j] <- groups == group.nam[j]
   }

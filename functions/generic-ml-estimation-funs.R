@@ -24,7 +24,7 @@ propensity.score <- function(Z, D, learner = "random.forest"){
   # specify the machine learner 
   if(is.environment(learner)){
     learner <- learner
-  } else if(learner == "glm"){
+  } else if(learner == "elastic.net"){
     
     learner <- mlr3::lrn("classif.cv_glmnet", s = "lambda.min")
     
@@ -88,7 +88,7 @@ baseline.proxy.estimator <- function(Z, D, Y,
   # specify the machine learner
   if(is.environment(learner)){
     learner <- learner
-  } else if(learner == "glm"){
+  } else if(learner == "elastic.net"){
     
     learner <- mlr3::lrn("regr.cv_glmnet", s = "lambda.min")
     
@@ -164,7 +164,7 @@ CATE.proxy.estimator <- function(Z, D, Y,
   # specify the machine learner
   if(is.environment(learner)){
     learner <- learner
-  } else if(learner == "glm"){
+  } else if(learner == "elastic.net"){
     
     learner <- mlr3::lrn("regr.cv_glmnet", s = "lambda.min")
     
@@ -427,7 +427,7 @@ VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
 #' 
 #' @export
 genericML <- function(Z, D, Y, 
-                      learner.propensity.score = "glm", 
+                      learner.propensity.score = "elastic.net", 
                       learners.genericML,
                       num.splits = 100,
                       Z.clan = NULL,
