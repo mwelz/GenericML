@@ -396,8 +396,11 @@ Med <- function(x){
   F.x <- ecdf.x(x)
   
   # get lower median and upper median
-  lower <- min(x[F.x >= 0.5])
-  upper <- max(x[(1 - F.x) >= 0.5])
+  lower       <- min(x[F.x >= 0.5])
+  upper.array <- x[(1 - F.x) >= 0.5]
+  upper       <- ifelse(length(upper.array) == 0, 
+                        lower,
+                        max(upper.array)) # account for case where upper.array is empty
   
   return(list(lower.median = lower, 
               upper.median = upper, 
