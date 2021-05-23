@@ -1,0 +1,216 @@
+---
+title: "Generic ML Demonstration"
+author: "Max Welz and Andreas Alfons"
+date: "5/23/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This is a demonstration of an R implementation of Generic ML, as proposed by [Chernozhukov, Demirer, Duflo, & Fernández-Val (2021)](https://arxiv.org/abs/1712.04802). Note that this implementation is **not** yet an R package, although we intend to create a package for the CRAN based on it.
+
+## Setup
+
+### Install dependencies
+
+```{r}
+rm(list = ls()) ; cat("\014")
+
+# Install the required packages if they are not already installed
+required.packages <- c("ggplot2", "mlr3", "mlr3learners", 
+                       "mvtnorm", "glmnet", "ranger", "e1071",
+                       "kknn", "MASS", "nnet", "xgboost")
+new.packages      <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+rm(required.packages, new.packages)
+
+library(ggplot2)
+```
+
+### Load functions
+
+```{r}
+source(paste0(dirname(getwd()), "/functions/generic-ml-estimation-funs.R"))
+source(paste0(dirname(getwd()), "/functions/generic-ml-auxiliary-funs.R"))
+```
+
+## Data generation
+
+We generate $n=5,000$ samples that adhere to a simple linear data generating process. We emulate a randomized experiment. There is no treatment effect heterogeneity since the treatment effect is constant at value two. Hence, Generic ML should not indicate the existence of treatment effect heterogeneity.
+
+```{r}
+set.seed(1)
+num.obs  <- 5000
+num.vars <- 5
+
+# ATE parameter
+ATE <- 2
+
+# random treatment assignment 
+D <- rbinom(num.obs, 1, 0.5) 
+
+# covariates
+Z <- mvtnorm::rmvnorm(num.obs, mean = rep(0, num.vars), sigma = diag(num.vars))
+colnames(Z) <- paste0("z", 1:num.vars)
+
+# counterfactual outcomes
+Y0 <- as.numeric(Z %*% c(2, -3, 0, 1, 2)) + rnorm(num.obs)
+Y1 <- ATE + Y0
+
+# observed outcome
+Y  <- ifelse(D == 1, Y1, Y0) 
+```
+
+## Applying Generic ML
+
+### The core function, `genericML()`
+
+The core of this implementation is the function `genericML()`, which is based on the object-riented `mlr3` framework. This function allows the user to flexibly specify machine learners with `mlr3` syntax. We introduce the arguments of `genericML()` below.
+
+* `Z`. A matrix or data frame of the covariates.
+* `D`. A binary vector of treatment assignment. 
+* `Y`. The response vector.
+* `learner.propensity.score`. The machine learner to be used for estimating the propensity scores. Either `'elastic.net'`, `'random.forest'`, or `'tree'`. Can alternatively be specified by using `mlr3` syntax, for example `'mlr3::lrn("ranger", num.trees = 500)'`. See https://mlr3learners.mlr-org.com for a list of `mlr3` learners. Default is `'elastic.net'`.
+* `learners.genericML`. A vector of strings specifying the machine learners to be used for estimating the BCA and CATE. Either `'elastic.net'`, `'random.forest'`, or `'tree'`. Can alternatively be specified by using `mlr3` syntax, for example `'mlr3::lrn("ranger", num.trees = 500)'`. See https://mlr3learners.mlr-org.com for a list of `mlr3` learners.
+* `num.splits`. Number of sample splits. Default is 100.
+* `Z.clan`.  A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z.clan = Z`, i.e. CLAN is performed for all variables in `Z`.
+* `quantile.cutoffs`. The cutoff points of quantiles that shall be used for GATES grouping. Default is `c(0.25, 0.5, 0.75)`, which corresponds to the quartiles.
+* `proportion.in.main.set`. The proportion of samples that shall be in the main set. Default is `0.5`.
+* `significance.level` The significance level for VEIN. Default is `0.05`.
+* `store.learners` Logical. If `TRUE`, all intermediate results of the learners will be stored. Default is `FALSE`.
+* `store.splits` Logical. If `TRUE`, information on the sample splits will be stored. Default is `FALSE`.
+
+### Specifying the arguments of the core function 
+
+```{r}
+# quantile cutoffs for the GATES grouping of the estimated CATEs 
+quantile.cutoffs         <- c(0.2, 0.4, 0.6, 0.8) # 20%, 40%, 60%, 80% quantiles
+
+# specify the learner of the propensity score (non-penalized logistic regression here)
+learner.propensity.score <- "mlr3::lrn('glmnet', lambda = 0, alpha = 1)" 
+
+# specify the considered learners of the BCA and the CATE (here: elastic net, random forest, and SVM)
+learners.genericML       <- c("elastic.net", "mlr3::lrn('ranger', num.trees = 100)", "mlr3::lrn('svm')")
+
+# specify the data that shall be used for the CLAN
+# here, we use all variables of Z and uniformly distributed random noise
+Z.clan <- cbind(Z, random = runif(num.obs))
+
+# specify the number of splits 
+num.splits               <- 100
+
+# specify the significance level
+significance.level       <- 0.05
+
+# specify the proportion of samples that shall be selected in the main set
+proportion.in.main.set   <- 0.5
+
+# specify whether or not the splits and auxiliary results of the learners shall be stored
+store.splits             <- FALSE
+store.learners           <- FALSE
+```
+
+### Run the core function on the generated data
+
+We pass the arguments we specified above to `genericML()`.
+
+```{r}
+# runtime: ~121 seconds with R version 4.1.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 20.10.
+genML <- genericML(Z = Z, D = D, Y = Y, 
+                   learner.propensity.score = learner.propensity.score, 
+                   learners.genericML = learners.genericML,
+                   num.splits = num.splits,
+                   Z.clan = Z.clan,
+                   quantile.cutoffs = quantile.cutoffs,
+                   proportion.in.main.set = proportion.in.main.set, 
+                   significance.level = significance.level,
+                   store.splits = store.splits,
+                   store.learners = store.learners)
+```
+
+## Analyzing the output of `genericML()`
+
+Aside from some information on its input, `genericML()` returns an `genericML`-object that consists of two main lists:
+
+1. `best.learners`. Contains information on the performance of each learner (as measured by $\hat{\Lambda}$ and $\hat{\bar{\Lambda}}$).
+2. `VEIN` for information on the VEIN analysis.
+
+### The returned `best.learners` list
+
+```{r}
+# the line below returns the medians of the estimated  \Lambda and \bar{\Lambda}
+genML$best.learners$lambda.overview
+```
+
+We can see that the SVM is the best learner for estimating the CATEs, as it maximizes the median of $\hat{\Lambda}$:
+
+```{r}
+genML$best.learners$best.learner.for.CATE
+```
+
+Conversely, the elastic net is the best learner for the GATES, as it maximizes the median of $\hat{\bar{\Lambda}}$:
+
+```{r}
+genML$best.learners$best.learner.for.GATES
+```
+
+### The returned `VEIN` list
+
+This list contains VEIN objects for the BLP, GATES, and CLAN. Each object adheres to the same structure and contains information on the relevant point estimates, confidence bounds, as well as the raw and adjusted $p$-values. Since the significance level was set to 5%, the confidence bounds are at 90% confidence level (due to uncertainty from sample splitting). Moreover, we can specify which learner's VEIN we want to return. We choose the respective best learner here by using the `best.learners` sub-list.
+
+#### VEIN of BLP 
+
+```{r}
+round(genML$VEIN$best.learners$BLP, 5)
+```
+
+We see that `beta.1` (the estimate of the ATE) is estimated at ~1.98. True ATE is 2, which is contained in the 90% confidence bounds. 
+Moreover, `beta.2` is clearly not significant (adjusted $p$-value of ~0.94). Hence, there is (correctly) no indication of treatment effect heterogeneity. Moreover, the function `genericML.plot()` visualizes these results for the BLP:
+
+```{r, out.width="50%"}
+genericML.plot(genML, type = "BLP", title = "VEIN of BLP") 
+```
+
+Note that the function `genericML.plot()` can visualize the VEIN for each considered learner. The default (which we use here) visualizes the respective best learner.
+
+#### VEIN of GATES
+
+```{r}
+round(genML$VEIN$best.learners$GATES, 5)
+```
+
+All point estimates for the $\gamma$ coefficients are close to each other. Difference between most and least affected group is insignificant (adjusted $p$-value of ~1). Hence, there is (correctly) no indication of treatment effect heterogeneity. We again visualize these results with `genericML.plot()`:
+
+```{r, out.width="50%"}
+genericML.plot(genML, type = "GATES", title = "VEIN of GATES") 
+```
+
+Observe that also the estimate of the ATE, along its 90% confidence bounds, are plotted.
+
+#### VEIN of CLAN
+
+CLAN of the variable `z1` (which was a variable in the input object `Z.clan`):
+
+```{r}
+genML$VEIN$best.learners$CLAN$z1
+```
+
+This indicates some evidence for weak heterogeneity along the variable `z1`. This could be due to a number of factors, such as a relatively low number for `num.splits` (recall that there is no treatment effect heterogeneity).
+
+```{r, out.width="50%"}
+genericML.plot(genML, type = "CLAN", CLAN.variable = "z1", title = "CLAN of 'z1'") 
+```
+
+Visualizing the CLAN for the variable `random`, which was a column in `Z.clan`:
+
+```{r, out.width="50%"}
+genericML.plot(genML, type = "CLAN", CLAN.variable = "random", title = "CLAN of 'random'") 
+```
+
+Correctly no evidence for heterogeneity along `random`.
+
+## Conclusion
+
+We conclude that in this demonstration, Generic ML correctly did not find evidence for treatment effect heterogeneity.

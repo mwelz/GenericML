@@ -412,7 +412,7 @@ VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
 #' @param D a binary vector of treatment status of length 
 #' @param Y a vector of responses of length
 #' @param learner.propensity.score the machine learner to be used for estimating the propensity scores. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example 'mlr3::lrn("ranger", num.trees = 500)'. Default is 'glm'.
-#' @param learner.genericML the machine learner to be used for estinating the CATE. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example 'mlr3::lrn("ranger", num.trees = 500)' for a random forest, which is also the default. 
+#' @param learners.genericML the machine learner to be used for estinating the CATE. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example 'mlr3::lrn("ranger", num.trees = 500)' for a random forest, which is also the default. 
 #' @param num.splits number of sample splits. Default is 100.
 #' @param Z.clan the matrix of variables that shall be considered in CLAN. If NULL (default), then Z.clan = Z.
 #' @param quantile.cutoffs cutoff points of quantiles that shall be used for GATES grouping.
