@@ -1,0 +1,3 @@
+- GenericML-example.Rmd generates GenericML-example.html.
+- GenericML-example.R generates GenericML-example.Rdata.
+- GenericML-example.R and GenericML-example.Rmd are equivalent.
