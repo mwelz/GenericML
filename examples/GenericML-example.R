@@ -15,7 +15,7 @@ source(paste0(getwd(), "/functions/generic-ml-auxiliary-funs.R"))
 
 ### 1. Data Generation (linear, no treatment effect heterogeneity) ----
 set.seed(1)
-num.obs  <- 10000
+num.obs  <- 5000
 num.vars <- 5
 
 # ATE parameter
@@ -54,7 +54,7 @@ learners.genericML       <- c("elastic.net", "mlr3::lrn('ranger', num.trees = 10
 Z.clan <- cbind(Z, random = runif(num.obs))
 
 # specify the number of splits 
-num.splits               <- 1000
+num.splits               <- 100
 
 # specify the significance level
 significance.level       <- 0.05
@@ -67,9 +67,7 @@ store.splits             <- FALSE
 store.learners           <- FALSE
 
 ### 3. run the genericML() functions with these arguments ----
-# runtime: ~55 seconds with R version 4.1.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 20.10
-
-tm = Sys.time()
+# runtime: ~121 seconds with R version 4.1.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 20.10
 
 genML <- genericML(Z = Z, D = D, Y = Y, 
                    learner.propensity.score = learner.propensity.score, 
@@ -84,8 +82,6 @@ genML <- genericML(Z = Z, D = D, Y = Y,
 
 # save relevant objects
 save(genML, ATE, Y, D, Z, file = paste0(getwd(), "/examples/GenericML-example.Rdata"))
-
-Sys.time() - tm # time difference of 45.1 minutes
 
 # if you don't want to run the genericML() function above, uncomment the line below
 # load(file = paste0(getwd(), "/examples/GenericML-example.Rdata"))
