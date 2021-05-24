@@ -73,9 +73,9 @@ The core of this implementation is the function `genericML()`, which is based on
 * `D`. A binary vector of treatment assignment. 
 * `Y`. The response vector.
 * `learner.propensity.score`. The machine learner to be used for estimating the propensity scores. Either `'elastic.net'`, `'random.forest'`, or `'tree'`. Can alternatively be specified by using `mlr3` syntax, for example `'mlr3::lrn("ranger", num.trees = 500)'`. See https://mlr3learners.mlr-org.com for a list of `mlr3` learners. Default is `'elastic.net'`.
-* `learners.genericML`. A vector of strings specifying the machine learners to be used for estimating the BCA and CATE. Either `'elastic.net'`, `'random.forest'`, or `'tree'`. Can alternatively be specified by using `mlr3` syntax, for example `'mlr3::lrn("ranger", num.trees = 500)'`. See https://mlr3learners.mlr-org.com for a list of `mlr3` learners.
+* `learners.genericML`. A vector of strings specifying the machine learners to be used for estimating the BCA (Baseline Conditional Average) and CATE (Conditional Average Treatment Effect). Either `'elastic.net'`, `'random.forest'`, or `'tree'`. Can alternatively be specified by using `mlr3` syntax, for example `'mlr3::lrn("ranger", num.trees = 500)'`. See https://mlr3learners.mlr-org.com for a list of `mlr3` learners.
 * `num.splits`. Number of sample splits. Default is 100.
-* `Z.clan`.  A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z.clan = Z`, i.e. CLAN is performed for all variables in `Z`.
+* `Z.clan`.  A matrix of variables that shall be considered for the Classification Analysis (CLAN). If `NULL` (default), then `Z.clan = Z`, i.e. CLAN is performed for all variables in `Z`.
 * `quantile.cutoffs`. The cutoff points of quantiles that shall be used for GATES grouping. Default is `c(0.25, 0.5, 0.75)`, which corresponds to the quartiles.
 * `proportion.in.main.set`. The proportion of samples that shall be in the main set. Default is `0.5`.
 * `significance.level` The significance level for VEIN. Default is `0.05`.
@@ -158,7 +158,7 @@ genML$best.learners$best.learner.for.GATES
 
 ### The returned `VEIN` list
 
-This list contains VEIN objects for the BLP, GATES, and CLAN. Each object adheres to the same structure and contains information on the relevant point estimates, confidence bounds, as well as the raw and adjusted $p$-values. Since the significance level was set to 5%, the confidence bounds are at 90% confidence level (due to uncertainty from sample splitting). Moreover, we can specify which learner's VEIN we want to return. We choose the respective best learner here by using the `best.learners` sub-list.
+This list contains VEIN objects for the BLP (Best Linear Predictor), GATES (Sorted Group Average Treatment Effects), and CLAN (Classification Analysis). Each object adheres to the same structure and contains information on the relevant point estimates, confidence bounds, as well as the raw and adjusted $p$-values. Since the significance level was set to 5%, the confidence bounds are at 90% confidence level (due to uncertainty from sample splitting). Moreover, we can specify which learner's VEIN we want to return. We choose the respective best learner here by using the `best.learners` sub-list.
 
 #### VEIN of BLP 
 
