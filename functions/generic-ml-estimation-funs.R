@@ -408,22 +408,18 @@ VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
 
 #' Performs generic ML 
 #' 
-#' @param Z a matrix or data frame of covariates
-#' @param D a binary vector of treatment status of length 
-#' @param Y a vector of responses of length
-#' @param learner.propensity.score the machine learner to be used for estimating the propensity scores. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example 'mlr3::lrn("ranger", num.trees = 500)'. Default is 'glm'.
-#' @param learners.genericML the machine learner to be used for estinating the CATE. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example 'mlr3::lrn("ranger", num.trees = 500)' for a random forest, which is also the default. 
+#' @param Z A matrix or data frame of the covariates.
+#' @param D A binary vector of treatment assignment. 
+#' @param Y The response vector.
+#' @param learner.propensity.score The machine learner to be used for estimating the propensity scores. Either `'elastic.net'`, `'random.forest'`, or `'tree'`. Can alternatively be specified by using `mlr3` syntax, for example `'mlr3::lrn("ranger", num.trees = 500)'`. See https://mlr3learners.mlr-org.com for a list of `mlr3` learners. Default is `'elastic.net'`.
+#' @param learners.genericML A vector of strings specifying the machine learners to be used for estimating the BCA and CATE. Either `'elastic.net'`, `'random.forest'`, or `'tree'`. Can alternatively be specified by using `mlr3` syntax, for example `'mlr3::lrn("ranger", num.trees = 500)'`. See https://mlr3learners.mlr-org.com for a list of `mlr3` learners.
 #' @param num.splits number of sample splits. Default is 100.
-#' @param Z.clan the matrix of variables that shall be considered in CLAN. If NULL (default), then Z.clan = Z.
-#' @param quantile.cutoffs cutoff points of quantiles that shall be used for GATES grouping.
+#' @param Z.clan A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z.clan = Z`, i.e. CLAN is performed for all variables in `Z`.
+#' @param quantile.cutoffs The cutoff points of quantiles that shall be used for GATES grouping. Default is `c(0.25, 0.5, 0.75)`, which corresponds to the quartiles.
 #' @param proportion.in.main.set proportion of samples that shall be in main set. Default is 0.5.
 #' @param significance.level significance level for VEIN. Default is 0.05.
-#' @param store.learners logical. If TRUE, all intermediate results of teh learners will be stored. Default is FALSE.
-#' @param store.splits logical. If TRUE, the splits will be stored. Default is FALSE.
-#'
-#' TODO: in 'get.geenric.ml.for.given.learner': intervals need to be [) instead of (]
-#' TODO: instructions on how mlr3 input is supposed to work (needs to be a string!)
-#' TODO: comments on CLAN: If there are categorical variables, apply one-hot-encoding to Z.clan. The interpretation then becomes: Is there a factor that is overproportionally present in the least or most affected group?
+#' @param store.learners Logical. If TRUE, all intermediate results of the learners will be stored. Default is FALSE.
+#' @param store.splits Logical. If `TRUE`, information on the sample splits will be stored. Default is `FALSE`.
 #' 
 #' @export
 genericML <- function(Z, D, Y, 
@@ -465,6 +461,7 @@ genericML <- function(Z, D, Y,
   
   return(list(VEIN = vein,
               best.learners = best.learners,
+              propensity.scores = propensity.scores,
               genericML.by.split = gen.ml.different.learners$genericML.by.split,
               splits = gen.ml.different.learners$splits, 
               arguments = list(quantile.cutoffs = c(0.25, 0.5, 0.75),
