@@ -132,7 +132,7 @@ genML <- genericML(Z = Z, D = D, Y = Y,
 
 ## Analyzing the output of `genericML()`
 
-Aside from some information on its input, `genericML()` returns an `genericML`-object that consists of two main lists:
+Aside from some information on its input and the estimated propensity scores, `genericML()` returns an `genericML`-object that consists of two main lists:
 
 1. `best.learners`. Contains information on the performance of each learner (as measured by $\hat{\Lambda}$ and $\hat{\bar{\Lambda}}$).
 2. `VEIN` for information on the VEIN analysis.
@@ -197,7 +197,8 @@ CLAN of the variable `z1` (which was a variable in the input object `Z.clan`):
 genML$VEIN$best.learners$CLAN$z1
 ```
 
-This indicates some evidence for weak heterogeneity along the variable `z1`. This could be due to a number of factors, such as a relatively low number for `num.splits` (recall that there is no treatment effect heterogeneity).
+This indicates some evidence for weak heterogeneity along the variable `z1`. Could be due to the fact that `z1` is positively correlated with the outcome `Y`.
+
 
 ```{r, out.width="50%"}
 genericML.plot(genML, type = "CLAN", CLAN.variable = "z1", title = "CLAN of 'z1'") 

@@ -140,10 +140,28 @@ genML$VEIN$best.learners$CLAN$z1
 #' delta.1          0.2091063  0.1222465  0.2959660     9.418759e-30 4.709380e-30
 #' delta.K         -0.2365256 -0.3227453 -0.1476362     7.966651e-31 3.983326e-31
 #' delta.K-delta.1 -0.4673637 -0.5901810 -0.3445465     7.203990e-60 3.601995e-60
-# This indicates some evidence for weak heterogeneity along the variable `z1`. This could be due to a number of factors, such as a relatively low number for `num.splits` (recall that there is no treatment effect heterogeneity).
+# This indicates some evidence for weak heterogeneity along the variable `z1`. This could be due to the fact that `z1` is positively correlated with the outcome Y.
 genericML.plot(genML, type = "CLAN", CLAN.variable = "z1", title = "CLAN of 'z1'") 
 
 
 # VEIN of CLAN for variable 'random'
 genericML.plot(genML, type = "CLAN", CLAN.variable = "random", title = "CLAN of 'random'") 
 # Correctly no evidence for heterogeneity along `random`.
+
+
+### 5. store all plots ----
+
+pdf(file = paste0(getwd(), "/examples/plots/VEIN-BLP.pdf"))
+genericML.plot(genML, type = "BLP", title = "VEIN of BLP") 
+dev.off()
+
+pdf(file = paste0(getwd(), "/examples/plots/VEIN-GATES.pdf"))
+genericML.plot(genML, type = "GATES", title = "VEIN of GATES") 
+dev.off()
+
+for(varname in colnames(Z.clan)){
+  pdf(file = paste0(getwd(), "/examples/plots/VEIN-CLAN-", varname, ".pdf"))
+  print(genericML.plot(genML, type = "CLAN", CLAN.variable = varname,
+                 title = paste0("CLAN of '", varname, "'"))) 
+  dev.off()
+}
