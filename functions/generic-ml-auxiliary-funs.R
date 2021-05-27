@@ -39,7 +39,7 @@ get.BLP.params.classic <- function(D, Y, propensity.scores,
   beta2.inference[2, "t value"] <- 
     (coefficients["beta.2", "Estimate"] - 1) / coefficients["beta.2", "Std. Error"]  
   beta2.inference[2, "Pr(>|t|)"] <- 
-    2 * pt(beta2.inference[2, "t value"], df = blp.obj$df.residual, lower.tail = FALSE)
+    2 * pt(abs(beta2.inference[2, "t value"]), df = blp.obj$df.residual, lower.tail = FALSE)
   
   # generic targets
   generic.targets <- coefficients[c("beta.1", "beta.2"), ]
