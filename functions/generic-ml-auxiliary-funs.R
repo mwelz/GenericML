@@ -30,33 +30,23 @@ get.BLP.params.classic <- function(D, Y, propensity.scores,
   # extract coefficients
   coefficients     <- summary(blp.obj)$coefficients
   
-  # inference on beta2: test the null that it is 1) = 0, 2) = 1.
-  beta2.inference <- matrix(NA_real_, 2, 2)
-  rownames(beta2.inference) <- c("H0: beta.2 = 0", "H0: beta.2 = 1")
-  colnames(beta2.inference) <- c("t value", "Pr(>|t|)")
-  beta2.inference[1,] <- coefficients["beta.2", c("t value", "Pr(>|t|)")]
-  beta2.inference[2, "t value"] <- 
-    (coefficients["beta.2", "Estimate"] - 1) / coefficients["beta.2", "Std. Error"]  
-  beta2.inference[2, "Pr(>|t|)"] <- 
-    2 * pt(abs(beta2.inference[2, "t value"]), df = blp.obj$df.residual, lower.tail = FALSE)
-  
   # generic targets
-  generic.targets <- coefficients[c("beta.1", "beta.2"), ]
-  colnames(generic.targets) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)")
-  generic.targets[,"Pr(>|z|)"] <- 2 * pnorm(abs(generic.targets[,"z value"]), lower.tail = FALSE)
-  ci.lo <- generic.targets[,"Estimate"] - qnorm(1-significance.level/2) * generic.targets[,"Std. Error"]
-  ci.up <- generic.targets[,"Estimate"] + qnorm(1-significance.level/2) * generic.targets[,"Std. Error"]
-  generic.targets <- cbind(generic.targets, ci.lo, ci.up)
-  colnames(generic.targets) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)", "CB lower", "CB upper")
+  coefficients.temp <- coefficients[c("beta.1", "beta.2"), 1:3]
+  colnames(coefficients.temp) <- c("Estimate", "Std. Error", "z value")
+  p.right <- pnorm(coefficients.temp[,"z value"], lower.tail = FALSE) # right p-value: Pr(Z>z)
+  p.left  <- pnorm(coefficients.temp[,"z value"], lower.tail = TRUE)  # left p-value: Pr(Z<z)
+  ci.lo   <- coefficients.temp[,"Estimate"] - qnorm(1-significance.level/2) * coefficients.temp[,"Std. Error"]
+  ci.up   <- coefficients.temp[,"Estimate"] + qnorm(1-significance.level/2) * coefficients.temp[,"Std. Error"]
+  generic.targets <- cbind(coefficients.temp, ci.lo, ci.up, p.left, p.right)
+  colnames(generic.targets) <- c("Estimate", "Std. Error", "z value", 
+                                 "CB lower", "CB upper", "Pr(<z)", "Pr(>z)")
   generic.targets <- generic.targets[,c("Estimate", "CB lower", "CB upper", 
-                                        "Std. Error", "z value", "Pr(>|z|)")]
+                                        "Std. Error", "z value", "Pr(<z)", "Pr(>z)")]
   
-
   return(list(lm.obj = blp.obj, 
               blp.coefficients = blp.obj$coefficients[c("beta.1", "beta.2")],
               generic.targets = generic.targets,
-              coefficients = coefficients,
-              beta2.inference = beta2.inference))
+              coefficients = coefficients))
   
 } # END FUN
 
@@ -101,16 +91,18 @@ get.GATES.params.classic <- function(D, Y,
   gates.coefficients.quantiles <- colnames(groups)
   names(gates.coefficients.quantiles) <- paste0("gamma.", 1:ncol(groups))
   
-  # prepare generic target parameters
-  coefficients.temp <- coefficients[-c(1,2),]
-  colnames(coefficients.temp) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)")
-  coefficients.temp[,"Pr(>|z|)"] <- 2 * pnorm(abs(coefficients.temp[,"z value"]), lower.tail = FALSE)
-  ci.lo <- coefficients.temp[,"Estimate"] - qnorm(1-significance.level/2) * coefficients.temp[,"Std. Error"]
-  ci.up <- coefficients.temp[,"Estimate"] + qnorm(1-significance.level/2) * coefficients.temp[,"Std. Error"]
-  coefficients.temp <- cbind(coefficients.temp, ci.lo, ci.up)
-  colnames(coefficients.temp) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)", "CB lower", "CB upper")
-  coefficients.temp <- coefficients.temp[,c("Estimate", "CB lower", "CB upper", 
-                                            "Std. Error", "z value", "Pr(>|z|)")]
+  # generic targets
+  coefficients.temp <- coefficients[-c(1,2), 1:3]
+  colnames(coefficients.temp) <- c("Estimate", "Std. Error", "z value")
+  p.right <- pnorm(coefficients.temp[,"z value"], lower.tail = FALSE) # right p-value: Pr(Z>z)
+  p.left  <- pnorm(coefficients.temp[,"z value"], lower.tail = TRUE)  # left p-value: Pr(Z<z)
+  ci.lo   <- coefficients.temp[,"Estimate"] - qnorm(1-significance.level/2) * coefficients.temp[,"Std. Error"]
+  ci.up   <- coefficients.temp[,"Estimate"] + qnorm(1-significance.level/2) * coefficients.temp[,"Std. Error"]
+  generic.targets <- cbind(coefficients.temp, ci.lo, ci.up, p.left, p.right)
+  colnames(generic.targets) <- c("Estimate", "Std. Error", "z value", 
+                                 "CB lower", "CB upper", "Pr(<z)", "Pr(>z)")
+  generic.targets <- generic.targets[,c("Estimate", "CB lower", "CB upper", 
+                                        "Std. Error", "z value", "Pr(<z)", "Pr(>z)")]
   
   # prepare generic target parameters for the difference
   covmat  <- stats::vcov(gates.obj)
@@ -121,13 +113,14 @@ get.GATES.params.classic <- function(D, Y,
   ci.lo   <- diff - qnorm(1-significance.level/2) * diff.se
   ci.up   <- diff + qnorm(1-significance.level/2) * diff.se
   zstat   <- diff / diff.se
-  pval    <- 2 * pnorm(abs(zstat), lower.tail = FALSE)
-  
+  p.right <- pnorm(zstat, lower.tail = FALSE) # right p-value: Pr(Z>z)
+  p.left  <- pnorm(zstat, lower.tail = TRUE)  # left p-value: Pr(Z<z)
+
   return(list(lm.obj = gates.obj, 
               gates.coefficients = gates.coefficients,
               gates.coefficients.quantiles = gates.coefficients.quantiles,
-              generic.targets = rbind(coefficients.temp, 
-                                      matrix(c(diff, ci.lo, ci.up, diff.se, zstat, pval), nrow = 1, 
+              generic.targets = rbind(generic.targets, 
+                                      matrix(c(diff, ci.lo, ci.up, diff.se, zstat, p.left, p.right), nrow = 1, 
                                              dimnames = list("gamma.K-gamma.1", NULL)) ),
               coefficients = coefficients))
 
@@ -156,34 +149,42 @@ get.CLAN.parameters <- function(Z.clan.main.sample,
   for(j in 1:ncol(Z.clan.main.sample)){
     
     # initialize matrix
-    out.mat <- matrix(NA_real_, nrow = 3, ncol = 6)
+    out.mat <- matrix(NA_real_, nrow = 3, ncol = 7)
     
     # get summary statistics for least affected group
     ttest.delta1 <- stats::t.test(Z.clan.main.sample[group.membership.main.sample[, 1], j])
     ci.lo        <- ttest.delta1$estimate - qnorm(1-significance.level/2) * ttest.delta1$stderr 
     ci.up        <- ttest.delta1$estimate + qnorm(1-significance.level/2) * ttest.delta1$stderr 
-    pval         <- 2 * pnorm(abs(ttest.delta1$statistic), lower.tail = FALSE)
+    p.right      <- pnorm(ttest.delta1$statistic, lower.tail = FALSE) # right p-value: Pr(Z>z)
+    p.left       <- pnorm(ttest.delta1$statistic, lower.tail = TRUE)  # left p-value: Pr(Z<z)
     out.mat[1,]  <- c(ttest.delta1$estimate, ci.lo, ci.up,
-                      ttest.delta1$stderr, ttest.delta1$statistic, pval)
+                      ttest.delta1$stderr, ttest.delta1$statistic, p.left, p.right)
     
     # get summary statistics for most affected group
     ttest.deltaK <- stats::t.test(Z.clan.main.sample[group.membership.main.sample[, K], j])
     ci.lo        <- ttest.deltaK$estimate - qnorm(1-significance.level/2) * ttest.deltaK$stderr 
     ci.up        <- ttest.deltaK$estimate + qnorm(1-significance.level/2) * ttest.deltaK$stderr 
-    pval         <- 2 * pnorm(abs(ttest.deltaK$statistic), lower.tail = FALSE)
+    p.right      <- pnorm(ttest.deltaK$statistic, lower.tail = FALSE) # right p-value: Pr(Z>z)
+    p.left       <- pnorm(ttest.deltaK$statistic, lower.tail = TRUE)  # left p-value: Pr(Z<z)
     out.mat[2,]  <- c(ttest.deltaK$estimate, ci.lo, ci.up,
-                      ttest.deltaK$stderr, ttest.deltaK$statistic, pval)
+                      ttest.deltaK$stderr, ttest.deltaK$statistic, p.left, p.right)
     
     # get summary statistics for difference between most and least affected group
-    diff        <- ttest.deltaK$estimate - ttest.delta1$estimate
-    diff.se     <- sqrt( ttest.deltaK$stderr^2 + ttest.delta1$stderr^2 )
+    ttest.diff <- stats::t.test(x = Z.clan.main.sample[group.membership.main.sample[, K], j], 
+                                y = Z.clan.main.sample[group.membership.main.sample[, 1], j], 
+                                var.equal = FALSE) # 2-sample Welch t-test
+
+    diff        <- ttest.deltaK$estimate - ttest.delta1$estimate # difference in means
+    diff.se     <- ttest.diff$stderr
     ci.lo       <- diff - qnorm(1-significance.level/2) * diff.se
     ci.up       <- diff + qnorm(1-significance.level/2) * diff.se
-    diff.ttest  <- diff / diff.se
-    pval        <- 2 * pnorm(abs(diff.ttest), lower.tail = FALSE)
-    out.mat[3,] <- c(diff, ci.lo, ci.up, diff.se, diff.ttest, pval)
+    z.diff      <- ttest.diff$statistic
+    p.right     <- pnorm(z.diff, lower.tail = FALSE) # right p-value: Pr(Z>z)
+    p.left      <- pnorm(z.diff, lower.tail = TRUE)  # left p-value: Pr(Z<z)
+    out.mat[3,] <- c(diff, ci.lo, ci.up, diff.se, z.diff, p.left, p.right)
     
-    colnames(out.mat)     <- c("Estimate", "CB lower", "CB upper", "Std. Error", "z value", "Pr(>|z|)")
+    colnames(out.mat)     <- c("Estimate", "CB lower", "CB upper", 
+                               "Std. Error", "z value", "Pr(<z)", "Pr(>z)")
     rownames(out.mat)     <- c("delta.1", "delta.K", "delta.K-delta.1")
     generic.targets[[j]]  <- out.mat
     clan.coefficients[,j] <- out.mat[,1] 
@@ -215,7 +216,7 @@ best.ml.method.parameters <- function(BLP.obj,
                                       group.membership.main.sample){
   
   return(list(lambda = as.numeric(BLP.obj$blp.coefficients["beta.2"]^2 * var(proxy.cate.main.sample)),
-              lambda.bar = as.numeric(colSums(group.membership.main.sample) %*%  GATES.obj$gates.coefficients^2)))
+              lambda.bar = as.numeric(colMeans(group.membership.main.sample) %*%  GATES.obj$gates.coefficients^2)))
   
 } # END FUN
 
@@ -254,20 +255,23 @@ initializer.for.splits <- function(Z, Z.clan, learners,
     Z.clan.nam <- colnames(Z.clan)
   }
   
-  clan <- array(NA_real_, dim = c(3, 6, num.splits), 
+  clan <- array(NA_real_, dim = c(3, 7, num.splits), 
                 dimnames = list(c("delta.1", "delta.K", "delta.K-delta.1"), 
-                                c("Estimate", "CB lower", "CB upper", "Std. Error", "z value", "Pr(>|z|)"),
+                                c("Estimate", "CB lower", "CB upper", "Std. Error", 
+                                  "z value", "Pr(<z)", "Pr(>z)"),
                                 NULL))
   
-  gates <- array(NA_real_, dim = c(length(quantile.cutoffs)+2, 6, num.splits),
+  gates <- array(NA_real_, dim = c(length(quantile.cutoffs)+2, 7, num.splits),
                  dimnames = list(
                    c(paste0("gamma.", 1:(length(quantile.cutoffs)+1)), "gamma.K-gamma.1"),
-                   c("Estimate", "CB lower", "CB upper", "Std. Error", "z value", "Pr(>|z|)"), 
+                   c("Estimate", "CB lower", "CB upper", "Std. Error", 
+                     "z value", "Pr(<z)", "Pr(>z)"), 
                    NULL))
   
-  blp <- array(NA_real_, dim = c(2, 6, num.splits),
+  blp <- array(NA_real_, dim = c(2, 7, num.splits),
                dimnames = list(c("beta.1", "beta.2"), 
-                               c("Estimate", "CB lower", "CB upper", "Std. Error", "z value", "Pr(>|z|)"),
+                               c("Estimate", "CB lower", "CB upper", "Std. Error", 
+                                 "z value", "Pr(<z)", "Pr(>z)"),
                                NULL))
   
   best <- array(NA_real_, dim = c(1, 2, num.splits), 
@@ -418,15 +422,18 @@ initialize.gen.ml <- function(generic.ml.across.learners.obj){
   
   blp.mat <- matrix(NA_real_, nrow = 2, ncol = 5, 
                     dimnames = list(c("beta.1", "beta.2"), 
-                                    c("Estimate", "CB lower", "CB upper", "p-value adjusted", "p-value raw")))
+                                    c("Estimate", "CB lower", "CB upper",
+                                      "Pr(<z) adjusted", "Pr(>z) adjusted")))
   
   gates.mat <- matrix(NA_real_, nrow = length(gates.nam), ncol = 5, 
                       dimnames = list(gates.nam, 
-                                      c("Estimate", "CB lower", "CB upper", "p-value adjusted", "p-value raw")))
+                                      c("Estimate", "CB lower", "CB upper",
+                                        "Pr(<z) adjusted", "Pr(>z) adjusted")))
   
   clan.mat <- matrix(NA_real_, nrow = length(clan.nam), ncol = 5, 
                      dimnames = list(clan.nam, 
-                                     c("Estimate", "CB lower", "CB upper", "p-value adjusted", "p-value raw")))
+                                     c("Estimate", "CB lower", "CB upper", 
+                                       "Pr(<z) adjusted", "Pr(>z) adjusted")))
   
   
   gates.ls <- lapply(learners, function(...) gates.mat)

@@ -348,7 +348,7 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
 } # END FUN
 
 
-
+# TODO: make documentation; generic.ml.across.learners.obj is NOT the correct description for the input anymore (check genericML function!)
 VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
   
   gen.ml.ls <- initialize.gen.ml(generic.ml.across.learners.obj)
@@ -365,12 +365,16 @@ VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
         apply(generic.ml.across.learners.obj[[learner]][[type]][,"CB lower",], 1, function(z) Med(z)$upper.median)
       gen.ml.ls[[type]][[learner]][,"CB upper"] <- 
         apply(generic.ml.across.learners.obj[[learner]][[type]][,"CB upper",], 1, function(z) Med(z)$lower.median)
-      pval <- 
-        apply(generic.ml.across.learners.obj[[learner]][[type]][,"Pr(>|z|)",], 1, function(z) Med(z)$lower.median)
-      gen.ml.ls[[type]][[learner]][,"p-value raw"] <- pval
-      pval.adj <- 2 * pval
-      pval.adj[pval.adj > 1] <- 1 # p-values cannot exceed 1
-      gen.ml.ls[[type]][[learner]][,"p-value adjusted"] <- pval.adj
+      p.left.raw <- 
+        apply(generic.ml.across.learners.obj[[learner]][[type]][,"Pr(<z)",], 1, function(z) Med(z)$lower.median)
+      p.right.raw <- 
+        apply(generic.ml.across.learners.obj[[learner]][[type]][,"Pr(>z)",], 1, function(z) Med(z)$lower.median)
+      p.left.adj  <- 2 * p.left.raw
+      p.right.adj <- 2 * p.right.raw
+      p.left.adj[p.left.adj > 1]   <- 1 # p-values cannot exceed 1
+      p.right.adj[p.right.adj > 1] <- 1
+      gen.ml.ls[[type]][[learner]][,"Pr(<z) adjusted"] <- p.left.adj
+      gen.ml.ls[[type]][[learner]][,"Pr(>z) adjusted"] <- p.right.adj
       
     } # FOR type
     
@@ -386,12 +390,16 @@ VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
         apply(generic.ml.across.learners.obj[[learner]][["CLAN"]][[z.clan]][,"CB lower",], 1, function(z) Med(z)$upper.median)
       gen.ml.ls$CLAN[[learner]][[z.clan]][,"CB upper"] <- 
         apply(generic.ml.across.learners.obj[[learner]][["CLAN"]][[z.clan]][,"CB upper",], 1, function(z) Med(z)$upper.median)
-      pval <- 
-        apply(generic.ml.across.learners.obj[[learner]][["CLAN"]][[z.clan]][,"Pr(>|z|)",], 1, function(z) Med(z)$lower.median)
-      gen.ml.ls$CLAN[[learner]][[z.clan]][,"p-value raw"] <- pval
-      pval.adj <- 2 * pval
-      pval.adj[pval.adj > 1] <- 1 # p-values cannot exceed 1
-      gen.ml.ls$CLAN[[learner]][[z.clan]][,"p-value adjusted"] <- pval.adj
+      p.left.raw <- 
+        apply(generic.ml.across.learners.obj[[learner]][["CLAN"]][[z.clan]][,"Pr(<z)",], 1, function(z) Med(z)$lower.median)
+      p.right.raw <- 
+        apply(generic.ml.across.learners.obj[[learner]][["CLAN"]][[z.clan]][,"Pr(>z)",], 1, function(z) Med(z)$lower.median)
+      p.left.adj  <- 2 * p.left.raw
+      p.right.adj <- 2 * p.right.raw
+      p.left.adj[p.left.adj > 1]   <- 1 # p-values cannot exceed 1
+      p.right.adj[p.right.adj > 1] <- 1
+      gen.ml.ls$CLAN[[learner]][[z.clan]][,"Pr(<z) adjusted"] <- p.left.adj
+      gen.ml.ls$CLAN[[learner]][[z.clan]][,"Pr(>z) adjusted"] <- p.right.adj
       
     } # FOR Z.clan
     
