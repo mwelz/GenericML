@@ -313,7 +313,7 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
   
   
   ### step 2c: estimate GATES parameters by OLS (TODO: HT transformation!) ----
-  # group the proxy estimators for the CATE in the main sample by quantiles. TODO: intervals need to be [) instead of (]
+  # group the proxy estimators for the CATE in the main sample by quantiles
   group.membership.main.sample <- quantile.group(proxy.cate, 
                                                  cutoffs = quantile.cutoffs, 
                                                  quantile.nam = TRUE) 

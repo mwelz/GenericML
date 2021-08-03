@@ -366,7 +366,7 @@ generic.ml.across.learners <- function(Z, D, Y,
   
   return(list(generic.targets = generic.targets, 
          genericML.by.split = genericML.by.split,
-         splits = splits.mat)) # TODO: also extract A.set, M.set, generic.ml.obj
+         splits = splits.mat))
   
 } # END FUN
 
