@@ -3,7 +3,7 @@
 #' Note that this implementation is **not** yet an R package, although we intend to create a package for the CRAN based on it.
 #' 
 #' Author: mwelz & aalfons
-#' Last changed: May 23, 2021
+#' Last changed: Aug 3, 2021
 #' ------------------------------------------------------------
 rm(list = ls()) ; gc(); cat("\014")
 
@@ -96,51 +96,51 @@ save(genML, ATE, Y, D, Z, file = paste0(getwd(), "/examples/GenericML-example.Rd
 ### 4. analyze the output ----
 # the line below returns the medians of the estimated  \Lambda and \bar{\Lambda}
 genML$best.learners$lambda.overview
-#'                                      lambda         lambda.bar
-#' elastic.net                          0.0003662581   9950.862
-#' mlr3::lrn('ranger', num.trees = 100) 0.0009451692   9823.487
-#' mlr3::lrn('svm')                     0.0011130656   9826.750
+#                                            lambda lambda.bar
+# elastic.net                          0.0003603402   3.981820
+# mlr3::lrn('ranger', num.trees = 100) 0.0016003558   4.010251
+# mlr3::lrn('svm')                     0.0019966309   3.957013
 
 
 # We can see that the SVM is the best learner for estimating the CATEs, as it maximizes the median of $\hat{\Lambda}$:
 genML$best.learners$best.learner.for.CATE
-#' "mlr3::lrn('svm')"
+# "mlr3::lrn('svm')"
 
 
-# Conversely, the elastic net is the best learner for the GATES, as it maximizes the median of $\hat{\bar{\Lambda}}$:
+# Conversely, the random forest is the best learner for the GATES, as it maximizes the median of $\hat{\bar{\Lambda}}$:
 genML$best.learners$best.learner.for.GATES
-#' "elastic net"
+# "mlr3::lrn('ranger', num.trees = 100)"
 
 
 # VEIN of BLP
 round(genML$VEIN$best.learners$BLP, 5)
-#'        Estimate CB lower CB upper p-value adjusted p-value raw
-#' beta.1  1.97975  1.88779  2.07171          0.00000     0.00000
-#' beta.2  0.02613 -0.12937  0.18410          0.94309     0.47154
-# We see that `beta.1` (the estimate of the ATE) is estimated at ~1.98. True ATE is 2, which is contained in the 90% confidence bounds.  Moreover, `beta.2` is clearly not significant (adjusted $p$-value of ~0.94). Hence, there is (correctly) no indication of treatment effect heterogeneity. Moreover, the function `genericML.plot()` visualizes these results for the BLP:
+#        Estimate CB lower CB upper Pr(<z) adjusted Pr(>z) adjusted
+# beta.1  1.98654  1.89041  2.08317               1         0.00000
+# beta.2  0.01947 -0.14071  0.18628               1         0.78648
+# We see that `beta.1` (the estimate of the ATE) is estimated at ~1.99. True ATE is 2, which is contained in the 90% confidence bounds.  Moreover, `beta.2` is clearly not significant (adjusted $p$-values of both one sided tests are much larger than 0.05). Hence, there is (correctly) no indication of treatment effect heterogeneity. Moreover, the function `genericML.plot()` visualizes these results for the BLP:
 genericML.plot(genML, type = "BLP", title = "VEIN of BLP") 
 
 
 # VEIN of GATES
 round(genML$VEIN$best.learners$GATES, 5)
-#'                 Estimate CB lower CB upper p-value adjusted p-value raw
-#' gamma.1          1.93589  1.75543  2.11599                0     0.00000
-#' gamma.2          1.99687  1.81672  2.17643                0     0.00000
-#' gamma.3          2.02001  1.84212  2.19790                0     0.00000
-#' gamma.4          2.01884  1.83918  2.19775                0     0.00000
-#' gamma.5          1.97835  1.79725  2.15980                0     0.00000
-#' gamma.K-gamma.1  0.03154 -0.22497  0.28706                1     0.57596
-# All point estimates for the $\gamma$ coefficients are close to each other. Difference between most and least affected group is insignificant (adjusted $p$-value of ~1). Hence, there is (correctly) no indication of treatment effect heterogeneity. We again visualize these results with `genericML.plot()`:
+#                 Estimate CB lower CB upper Pr(<z) adjusted Pr(>z) adjusted
+# gamma.1          1.99756  1.76517  2.22686               1         0.00000
+# gamma.2          1.98240  1.75276  2.21204               1         0.00000
+# gamma.3          1.98286  1.74370  2.21676               1         0.00000
+# gamma.4          1.99459  1.77094  2.22709               1         0.00000
+# gamma.5          2.02006  1.78922  2.24912               1         0.00000
+# gamma.K-gamma.1  0.00069 -0.32917  0.32709               1         0.98721
+# All point estimates for the $\gamma$ coefficients are close to each other. Difference between most and least affected group is insignificant (adjusted $p$-values of ~1). Hence, there is (correctly) no indication of treatment effect heterogeneity. We again visualize these results with `genericML.plot()`:
 genericML.plot(genML, type = "GATES", title = "VEIN of GATES") 
 
 
 # VEIN of CLAN for variable 'z1'
 genML$VEIN$best.learners$CLAN$z1
-#'                   Estimate   CB lower   CB upper p-value adjusted  p-value raw
-#' delta.1          0.2091063  0.1222465  0.2959660     9.418759e-30 4.709380e-30
-#' delta.K         -0.2365256 -0.3227453 -0.1476362     7.966651e-31 3.983326e-31
-#' delta.K-delta.1 -0.4673637 -0.5901810 -0.3445465     7.203990e-60 3.601995e-60
-# This indicates some evidence for weak heterogeneity along the variable `z1`. This could be due to the fact that `z1` is positively correlated with the outcome Y.
+#                    Estimate    CB lower   CB upper Pr(<z) adjusted Pr(>z) adjusted
+# delta.1          0.00726143 -0.08740091 0.09945609       1.0000000       0.8227289
+# delta.K         -0.03885376 -0.12268665 0.04409473       0.3642137       1.0000000
+# delta.K-delta.1 -0.03247315 -0.16097983 0.09603352       0.6204056       1.0000000
+# This correctly indicates that there is no heterogeneity along `z1` (all p-values are much larger than 0.05)
 genericML.plot(genML, type = "CLAN", CLAN.variable = "z1", title = "CLAN of 'z1'") 
 
 

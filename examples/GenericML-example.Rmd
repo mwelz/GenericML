@@ -1,7 +1,7 @@
 ---
 title: "Generic ML Demonstration"
 author: "Max Welz and Andreas Alfons"
-date: "5/23/2021"
+date: "08/03/2021"
 output: html_document
 ---
 
@@ -150,7 +150,7 @@ We can see that the SVM is the best learner for estimating the CATEs, as it maxi
 genML$best.learners$best.learner.for.CATE
 ```
 
-Conversely, the elastic net is the best learner for the GATES, as it maximizes the median of $\hat{\bar{\Lambda}}$:
+Conversely, the random forest is the best learner for the GATES, as it maximizes the median of $\hat{\bar{\Lambda}}$:
 
 ```{r}
 genML$best.learners$best.learner.for.GATES
@@ -158,7 +158,7 @@ genML$best.learners$best.learner.for.GATES
 
 ### The returned `VEIN` list
 
-This list contains VEIN objects for the BLP (Best Linear Predictor), GATES (Sorted Group Average Treatment Effects), and CLAN (Classification Analysis). Each object adheres to the same structure and contains information on the relevant point estimates, confidence bounds, as well as the raw and adjusted $p$-values. Since the significance level was set to 5%, the confidence bounds are at 90% confidence level (due to uncertainty from sample splitting). Moreover, we can specify which learner's VEIN we want to return. We choose the respective best learner here by using the `best.learners` sub-list.
+This list contains VEIN objects for the BLP (Best Linear Predictor), GATES (Sorted Group Average Treatment Effects), and CLAN (Classification Analysis). Each object adheres to the same structure and contains information on the relevant point estimates, confidence bounds, as well as the sample splitting adjusted $p$-values of two one-tailed $z$-tests (left and right tailed,respectively). Since the significance level was set to 5%, the confidence bounds are at 90% confidence level (due to uncertainty from sample splitting). Moreover, we can specify which learner's VEIN we want to return. We choose the respective best learner here by using the `best.learners` sub-list.
 
 #### VEIN of BLP 
 
@@ -166,8 +166,11 @@ This list contains VEIN objects for the BLP (Best Linear Predictor), GATES (Sort
 round(genML$VEIN$best.learners$BLP, 5)
 ```
 
-We see that `beta.1` (the estimate of the ATE) is estimated at ~1.98. True ATE is 2, which is contained in the 90% confidence bounds. 
-Moreover, `beta.2` is clearly not significant (adjusted $p$-value of ~0.94). Hence, there is (correctly) no indication of treatment effect heterogeneity. Moreover, the function `genericML.plot()` visualizes these results for the BLP:
+We see that `beta.1` (the estimate of the ATE) is estimated at ~1.99. True ATE is 2, which is contained in the 90% confidence bounds.  Moreover, `beta.2` is clearly not significant (adjusted $p$-values of both one-tailed tests are much larger than 0.05). Hence, there is (correctly) no indication of treatment effect heterogeneity. Moreover, the function `genericML.plot()` visualizes these results for the BLP:
+ 
+We see that `beta.1` (the estimate of the ATE) is estimated at ~1.99. True ATE is 2, which is contained in the 90% confidence bounds.
+
+Moreover, `beta.2` is clearly not significant (the adjusted $p$-values of both one-tailed tests are much larger than 0.05). Hence, there is (correctly) no indication of treatment effect heterogeneity. Moreover, the function `genericML.plot()` visualizes these results for the BLP:
 
 ```{r, out.width="50%"}
 genericML.plot(genML, type = "BLP", title = "VEIN of BLP") 
@@ -181,7 +184,7 @@ Note that the function `genericML.plot()` can visualize the VEIN for each consid
 round(genML$VEIN$best.learners$GATES, 5)
 ```
 
-All point estimates for the $\gamma$ coefficients are close to each other. Difference between most and least affected group is insignificant (adjusted $p$-value of ~1). Hence, there is (correctly) no indication of treatment effect heterogeneity. We again visualize these results with `genericML.plot()`:
+All point estimates for the $\gamma$ coefficients are close to each other. The difference between the most and least affected group is insignificant (adjusted $p$-values of ~1). Hence, there is (correctly) no indication of treatment effect heterogeneity. We again visualize these results with `genericML.plot()`:
 
 ```{r, out.width="50%"}
 genericML.plot(genML, type = "GATES", title = "VEIN of GATES") 
@@ -197,7 +200,7 @@ CLAN of the variable `z1` (which was a variable in the input object `Z.clan`):
 genML$VEIN$best.learners$CLAN$z1
 ```
 
-This indicates some evidence for weak heterogeneity along the variable `z1`. Could be due to the fact that `z1` is positively correlated with the outcome `Y`.
+The CLAN correctly indicates that there is no heterogeneity along `z1` (all $p$-values are much larger than 0.05)
 
 
 ```{r, out.width="50%"}
