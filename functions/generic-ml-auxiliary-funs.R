@@ -21,7 +21,6 @@ get.BLP.params.classic <- function(D, Y, propensity.scores,
   
   # prepare covariate matrix
   X <- data.frame(B = proxy.baseline, 
-                  S = proxy.cate,
                   beta.1 = D - propensity.scores, 
                   beta.2 = (D - propensity.scores) * (proxy.cate - mean(proxy.cate))) 
   
@@ -90,9 +89,8 @@ get.GATES.params.classic <- function(D, Y,
   
   # prepare covariate matrix
   X <- data.frame(B = proxy.baseline, 
-                  S = proxy.cate,
                   (D - propensity.scores) * groups)
-  colnames(X) <- c(colnames(X)[c(1,2)], paste0("gamma.", 1:ncol(groups)))
+  colnames(X) <- c("B", paste0("gamma.", 1:ncol(groups)))
   
   # fit weighted linear regression by OLS
   gates.obj <- lm(Y ~., data = data.frame(Y, X), weights = weights)
@@ -104,7 +102,7 @@ get.GATES.params.classic <- function(D, Y,
   names(gates.coefficients.quantiles) <- paste0("gamma.", 1:ncol(groups))
   
   # prepare generic target parameters
-  coefficients.temp <- coefficients[-c(1,2,3),]
+  coefficients.temp <- coefficients[-c(1,2),]
   colnames(coefficients.temp) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)")
   coefficients.temp[,"Pr(>|z|)"] <- 2 * pnorm(abs(coefficients.temp[,"z value"]), lower.tail = FALSE)
   ci.lo <- coefficients.temp[,"Estimate"] - qnorm(1-significance.level/2) * coefficients.temp[,"Std. Error"]
