@@ -55,8 +55,7 @@ get.BLP.params.classic <- function(D, Y, propensity.scores,
 
   return(list(lm.obj = blp.obj, 
               blp.coefficients = blp.obj$coefficients[c("beta.1", "beta.2")],
-              generic.targets = matrix(generic.targets, nrow = 1,
-                                       dimnames = list("beta.2", names(generic.targets))),
+              generic.targets = generic.targets,
               coefficients = coefficients,
               beta2.inference = beta2.inference))
   
