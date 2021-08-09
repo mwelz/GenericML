@@ -13,7 +13,8 @@ R implementation of Generic Machine Learning (Chernozhukov, V., Demirer, M., Duf
 - [ ] Add noise in case of low variation of the `S` and `B` learner;
 - [ ] Add optional monotonization of the confindence bounds;
 - [ ] Error handling. Current implementation might throw an error in case of undersampling;
+- [ ] Implement S3 class structure and reorganize repo;
 - [ ] Make an R package.
 
 ## Authors
-Max Welz (m.welz@erasmusmc.nl) and Andreas Alfons (aalfons@ese.eur.nl).
+Max Welz (m.welz@erasmusmc.nl), Andreas Alfons (aalfons@ese.eur.nl), and Mert Demirer (mdemirer@mit.edu).
