@@ -25,15 +25,12 @@ required.packages <- c("ggplot2", "mlr3", "mlr3learners",
 new.packages      <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 rm(required.packages, new.packages)
-
-library(ggplot2)
 ```
 
 ### Load functions
 
 ```{r}
-source(paste0(dirname(getwd()), "/functions/generic-ml-estimation-funs.R"))
-source(paste0(dirname(getwd()), "/functions/generic-ml-auxiliary-funs.R"))
+source(paste0(getwd(), "/functions/loader.R"))
 ```
 
 ## Data generation
@@ -65,9 +62,9 @@ Y  <- ifelse(D == 1, Y1, Y0)
 
 ## Applying Generic ML
 
-### The core function, `genericML()`
+### The core function, `GenericML()`
 
-The core of this implementation is the function `genericML()`, which is based on the object-riented `mlr3` framework. This function allows the user to flexibly specify machine learners with `mlr3` syntax. We introduce the arguments of `genericML()` below.
+The core of this implementation is the function `GenericML()`, which is based on the object-riented `mlr3` framework. This function allows the user to flexibly specify machine learners with `mlr3` syntax. We introduce the arguments of `GenericML()` below.
 
 * `Z`. A matrix or data frame of the covariates.
 * `D`. A binary vector of treatment assignment. 
@@ -118,7 +115,7 @@ We pass the arguments we specified above to `genericML()`.
 
 ```{r}
 # runtime: ~121 seconds with R version 4.1.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 20.10.
-genML <- genericML(Z = Z, D = D, Y = Y, 
+genML <- GenericML(Z = Z, D = D, Y = Y, 
                    learner.propensity.score = learner.propensity.score, 
                    learners.genericML = learners.genericML,
                    num.splits = num.splits,
@@ -130,9 +127,9 @@ genML <- genericML(Z = Z, D = D, Y = Y,
                    store.learners = store.learners)
 ```
 
-## Analyzing the output of `genericML()`
+## Analyzing the output of `GenericML()`
 
-Aside from some information on its input and the estimated propensity scores, `genericML()` returns an `genericML`-object that consists of two main lists:
+Aside from some information on its input and the estimated propensity scores, `GenericML()` returns an `GenericML`-object that consists of two main lists:
 
 1. `best.learners`. Contains information on the performance of each learner (as measured by $\hat{\Lambda}$ and $\hat{\bar{\Lambda}}$).
 2. `VEIN` for information on the VEIN analysis.

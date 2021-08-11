@@ -14,12 +14,10 @@ required.packages <- c("ggplot2", "mlr3", "mlr3learners",
 new.packages      <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 rm(required.packages, new.packages)
-library(ggplot2)
 
 
 # load the functions
-source(paste0(getwd(), "/functions/generic-ml-estimation-funs.R"))
-source(paste0(getwd(), "/functions/generic-ml-auxiliary-funs.R"))
+source(paste0(getwd(), "/functions/loader.R"))
 
 ### 1. Data Generation (linear, no treatment effect heterogeneity) ----
 # We generate $n=5,000$ samples that adhere to a simple linear data generating process. We emulate a randomized experiment. There is no treatment effect heterogeneity since the treatment effect is constant at value two. Hence, Generic ML should not indicate the existence of treatment effect heterogeneity.
@@ -75,7 +73,7 @@ store.learners           <- FALSE
 
 ### 3. run the genericML() functions with these arguments ----
 # runtime: ~121 seconds with R version 4.1.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 20.10
-genML <- genericML(Z = Z, D = D, Y = Y, 
+genML <- GenericML(Z = Z, D = D, Y = Y, 
                    learner.propensity.score = learner.propensity.score, 
                    learners.genericML = learners.genericML,
                    num.splits = num.splits,
