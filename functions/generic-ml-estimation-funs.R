@@ -305,11 +305,11 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
   
   
   ### step 2b: estimate BLP parameters by OLS (TODO: HT transformation!) ----
-  blp.obj <- get.BLP.params.classic(D = D[M.set], Y = Y[M.set],
-                                    propensity.scores = propensity.scores[M.set],
-                                    proxy.baseline = proxy.baseline, 
-                                    proxy.cate = proxy.cate, 
-                                    significance.level = significance.level)
+  blp.obj <- BLP.classic(D = D[M.set], Y = Y[M.set],
+                         propensity.scores = propensity.scores[M.set],
+                         proxy.baseline = proxy.baseline, 
+                         proxy.cate = proxy.cate, 
+                         significance.level = significance.level)
   
   
   ### step 2c: estimate GATES parameters by OLS (TODO: HT transformation!) ----
@@ -318,16 +318,16 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                                                  cutoffs = quantile.cutoffs, 
                                                  quantile.nam = TRUE) 
   
-  gates.obj <- get.GATES.params.classic(D = D[M.set], Y = Y[M.set],
-                                        propensity.scores = propensity.scores[M.set],
-                                        group.membership.main.sample = group.membership.main.sample, 
-                                        proxy.baseline = proxy.baseline, proxy.cate = proxy.cate,
-                                        significance.level = significance.level)
+  gates.obj <- GATES.classic(D = D[M.set], Y = Y[M.set],
+                             propensity.scores = propensity.scores[M.set],
+                             group.membership.main.sample = group.membership.main.sample, 
+                             proxy.baseline = proxy.baseline, proxy.cate = proxy.cate,
+                             significance.level = significance.level)
   
   
   ### step 2d: estimate CLAN parameters in the main sample
-  clan.obj <- get.CLAN.parameters(Z.clan.main.sample = Z.clan[M.set,], 
-                                  group.membership.main.sample = group.membership.main.sample)
+  clan.obj <- CLAN(Z.clan.main.sample = Z.clan[M.set,], 
+                   group.membership.main.sample = group.membership.main.sample)
   
   
   ### step 2e: get parameters over which we maximize to find the "best" ML method ----

@@ -12,9 +12,9 @@ library(ggplot2)
 #' @export
 #' 
 #' TODO: implement same with HT transformation! 
-get.BLP.params.classic <- function(D, Y, propensity.scores, 
-                                   proxy.baseline, proxy.cate, 
-                                   significance.level = 0.05){
+BLP.classic <- function(D, Y, propensity.scores, 
+                        proxy.baseline, proxy.cate, 
+                        significance.level = 0.05){
   
   # prepare weights
   weights <- 1 / (propensity.scores * (1 - propensity.scores))
@@ -65,11 +65,11 @@ get.BLP.params.classic <- function(D, Y, propensity.scores,
 #' @export
 #' 
 #' TODO: implement same with HT transformation! 
-get.GATES.params.classic <- function(D, Y, 
-                                     propensity.scores, 
-                                     proxy.baseline, proxy.cate,
-                                     group.membership.main.sample,
-                                     significance.level = 0.05){
+GATES.classic <- function(D, Y, 
+                          propensity.scores, 
+                          proxy.baseline, proxy.cate,
+                          group.membership.main.sample,
+                          significance.level = 0.05){
   
   # make the group membership a binary matrix
   groups <- 1 * group.membership.main.sample
@@ -135,7 +135,7 @@ get.GATES.params.classic <- function(D, Y,
 #' @return The two CLAN parameters ("most" affected and "least" affected) for each variable in Z.clan.main.sample
 #' 
 #' @export
-get.CLAN.parameters <- function(Z.clan.main.sample, 
+CLAN <- function(Z.clan.main.sample, 
                                 group.membership.main.sample, 
                                 significance.level = 0.05){
   
@@ -202,7 +202,7 @@ get.CLAN.parameters <- function(Z.clan.main.sample,
 
 #' returns the two parameters that are used to find the best ML method
 #' 
-#' @param BLP.obj an object as returned by get.CLAN.parameters()
+#' @param BLP.obj an object as returned by CLAN()
 #' @param GATES.obj an object as returned by get.BLP.parameters()
 #' @param proxy.cate.main.sample Proxy CATE estimators for the main sample
 #' @param group.membership.main.sample a logical matrix with _M_ rows that indicate 
