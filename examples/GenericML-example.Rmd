@@ -30,6 +30,7 @@ rm(required.packages, new.packages)
 ### Load functions
 
 ```{r}
+setwd(dirname(getwd()))
 source(paste0(getwd(), "/functions/loader.R"))
 ```
 

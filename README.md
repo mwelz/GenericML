@@ -8,6 +8,7 @@ R implementation of Generic Machine Learning (Chernozhukov, V., Demirer, M., Duf
 
 ## TODO
 
+- [ ] Make it optional to have heteroskedastic errors in the linear models (also for two-sample t-tests);
 - [ ] Implement deep neural networks as regression learner. Currently not supported by `mlr3`;
 - [ ] Implement the Horvitz-Thompson transformation;
 - [ ] Add noise in case of low variation of the `S` and `B` learner;
