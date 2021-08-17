@@ -282,3 +282,17 @@ VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
   
 } # END FUN
 
+
+# helper that throws error in case of illegal input in 'X1.variables'
+input.checks.X1 <- function(X1.variables){
+  
+  legalinput <- X1.variables %in% c("S", "B", "p")
+  
+  if(!all(legalinput)){
+    
+    stop(paste0("Entries '", 
+                X1.variables[!legalinput], 
+                "' of 'X1.variables' are not contained in c('S', 'B', 'p')!"))
+    
+  } # IF
+} # FUN

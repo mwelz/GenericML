@@ -1,96 +1,15 @@
-#' Estimates the GATES parameters based on the main sample M. 
-#' 
-#' @param D a binary vector of treatment status of length _|M|_
-#' @param Y a vector of responses of length _|M|_
-#' @param propensity.scores a vector of propensity scores of length _|M|_
-#' @param proxy.baseline a vector of proxy baseline estimates of length _M_
-#' @param proxy.cate a vector of proxy CATE estimates of length _M_
-#' @param group.membership.main.sample a logical matrix with _M_ rows that indicate 
-#' the group memberships (such a matrix is returned by the function quantile.group())
-#' @param vcov.type a character string specifying the estimation type of the error covariance matrix. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
-#' @return GATES coefficients 
-#' 
-#' @export
-#' 
-#' TODO: implement same with HT transformation! 
-GATES.classic <- function(D, Y, 
-                          propensity.scores, 
-                          proxy.baseline, proxy.cate,
-                          vcov.type = "const",
-                          group.membership.main.sample,
-                          significance.level = 0.05){
-  
-  # make the group membership a binary matrix
-  groups <- 1 * group.membership.main.sample
-  
-  # prepare weights
-  weights <- 1 / (propensity.scores * (1 - propensity.scores))
-  
-  # prepare covariate matrix
-  X <- data.frame(B = proxy.baseline, 
-                  (D - propensity.scores) * groups)
-  colnames(X) <- c("B", paste0("gamma.", 1:ncol(groups)))
-  
-  # fit weighted linear regression by OLS
-  gates.obj <- lm(Y ~., data = data.frame(Y, X), weights = weights)
-  
-  # get estimate of error covariance matrix (potentially heteroskedasticity robust)
-  vcov <- sandwich::vcovHC(x = gates.obj, type = vcov.type)
-  
-  # extract coefficients
-  coefficients                 <- lmtest::coeftest(gates.obj, vcov. = vcov)
-  gates.coefficients           <- coefficients[paste0("gamma.", 1:ncol(groups)), 1]
-  gates.coefficients.quantiles <- colnames(groups)
-  names(gates.coefficients.quantiles) <- paste0("gamma.", 1:ncol(groups))
-  
-  # generic targets
-  coefficients.temp <- coefficients[-c(1,2), 1:3]
-  colnames(coefficients.temp) <- c("Estimate", "Std. Error", "z value")
-  p.right <- pnorm(coefficients.temp[,"z value"], lower.tail = FALSE) # right p-value: Pr(Z>z)
-  p.left  <- pnorm(coefficients.temp[,"z value"], lower.tail = TRUE)  # left p-value: Pr(Z<z)
-  ci.lo   <- coefficients.temp[,"Estimate"] - qnorm(1-significance.level/2) * coefficients.temp[,"Std. Error"]
-  ci.up   <- coefficients.temp[,"Estimate"] + qnorm(1-significance.level/2) * coefficients.temp[,"Std. Error"]
-  generic.targets <- cbind(coefficients.temp, ci.lo, ci.up, p.left, p.right)
-  colnames(generic.targets) <- c("Estimate", "Std. Error", "z value", 
-                                 "CB lower", "CB upper", "Pr(<z)", "Pr(>z)")
-  generic.targets <- generic.targets[,c("Estimate", "CB lower", "CB upper", 
-                                        "Std. Error", "z value", "Pr(<z)", "Pr(>z)")]
-  
-  # prepare generic target parameters for the difference
-  diff    <- coefficients[paste0("gamma.", ncol(groups)), "Estimate"] - 
-    coefficients["gamma.1", "Estimate"]
-  diff.se <- sqrt(vcov[paste0("gamma.", ncol(groups)), paste0("gamma.", ncol(groups))] +
-                    vcov["gamma.1", "gamma.1"] - 2 * vcov[paste0("gamma.", ncol(groups)), "gamma.1"])
-  ci.lo   <- diff - qnorm(1-significance.level/2) * diff.se
-  ci.up   <- diff + qnorm(1-significance.level/2) * diff.se
-  zstat   <- diff / diff.se
-  p.right <- pnorm(zstat, lower.tail = FALSE) # right p-value: Pr(Z>z)
-  p.left  <- pnorm(zstat, lower.tail = TRUE)  # left p-value: Pr(Z<z)
-  
-  return(list(lm.obj = gates.obj, 
-              gates.coefficients = gates.coefficients,
-              gates.coefficients.quantiles = gates.coefficients.quantiles,
-              generic.targets = rbind(generic.targets, 
-                                      matrix(c(diff, ci.lo, ci.up, diff.se, zstat, p.left, p.right), nrow = 1, 
-                                             dimnames = list("gamma.K-gamma.1", NULL)) ),
-              coefficients = coefficients))
-  
-} # END FUN
-
-
-
 #' Estimates the CLAN parameters in the main sample
 #' 
 #' @param Z.clan.main.sample a matrix with _|M|_ rows. Each column represents a variable for which CLAN shall be performed.
 #' @param group.membership.main.sample a logical matrix with _M_ rows that indicate 
 #' the group memberships (such a matrix is returned by the function quantile.group())
-#' @param equal.group.variances_CLAN logical. If TRUE, the the two within-group variances of the most and least affected group are assumed to be equal. Default is FALSE.
+#' @param equal.group.variances logical. If TRUE, the the two within-group variances of the most and least affected group are assumed to be equal. Default is FALSE.
 #' @return The two CLAN parameters ("most" affected and "least" affected) for each variable in Z.clan.main.sample
 #' 
 #' @export
 CLAN <- function(Z.clan.main.sample, 
                  group.membership.main.sample, 
-                 equal.group.variances_CLAN = FALSE,
+                 equal.group.variances = FALSE,
                  significance.level = 0.05){
   
   K <- ncol(group.membership.main.sample)
@@ -126,7 +45,7 @@ CLAN <- function(Z.clan.main.sample,
     # get summary statistics for difference between most and least affected group
     ttest.diff <- stats::t.test(x = Z.clan.main.sample[group.membership.main.sample[, K], j], 
                                 y = Z.clan.main.sample[group.membership.main.sample[, 1], j], 
-                                var.equal = equal.group.variances_CLAN) # 2-sample t-test
+                                var.equal = equal.group.variances) # 2-sample t-test
     
     diff        <- ttest.deltaK$estimate - ttest.delta1$estimate # difference in means
     diff.se     <- ttest.diff$stderr

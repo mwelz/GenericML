@@ -1,0 +1,188 @@
+#' Estimates the GATES parameters based on the main sample M. 
+#' 
+#' @param D a binary vector of treatment status of length _|M|_
+#' @param Y a vector of responses of length _|M|_
+#' @param propensity.scores a vector of propensity scores of length _|M|_
+#' @param proxy.baseline a vector of proxy baseline estimates of length _M_
+#' @param proxy.cate a vector of proxy CATE estimates of length _M_
+#' @param group.membership.main.sample a logical matrix with _M_ rows that indicate 
+#' the group memberships (such a matrix is returned by the function quantile.group())
+#' @param HT.transformation logical. If TRUE, a HT transformation is applied (BLP2 in the paper). Default is FALSE.
+#' @param X1.variables a character string specifying the variables in the matrix X1. Needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores. If no HT transformation is applied, a constant 1 is silently included in X1.
+#' @param vcov.type a character string specifying the estimation type of the error covariance matrix. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
+#' @param significance.level significance level for construction of confidence intervals
+#' @return GATES coefficients 
+#' 
+#' @export
+GATES <- function(D, Y, 
+                  propensity.scores, 
+                  proxy.baseline,
+                  proxy.cate,
+                  group.membership.main.sample,
+                  HT.transformation  = FALSE,
+                  X1.variables       = c("B"),
+                  vcov.type          = "const",
+                  significance.level = 0.05){
+  
+  # input check
+  input.checks.X1(X1.variables)
+  
+  # fit model according to strategy 1 or 2 in the paper
+  do.call(what = get(ifelse(HT.transformation, "GATES.HT", "GATES.classic")),
+          args = list(D = D, Y = Y, 
+                      propensity.scores  = propensity.scores, 
+                      proxy.baseline     = proxy.baseline,
+                      proxy.cate         = proxy.cate, 
+                      group.membership.main.sample = group.membership.main.sample,
+                      X1.variables       = X1.variables,
+                      vcov.type          = vcov.type,
+                      significance.level = significance.level))
+  
+} # FUN
+
+
+# helper function for case when there is no HT transformation used. Wrapped by function "GATES"
+GATES.classic <- function(D, Y, 
+                          propensity.scores, 
+                          proxy.baseline, proxy.cate,
+                          group.membership.main.sample,
+                          X1.variables = c("B"),
+                          vcov.type = "const",
+                          significance.level = 0.05){
+  
+  # make the group membership a binary matrix
+  groups <- 1 * group.membership.main.sample
+  
+  # number of groups
+  K <- ncol(groups)
+  
+  # prepare weights
+  weights <- 1 / (propensity.scores * (1 - propensity.scores))
+  
+  # prepare matrix X1
+  X1.big <- cbind(S = proxy.cate, B = proxy.baseline, p = propensity.scores)
+  X1     <- X1.big[, X1.variables]
+  
+  # prepare covariate matrix
+  X <- data.frame(X1, 
+                  (D - propensity.scores) * groups)
+  colnames(X) <- c(X1.variables, paste0("gamma.", 1:K))
+  
+  # fit weighted linear regression by OLS
+  gates.obj <- lm(Y ~., data = data.frame(Y, X), weights = weights)
+  
+  # get estimate of error covariance matrix (potentially heteroskedasticity robust)
+  vcov <- sandwich::vcovHC(x = gates.obj, type = vcov.type)
+  
+  # extract the relevant coefficients
+  coefficients                 <- lmtest::coeftest(gates.obj, vcov. = vcov)
+  gates.coefficients           <- coefficients[paste0("gamma.", 1:K), 1]
+  gates.coefficients.quantiles <- colnames(groups)
+  names(gates.coefficients.quantiles) <- paste0("gamma.", 1:K)
+  
+  # return
+  return(list(lm.obj = gates.obj, 
+              gates.coefficients = gates.coefficients,
+              gates.coefficients.quantiles = gates.coefficients.quantiles,
+              generic.targets = generic.targets_GATES(coeftest.object = coefficients, 
+                                                      K = K, 
+                                                      vcov = vcov, 
+                                                      significance.level = significance.level),
+              coefficients = coefficients))
+  
+} # END FUN
+
+
+# helper function for case when there is a HT transformation used. Wrapped by function "GATES"
+GATES.HT <- function(D, Y, 
+                     propensity.scores, 
+                     proxy.baseline, proxy.cate,
+                     group.membership.main.sample,
+                     X1.variables = c("B"),
+                     vcov.type = "const",
+                     significance.level = 0.05){
+ 
+  # make the group membership a binary matrix
+  groups <- 1 * group.membership.main.sample
+  
+  # number of groups
+  K <- ncol(groups)
+  
+  # HT transformation
+  H <- (D - propensity.scores) / (propensity.scores * (1 - propensity.scores))
+  
+  # prepare matrix X1
+  X1.big <- cbind(S = proxy.cate, B = proxy.baseline, p = propensity.scores)
+  X1     <- X1.big[, X1.variables]
+  
+  # matrix X_1 * H
+  X1H           <- X1 * H
+  colnames(X1H) <- paste0(colnames(X1), ".H")
+  
+  # prepare covariate matrix
+  X <- data.frame(X1,  groups)
+  colnames(X) <- c(colnames(X1H), paste0("gamma.", 1:K))
+  
+  # fit linear regression by OLS (no intercept!)
+  gates.obj <- lm(formula =  as.formula(paste0("YH ~ ", paste0(colnames(X), collapse = " + "), " + 0")),
+                data = data.frame(YH = Y*H, X))
+  
+  # get estimate of error covariance matrix (potentially heteroskedasticity robust)
+  vcov <- sandwich::vcovHC(x = gates.obj, type = vcov.type)
+  
+  # extract the relevant coefficients
+  coefficients                 <- lmtest::coeftest(gates.obj, vcov. = vcov)
+  gates.coefficients           <- coefficients[paste0("gamma.", 1:K), 1]
+  gates.coefficients.quantiles <- colnames(groups)
+  names(gates.coefficients.quantiles) <- paste0("gamma.", 1:K)
+  
+  # return
+  return(list(lm.obj = gates.obj, 
+              gates.coefficients = gates.coefficients,
+              gates.coefficients.quantiles = gates.coefficients.quantiles,
+              generic.targets = generic.targets_GATES(coeftest.object = coefficients, 
+                                                      K = K, 
+                                                      vcov = vcov, 
+                                                      significance.level = significance.level),
+              coefficients = coefficients))
+  
+} # END FUN
+
+
+# helper function to calculate the generic targets of BLP
+generic.targets_GATES <- function(coeftest.object, K, vcov, significance.level = 0.05){
+  
+  # extract coefficients
+  coefficients.temp <- coeftest.object[paste0("gamma.", 1:K), 1:3]
+  colnames(coefficients.temp) <- c("Estimate", "Std. Error", "z value")
+  
+  # compute relevant statistics
+  p.right <- pnorm(coefficients.temp[,"z value"], lower.tail = FALSE) # right p-value: Pr(Z>z)
+  p.left  <- pnorm(coefficients.temp[,"z value"], lower.tail = TRUE)  # left p-value: Pr(Z<z)
+  ci.lo   <- coefficients.temp[,"Estimate"] - qnorm(1-significance.level/2) * coefficients.temp[,"Std. Error"]
+  ci.up   <- coefficients.temp[,"Estimate"] + qnorm(1-significance.level/2) * coefficients.temp[,"Std. Error"]
+  
+  # prepare generic targets of the gammas
+  generic.targets <- cbind(coefficients.temp, ci.lo, ci.up, p.left, p.right)
+  colnames(generic.targets) <- c("Estimate", "Std. Error", "z value", 
+                                 "CB lower", "CB upper", "Pr(<z)", "Pr(>z)")
+  generic.targets <- generic.targets[,c("Estimate", "CB lower", "CB upper", 
+                                        "Std. Error", "z value", "Pr(<z)", "Pr(>z)")]
+  
+  # prepare generic target parameters for the difference gamma.K - gamma.1
+  diff    <- coeftest.object[paste0("gamma.", K), "Estimate"] - 
+    coeftest.object["gamma.1", "Estimate"]
+  diff.se <- sqrt(vcov[paste0("gamma.", K), paste0("gamma.", K)] +
+                    vcov["gamma.1", "gamma.1"] - 2 * vcov[paste0("gamma.", K), "gamma.1"])
+  ci.lo   <- diff - qnorm(1-significance.level/2) * diff.se
+  ci.up   <- diff + qnorm(1-significance.level/2) * diff.se
+  zstat   <- diff / diff.se
+  p.right <- pnorm(zstat, lower.tail = FALSE) # right p-value: Pr(Z>z)
+  p.left  <- pnorm(zstat, lower.tail = TRUE)  # left p-value: Pr(Z<z)
+  
+  # return final matrix
+  rbind(generic.targets, 
+        matrix(c(diff, ci.lo, ci.up, diff.se, zstat, p.left, p.right), nrow = 1, 
+               dimnames = list("gamma.K-gamma.1", NULL)))
+  
+} # FUN

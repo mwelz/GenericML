@@ -145,7 +145,7 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
   ### step 2d: estimate CLAN parameters in the main sample
   clan.obj <- CLAN(Z.clan.main.sample = Z.clan[M.set,], 
                    group.membership.main.sample = group.membership.main.sample,
-                   equal.group.variances_CLAN = equal.group.variances_CLAN,
+                   equal.group.variances = equal.group.variances_CLAN,
                    significance.level = significance.level)
   
   
