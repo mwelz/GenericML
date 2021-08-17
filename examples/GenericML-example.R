@@ -3,7 +3,7 @@
 #' Note that this implementation is **not** yet an R package, although we intend to create a package for the CRAN based on it.
 #' 
 #' Author: mwelz & aalfons
-#' Last changed: Aug 3, 2021
+#' Last changed: Aug 17, 2021
 #' ------------------------------------------------------------
 rm(list = ls()) ; gc(); cat("\014")
 
@@ -61,6 +61,12 @@ Z.clan <- cbind(Z, random = runif(num.obs))
 # specify the number of splits 
 num.splits               <- 100
 
+# specify if a HT transformation shall be used when estimating BLP and GATES
+HT.transformation <- FALSE
+
+# specify the variables in the matrix X1. Needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores. Unless a HT transformation is employed in GATES, a constant 1 is silently included in X1 as well.
+X1.variables <- c("B")
+
 # specify the significance level
 significance.level       <- 0.05
 
@@ -85,6 +91,8 @@ genML <- GenericML(Z = Z, D = D, Y = Y,
                    learners.genericML = learners.genericML,
                    num.splits = num.splits,
                    Z.clan = Z.clan,
+                   X1.variables = X1.variables,
+                   HT.transformation = HT.transformation,
                    quantile.cutoffs = quantile.cutoffs,
                    vcov.type_BLP = vcov.type_BLP,
                    vcov.type_GATES = vcov.type_GATES,

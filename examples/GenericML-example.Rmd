@@ -1,7 +1,7 @@
 ---
 title: "Generic ML Demonstration"
 author: "Max Welz and Andreas Alfons"
-date: "08/03/2021"
+date: "08/17/2021"
 output: html_document
 ---
 
@@ -67,17 +67,22 @@ Y  <- ifelse(D == 1, Y1, Y0)
 
 The core of this implementation is the function `GenericML()`, which is based on the object-riented `mlr3` framework. This function allows the user to flexibly specify machine learners with `mlr3` syntax. We introduce the arguments of `GenericML()` below.
 
-* `Z`. A matrix or data frame of the covariates.
-* `D`. A binary vector of treatment assignment. 
-* `Y`. The response vector.
-* `learner.propensity.score`. The machine learner to be used for estimating the propensity scores. Either `'elastic.net'`, `'random.forest'`, or `'tree'`. Can alternatively be specified by using `mlr3` syntax, for example `'mlr3::lrn("ranger", num.trees = 500)'`. See https://mlr3learners.mlr-org.com for a list of `mlr3` learners. Default is `'elastic.net'`.
-* `learners.genericML`. A vector of strings specifying the machine learners to be used for estimating the BCA (Baseline Conditional Average) and CATE (Conditional Average Treatment Effect). Either `'elastic.net'`, `'random.forest'`, or `'tree'`. Can alternatively be specified by using `mlr3` syntax, for example `'mlr3::lrn("ranger", num.trees = 500)'`. See https://mlr3learners.mlr-org.com for a list of `mlr3` learners.
-* `num.splits`. Number of sample splits. Default is 100.
-* `Z.clan`.  A matrix of variables that shall be considered for the Classification Analysis (CLAN). If `NULL` (default), then `Z.clan = Z`, i.e. CLAN is performed for all variables in `Z`.
-* `quantile.cutoffs`. The cutoff points of quantiles that shall be used for GATES grouping. Default is `c(0.25, 0.5, 0.75)`, which corresponds to the quartiles.
-* `proportion.in.main.set`. The proportion of samples that shall be in the main set. Default is `0.5`.
-* `significance.level` The significance level for VEIN. Default is `0.05`.
-* `store.learners` Logical. If `TRUE`, all intermediate results of the learners will be stored. Default is `FALSE`.
+* `Z` A matrix or data frame of the covariates.
+* `D` A binary vector of treatment assignment. 
+* `Y` The response vector.
+* `learner.propensity.score` The machine learner to be used for estimating the propensity scores. Either `'elastic.net'`, `'random.forest'`, or `'tree'`. Can alternatively be specified by using `mlr3` syntax, for example `'mlr3::lrn("ranger", num.trees = 500)'`. See https://mlr3learners.mlr-org.com for a list of `mlr3` learners. Default is `'elastic.net'`.
+* `learners.genericML` A vector of strings specifying the machine learners to be used for estimating the BCA and CATE. Either `'elastic.net'`, `'random.forest'`, or `'tree'`. Can alternatively be specified by using `mlr3` syntax, for example `'mlr3::lrn("ranger", num.trees = 500)'`. See https://mlr3learners.mlr-org.com for a list of `mlr3` learners.
+* `num.splits` number of sample splits. Default is 100.
+* `Z.clan` A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z.clan = Z`, i.e. CLAN is performed for all variables in `Z`.
+* `HT.transformation` logical. If `TRUE`, a HT transformation is applied in BLP and GATES. Default is `FALSE.`
+* `X1.variables` a character string specifying the variables in the matrix X1. Needs to be a subset of `c("S", "B", "p")`, where `"p"` corresponds to the propensity scores. Unless a HT transformation is employed in GATES, a constant 1 is silently included in X1 as well.
+* `quantile.cutoffs` The cutoff points of quantiles that shall be used for GATES grouping. Default is `c(0.25, 0.5, 0.75)`, which corresponds to the quartiles.
+* `vcov.type_BLP` a character string specifying the estimation type of the error covariance matrix in BLP. See `sandwich::vcovHC` for details. Default is "const" (for homoskedasticity)
+* `vcov.type_GATES` a character string specifying the estimation type of the error covariance matrix in GATES. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
+* `equal.group.variances_CLAN` logical. If `TRUE`, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is `FALSE.`
+* `proportion.in.main.set` proportion of samples that shall be in main set. Default is 0.5.
+* `significance.level` significance level for VEIN. Default is 0.05.
+* `store.learners` Logical. If `TRUE`, all intermediate results of the learners will be stored. Default is `FALSE.`
 * `store.splits` Logical. If `TRUE`, information on the sample splits will be stored. Default is `FALSE`.
 
 ### Specifying the arguments of the core function 
@@ -99,8 +104,21 @@ Z.clan <- cbind(Z, random = runif(num.obs))
 # specify the number of splits 
 num.splits               <- 100
 
+# specify if a HT transformation shall be used when estimating BLP and GATES
+HT.transformation <- FALSE
+
+# specify the variables in the matrix X1. Needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores. Unless a HT transformation is employed in GATES, a constant 1 is silently included in X1 as well.
+X1.variables <- c("B")
+
 # specify the significance level
 significance.level       <- 0.05
+
+# specify which estimator of the error covariance matrix shall be used in BLP and GATES
+vcov.type_BLP   <- "const"
+vcov.type_GATES <- "const" # homoskedasticity here
+
+# specify whether of not it should be assumed that the group variances of the most and least affected groups are equal in CLAN. 
+equal.group.variances_CLAN = FALSE
 
 # specify the proportion of samples that shall be selected in the main set
 proportion.in.main.set   <- 0.5
@@ -108,6 +126,7 @@ proportion.in.main.set   <- 0.5
 # specify whether or not the splits and auxiliary results of the learners shall be stored
 store.splits             <- FALSE
 store.learners           <- FALSE
+
 ```
 
 ### Run the core function on the generated data
@@ -121,7 +140,12 @@ genML <- GenericML(Z = Z, D = D, Y = Y,
                    learners.genericML = learners.genericML,
                    num.splits = num.splits,
                    Z.clan = Z.clan,
+                   X1.variables = X1.variables,
+                   HT.transformation = HT.transformation,
                    quantile.cutoffs = quantile.cutoffs,
+                   vcov.type_BLP = vcov.type_BLP,
+                   vcov.type_GATES = vcov.type_GATES,
+                   equal.group.variances_CLAN = equal.group.variances_CLAN,
                    proportion.in.main.set = proportion.in.main.set, 
                    significance.level = significance.level,
                    store.splits = store.splits,
