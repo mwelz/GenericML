@@ -7,6 +7,8 @@
 #' @param learners.genericML A vector of strings specifying the machine learners to be used for estimating the BCA and CATE. Either `'elastic.net'`, `'random.forest'`, or `'tree'`. Can alternatively be specified by using `mlr3` syntax, for example `'mlr3::lrn("ranger", num.trees = 500)'`. See https://mlr3learners.mlr-org.com for a list of `mlr3` learners.
 #' @param num.splits number of sample splits. Default is 100.
 #' @param Z.clan A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z.clan = Z`, i.e. CLAN is performed for all variables in `Z`.
+#' @param HT.transformation logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.
+#' @param X1.variables a character string specifying the variables in the matrix X1. Needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores. Unless a HT transformation is employed in GATES, a constant 1 is silently included in X1 as well.
 #' @param quantile.cutoffs The cutoff points of quantiles that shall be used for GATES grouping. Default is `c(0.25, 0.5, 0.75)`, which corresponds to the quartiles.
 #' @param vcov.type_BLP a character string specifying the estimation type of the error covariance matrix in BLP. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
 #' @param vcov.type_GATES a character string specifying the estimation type of the error covariance matrix in GATES. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
@@ -22,6 +24,8 @@ GenericML <- function(Z, D, Y,
                       learners.genericML,
                       num.splits = 100,
                       Z.clan = NULL,
+                      HT.transformation = FALSE,
+                      X1.variables = c("B"),
                       quantile.cutoffs = c(0.25, 0.5, 0.75),
                       vcov.type_BLP = "const",
                       vcov.type_GATES = "const",
@@ -41,18 +45,20 @@ GenericML <- function(Z, D, Y,
   
   gen.ml.different.learners <- 
     generic.ml.across.learners(Z = Z, D = D, Y = Y, 
-                               propensity.scores = propensity.scores, 
-                               learners = learners.genericML, 
-                               num.splits = num.splits,
-                               Z.clan = Z.clan, 
-                               vcov.type_BLP = vcov.type_BLP,
-                               vcov.type_GATES = vcov.type_GATES,
+                               propensity.scores          = propensity.scores, 
+                               learners                   = learners.genericML, 
+                               num.splits                 = num.splits,
+                               Z.clan                     = Z.clan, 
+                               X1.variables               = X1.variables,
+                               HT.transformation          = HT.transformation,
+                               vcov.type_BLP              = vcov.type_BLP,
+                               vcov.type_GATES            = vcov.type_GATES,
                                equal.group.variances_CLAN = equal.group.variances_CLAN,
-                               proportion.in.main.set = proportion.in.main.set, 
-                               quantile.cutoffs = quantile.cutoffs,
-                               significance.level = significance.level,
-                               store.learners = store.learners,
-                               store.splits = store.splits)
+                               proportion.in.main.set     = proportion.in.main.set, 
+                               quantile.cutoffs           = quantile.cutoffs,
+                               significance.level         = significance.level,
+                               store.learners             = store.learners,
+                               store.splits               = store.splits)
   
   # extract the best learners
   best.learners <- get.best.learners(gen.ml.different.learners$generic.targets)

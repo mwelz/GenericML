@@ -119,6 +119,8 @@ generic.ml.across.learners <- function(Z, D, Y,
                                        learners, 
                                        num.splits = 50,
                                        Z.clan = NULL, 
+                                       X1.variables = c("B"),
+                                       HT.transformation = FALSE,
                                        vcov.type_BLP = "const",
                                        vcov.type_GATES = "const",
                                        equal.group.variances_CLAN = FALSE,
@@ -161,17 +163,18 @@ generic.ml.across.learners <- function(Z, D, Y,
       
       generic.ml.obj <- 
         get.generic.ml.for.given.learner(Z = Z, D = D, Y = Y, 
-                                         propensity.scores = propensity.scores, 
-                                         learner = learners[i], 
+                                         propensity.scores = propensity.scores,
+                                         learner = learners[i],
                                          M.set = M.set, A.set = A.set,
-                                         Z.clan = Z.clan, 
-                                         vcov.type_BLP = vcov.type_BLP,
-                                         vcov.type_GATES = vcov.type_GATES,
+                                         Z.clan                     = Z.clan, 
+                                         HT.transformation          = HT.transformation,
+                                         vcov.type_BLP              = vcov.type_BLP,
+                                         vcov.type_GATES            = vcov.type_GATES,
                                          equal.group.variances_CLAN = equal.group.variances_CLAN,
-                                         proportion.in.main.set = proportion.in.main.set, 
-                                         quantile.cutoffs = quantile.cutoffs,
-                                         significance.level = significance.level)
-      
+                                         proportion.in.main.set     = proportion.in.main.set, 
+                                         quantile.cutoffs           = quantile.cutoffs,
+                                         significance.level         = significance.level)
+        
       generic.targets[[i]]$BLP[,,s]   <- generic.ml.obj$BLP$generic.targets
       generic.targets[[i]]$GATES[,,s] <- generic.ml.obj$GATES$generic.targets
       generic.targets[[i]]$best[,,s]  <- c(generic.ml.obj$best$lambda, generic.ml.obj$best$lambda.bar)

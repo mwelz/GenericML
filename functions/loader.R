@@ -6,7 +6,9 @@ library(mlr3learners) # potentially a bug in mlr3; if this is not loaded, mlr::l
 
 source(paste0(getwd(), "/functions/GenericML.R"))
 source(paste0(getwd(), "/functions/helpers.R"))
-source(paste0(getwd(), "/functions/inference.R"))
+source(paste0(getwd(), "/functions/clan.R"))
+source(paste0(getwd(), "/functions/blp.R"))
+source(paste0(getwd(), "/functions/gates.R"))
 source(paste0(getwd(), "/functions/misc.R"))
 source(paste0(getwd(), "/functions/mlr3.R"))
 source(paste0(getwd(), "/functions/plot.R"))

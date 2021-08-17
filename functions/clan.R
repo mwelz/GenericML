@@ -71,25 +71,3 @@ CLAN <- function(Z.clan.main.sample,
               generic.targets   = generic.targets))
   
 } # END FUN
-
-
-
-#' returns the two parameters that are used to find the best ML method
-#' 
-#' @param BLP.obj an object as returned by CLAN()
-#' @param GATES.obj an object as returned by get.BLP.parameters()
-#' @param proxy.cate.main.sample Proxy CATE estimators for the main sample
-#' @param group.membership.main.sample a logical matrix with _M_ rows that indicate 
-#' the group memberships (such a matrix is returned by the function quantile.group())
-#' @return lambda and lambda.bar parameters
-#' 
-#' @export
-best.ml.method.parameters <- function(BLP.obj,
-                                      GATES.obj, 
-                                      proxy.cate.main.sample, 
-                                      group.membership.main.sample){
-  
-  return(list(lambda = as.numeric(BLP.obj$blp.coefficients["beta.2"]^2 * var(proxy.cate.main.sample)),
-              lambda.bar = as.numeric(colMeans(group.membership.main.sample) %*%  GATES.obj$gates.coefficients^2)))
-  
-} # END FUN

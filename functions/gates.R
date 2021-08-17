@@ -7,7 +7,7 @@
 #' @param proxy.cate a vector of proxy CATE estimates of length _M_
 #' @param group.membership.main.sample a logical matrix with _M_ rows that indicate 
 #' the group memberships (such a matrix is returned by the function quantile.group())
-#' @param HT.transformation logical. If TRUE, a HT transformation is applied (BLP2 in the paper). Default is FALSE.
+#' @param HT.transformation logical. If TRUE, a HT transformation is applied (GATES2 in the paper). Default is FALSE.
 #' @param X1.variables a character string specifying the variables in the matrix X1. Needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores. If no HT transformation is applied, a constant 1 is silently included in X1.
 #' @param vcov.type a character string specifying the estimation type of the error covariance matrix. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
 #' @param significance.level significance level for construction of confidence intervals
