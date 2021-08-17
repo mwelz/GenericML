@@ -25,28 +25,15 @@ BLP <- function(D, Y,
   input.checks.X1(X1.variables)
   
   # fit model according to strategy 1 or 2 in the paper
-  if(HT.transformation){
-    
-    out <- BLP.HT(D = D, Y = Y, 
-                  propensity.scores  = propensity.scores, 
-                  proxy.baseline     = proxy.baseline,
-                  proxy.cate         = proxy.cate, 
-                  X1.variables       = X1.variables,
-                  vcov.type          = vcov.type,
-                  significance.level = significance.level)
-  } else{
-    
-    out <- BLP.classic(D = D, Y = Y, 
-                       propensity.scores  = propensity.scores, 
-                       proxy.baseline     = proxy.baseline,
-                       proxy.cate         = proxy.cate, 
-                       X1.variables       = X1.variables,
-                       vcov.type          = vcov.type,
-                       significance.level = significance.level)
-  } # IF
-  
-  return(out)
-  
+  do.call(what = get(ifelse(HT.transformation, "BLP.HT", "BLP.classic")),
+          args = list(D = D, Y = Y, 
+                      propensity.scores  = propensity.scores, 
+                      proxy.baseline     = proxy.baseline,
+                      proxy.cate         = proxy.cate, 
+                      X1.variables       = X1.variables,
+                      vcov.type          = vcov.type,
+                      significance.level = significance.level))
+
 } # FUN
 
 
