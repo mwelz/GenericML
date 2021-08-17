@@ -67,11 +67,14 @@ propensity.score <- function(Z, D, learner = "random.forest"){
 #' @param Y a vector of responses of length _n_
 #' @param auxiliary.sample a numerical vector of indices of observations in the auxiliary sample. Length is shorter than _n_
 #' @param learner the classification machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default. 
+#' @param minimum.variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
 #' @return Estimates of Y, both for the auxiliary sample and all observations, and an 'mlr3' object of the employed model 
 #' 
 #' @export
 baseline.proxy.estimator <- function(Z, D, Y, 
-                                     auxiliary.sample, learner = "random.forest"){
+                                     auxiliary.sample,
+                                     learner = "random.forest",
+                                     minimum.variation = 1e-05){
   
   # input checks
   if(length(unique(D)) != 2) stop("Treatment assignment 'D' does not have 2 unique values.")
@@ -120,6 +123,14 @@ baseline.proxy.estimator <- function(Z, D, Y,
   predictions.obj <- learner$predict(task.proxy.baseline.estimator)
   predictions     <- predictions.obj$response
   
+  # if there is not much variation in the predictions, add Gaussian noise
+  if(var(predictions) < minimum.variation){
+    
+    predictions <- predictions +
+      rnorm(length(n), mean = 0, sd = sqrt(var(Y) / 20))
+    
+  } # IF
+  
   # return 
   return(list(baseline.predictions.main.sample = predictions[main.sample],
               baseline.predictions.auxiliary.sample = predictions[auxiliary.sample],
@@ -140,12 +151,15 @@ baseline.proxy.estimator <- function(Z, D, Y,
 #' @param auxiliary.sample a numerical vector of indices of observations in the auxiliary sample. Length is shorter than _n_
 #' @param learner the regression machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default. 
 #' @param proxy.baseline.estimates A vector of length _n_ of proxy estimates of the baseline estimator E[Y | D=0, Z]. If NULL, these will be estimated separately.
+#' @param minimum.variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
 #' @return Estimates of the CATE, both for the auxiliary sample and all observations, and an 'mlr3' object of each employed model 
 #' 
 #' @export
 CATE.proxy.estimator <- function(Z, D, Y, 
-                                 auxiliary.sample, learner = "random.forest", 
-                                 proxy.baseline.estimates = NULL){
+                                 auxiliary.sample, 
+                                 learner = "random.forest", 
+                                 proxy.baseline.estimates = NULL, 
+                                 minimum.variation = 1e-05){
   
   # input checks
   if(length(unique(D)) != 2) stop("Treatment assignment 'D' does not have 2 unique values.")
@@ -245,8 +259,17 @@ CATE.proxy.estimator <- function(Z, D, Y,
          predictions.Y0_full.sample = predictions.controls,
          mlr3.objects = mlr3.controls)
   
-  # return
+  # get CATE predictions
   cate.predictions <- predictions.treated - predictions.controls
+  
+  # if there is not much variation in the predictions, add Gaussian noise
+  if(var(cate.predictions) < minimum.variation){
+    
+    cate.predictions <- cate.predictions +
+      rnorm(length(n), mean = 0, sd = sqrt(var(Y) / 20))
+    
+  } # IF
+  
   return(list(CATE.predictions.main.sample = cate.predictions[main.sample],
               CATE.predictions.auxiliary.sample = cate.predictions[auxiliary.sample],
               CATE.predictions.full.sample = cate.predictions,

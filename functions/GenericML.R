@@ -15,6 +15,7 @@
 #' @param equal.group.variances_CLAN logical. If TRUE, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is FALSE.
 #' @param proportion.in.main.set proportion of samples that shall be in main set. Default is 0.5.
 #' @param significance.level significance level for VEIN. Default is 0.05.
+#' @param minimum.variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
 #' @param store.learners Logical. If TRUE, all intermediate results of the learners will be stored. Default is FALSE.
 #' @param store.splits Logical. If `TRUE`, information on the sample splits will be stored. Default is `FALSE`.
 #' 
@@ -32,6 +33,7 @@ GenericML <- function(Z, D, Y,
                       equal.group.variances_CLAN = FALSE,
                       proportion.in.main.set = 0.5, 
                       significance.level = 0.05,
+                      minimum.variation = 1e-05,
                       store.learners = FALSE,
                       store.splits = FALSE){
   
@@ -57,6 +59,7 @@ GenericML <- function(Z, D, Y,
                                proportion.in.main.set     = proportion.in.main.set, 
                                quantile.cutoffs           = quantile.cutoffs,
                                significance.level         = significance.level,
+                               minimum.variation          = minimum.variation,
                                store.learners             = store.learners,
                                store.splits               = store.splits)
   

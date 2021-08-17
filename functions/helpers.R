@@ -127,6 +127,7 @@ generic.ml.across.learners <- function(Z, D, Y,
                                        proportion.in.main.set = 0.5, 
                                        quantile.cutoffs = c(0.25, 0.5, 0.75),
                                        significance.level = 0.05, 
+                                       minimum.variation = 1e-05,
                                        store.learners = FALSE,
                                        store.splits = FALSE){
   
@@ -174,7 +175,8 @@ generic.ml.across.learners <- function(Z, D, Y,
                                          equal.group.variances_CLAN = equal.group.variances_CLAN,
                                          proportion.in.main.set     = proportion.in.main.set, 
                                          quantile.cutoffs           = quantile.cutoffs,
-                                         significance.level         = significance.level)
+                                         significance.level         = significance.level,
+                                         minimum.variation          = minimum.variation)
         
       generic.targets[[i]]$BLP[,,s]   <- generic.ml.obj$BLP$generic.targets
       generic.targets[[i]]$GATES[,,s] <- generic.ml.obj$GATES$generic.targets

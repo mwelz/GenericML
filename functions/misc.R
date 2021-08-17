@@ -86,6 +86,7 @@ quantile.group <- function(x,
 #' @param proportion.in.main.set proportion of samples that shall be in main set. Default is 0.5.
 #' @param quantile.cutoffs Cutoff points of quantiles that shall be used for GATES grouping
 #' @param significance.level Significance level. Default is 0.05
+#' @param minimum.variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
 #' 
 #' TODO: instructions on how mlr3 input is supposed to work (needs to be a string!)
 #' TODO: comments on CLAN: If there are categorical variables, apply one-hot-encoding to Z.clan. The interpretation then becomes: Is there a factor that is overproportionally present in the least or most affected group?
@@ -103,7 +104,8 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                                              equal.group.variances_CLAN = FALSE,
                                              proportion.in.main.set     = 0.5, 
                                              quantile.cutoffs           = c(0.25, 0.5, 0.75),
-                                             significance.level         = 0.05){
+                                             significance.level         = 0.05,
+                                             minimum.variation          = 1e-05){
   
   ### step 1: input checks ---- 
   if(is.null(Z.clan)) Z.clan <- Z # if no input provided, set it equal to Z
@@ -113,7 +115,8 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
   # get the proxy baseline estimator for the main sample
   proxy.baseline.obj <- baseline.proxy.estimator(Z = Z, D = D, Y = Y, 
                                                  auxiliary.sample = A.set, 
-                                                 learner = make.mlr3.string(learner, regr = TRUE))
+                                                 learner = make.mlr3.string(learner, regr = TRUE), 
+                                                 minimum.variation = minimum.variation)
   proxy.baseline     <- proxy.baseline.obj$baseline.predictions.main.sample
   
   # get the proxy estimator of the CATE for the main sample
@@ -121,7 +124,8 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
     CATE.proxy.estimator(Z = Z, D = D, Y = Y,
                          auxiliary.sample = A.set, 
                          learner = make.mlr3.string(learner, regr = TRUE),
-                         proxy.baseline.estimates = proxy.baseline.obj$baseline.predictions.full.sample)
+                         proxy.baseline.estimates = proxy.baseline.obj$baseline.predictions.full.sample, 
+                         minimum.variation = minimum.variation)
   proxy.cate <- proxy.cate.obj$CATE.predictions.main.sample
   
   

@@ -238,6 +238,7 @@ Y  &lt;- ifelse(D == 1, Y1, Y0) </code></pre>
 <li><code>equal.group.variances_CLAN</code> logical. If <code>TRUE</code>, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is <code>FALSE.</code></li>
 <li><code>proportion.in.main.set</code> proportion of samples that shall be in main set. Default is 0.5.</li>
 <li><code>significance.level</code> significance level for VEIN. Default is 0.05.</li>
+<li><code>minimum.variation</code> minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.</li>
 <li><code>store.learners</code> Logical. If <code>TRUE</code>, all intermediate results of the learners will be stored. Default is <code>FALSE.</code></li>
 <li><code>store.splits</code> Logical. If <code>TRUE</code>, information on the sample splits will be stored. Default is <code>FALSE</code>.</li>
 </ul>
@@ -268,6 +269,9 @@ X1.variables &lt;- c(&quot;B&quot;)
 
 # specify the significance level
 significance.level       &lt;- 0.05
+
+# specify minimum variation of predictions before Gaussian noise with variance var(Y)/20 is added.
+minimum.variation &lt;- 1e-05
 
 # specify which estimator of the error covariance matrix shall be used in BLP and GATES
 vcov.type_BLP   &lt;- &quot;const&quot;
@@ -300,6 +304,7 @@ genML &lt;- GenericML(Z = Z, D = D, Y = Y,
                    equal.group.variances_CLAN = equal.group.variances_CLAN,
                    proportion.in.main.set = proportion.in.main.set, 
                    significance.level = significance.level,
+                   minimum.variation = minimum.variation,
                    store.splits = store.splits,
                    store.learners = store.learners)</code></pre>
 </div>

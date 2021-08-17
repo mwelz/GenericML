@@ -70,12 +70,15 @@ X1.variables <- c("B")
 # specify the significance level
 significance.level       <- 0.05
 
+# specify minimum variation of predictions before Gaussian noise with variance var(Y)/20 is added.
+minimum.variation <- 1e-05
+
 # specify which estimator of the error covariance matrix shall be used in BLP and GATES
 vcov.type_BLP   <- "const"
 vcov.type_GATES <- "const" # homoskedasticity here
 
 # specify whether of not it should be assumed that the group variances of the most and least affected groups are equal in CLAN. 
-equal.group.variances_CLAN = FALSE
+equal.group.variances_CLAN <- FALSE
 
 # specify the proportion of samples that shall be selected in the main set
 proportion.in.main.set   <- 0.5
@@ -99,6 +102,7 @@ genML <- GenericML(Z = Z, D = D, Y = Y,
                    equal.group.variances_CLAN = equal.group.variances_CLAN,
                    proportion.in.main.set = proportion.in.main.set, 
                    significance.level = significance.level,
+                   minimum.variation = minimum.variation,
                    store.splits = store.splits,
                    store.learners = store.learners)
 
