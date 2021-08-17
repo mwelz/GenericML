@@ -124,7 +124,7 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                          propensity.scores = propensity.scores[M.set],
                          proxy.baseline = proxy.baseline, 
                          proxy.cate = proxy.cate, 
-                         vcov.type_BLP = vcov.type_BLP,
+                         vcov.type = vcov.type_BLP,
                          significance.level = significance.level)
   
   
@@ -138,7 +138,7 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                              propensity.scores = propensity.scores[M.set],
                              group.membership.main.sample = group.membership.main.sample, 
                              proxy.baseline = proxy.baseline, proxy.cate = proxy.cate,
-                             vcov.type_GATES = vcov.type_GATES,
+                             vcov.type = vcov.type_GATES,
                              significance.level = significance.level)
   
   

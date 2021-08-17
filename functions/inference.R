@@ -1,60 +1,3 @@
-#' Estimates the BLP parameters based on the main sample M. 
-#' 
-#' @param D a binary vector of treatment status of length _|M|_
-#' @param Y a vector of responses of length _|M|_
-#' @param proxy.baseline a vector of proxy baseline estimates of length _M_
-#' @param proxy.cate a vector of proxy CATE estimates of length _M_
-#' @param propensity.scores a vector of propensity scores of length _|M|_
-#' @param vcov.type_BLP a character string specifying the estimation type of the error covariance matrix. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
-#' @return BLP coefficients with inference statements
-#' 
-#' @export
-#' 
-#' TODO: implement same with HT transformation! 
-BLP.classic <- function(D, Y, propensity.scores, 
-                        proxy.baseline, proxy.cate, 
-                        vcov.type_BLP = "const",
-                        significance.level = 0.05){
-  
-  # prepare weights
-  weights <- 1 / (propensity.scores * (1 - propensity.scores))
-  
-  # prepare covariate matrix
-  X <- data.frame(B = proxy.baseline, 
-                  beta.1 = D - propensity.scores, 
-                  beta.2 = (D - propensity.scores) * (proxy.cate - mean(proxy.cate))) 
-  
-  # fit weighted linear regression by OLS
-  blp.obj <- lm(Y ~., data = data.frame(Y, X), weights = weights)
-  
-  # get estimate of error covariance matrix (potentially heteroskedasticity robust)
-  vcov <- sandwich::vcovHC(x = blp.obj, type = vcov.type_BLP)
-  
-  # extract coefficients
-  coefficients <- lmtest::coeftest(blp.obj, vcov. = vcov)
-
-  # generic targets
-  coefficients.temp <- coefficients[c("beta.1", "beta.2"), 1:3]
-  colnames(coefficients.temp) <- c("Estimate", "Std. Error", "z value")
-  p.right <- pnorm(coefficients.temp[,"z value"], lower.tail = FALSE) # right p-value: Pr(Z>z)
-  p.left  <- pnorm(coefficients.temp[,"z value"], lower.tail = TRUE)  # left p-value: Pr(Z<z)
-  ci.lo   <- coefficients.temp[,"Estimate"] - qnorm(1-significance.level/2) * coefficients.temp[,"Std. Error"]
-  ci.up   <- coefficients.temp[,"Estimate"] + qnorm(1-significance.level/2) * coefficients.temp[,"Std. Error"]
-  generic.targets <- cbind(coefficients.temp, ci.lo, ci.up, p.left, p.right)
-  colnames(generic.targets) <- c("Estimate", "Std. Error", "z value", 
-                                 "CB lower", "CB upper", "Pr(<z)", "Pr(>z)")
-  generic.targets <- generic.targets[,c("Estimate", "CB lower", "CB upper", 
-                                        "Std. Error", "z value", "Pr(<z)", "Pr(>z)")]
-  
-  return(list(lm.obj = blp.obj, 
-              blp.coefficients = blp.obj$coefficients[c("beta.1", "beta.2")],
-              generic.targets = generic.targets,
-              coefficients = coefficients))
-  
-} # END FUN
-
-
-
 #' Estimates the GATES parameters based on the main sample M. 
 #' 
 #' @param D a binary vector of treatment status of length _|M|_
@@ -64,7 +7,7 @@ BLP.classic <- function(D, Y, propensity.scores,
 #' @param proxy.cate a vector of proxy CATE estimates of length _M_
 #' @param group.membership.main.sample a logical matrix with _M_ rows that indicate 
 #' the group memberships (such a matrix is returned by the function quantile.group())
-#' @param vcov.type_GATES a character string specifying the estimation type of the error covariance matrix. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
+#' @param vcov.type a character string specifying the estimation type of the error covariance matrix. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
 #' @return GATES coefficients 
 #' 
 #' @export
@@ -73,7 +16,7 @@ BLP.classic <- function(D, Y, propensity.scores,
 GATES.classic <- function(D, Y, 
                           propensity.scores, 
                           proxy.baseline, proxy.cate,
-                          vcov.type_GATES = "const",
+                          vcov.type = "const",
                           group.membership.main.sample,
                           significance.level = 0.05){
   
@@ -92,7 +35,7 @@ GATES.classic <- function(D, Y,
   gates.obj <- lm(Y ~., data = data.frame(Y, X), weights = weights)
   
   # get estimate of error covariance matrix (potentially heteroskedasticity robust)
-  vcov <- sandwich::vcovHC(x = gates.obj, type = vcov.type_GATES)
+  vcov <- sandwich::vcovHC(x = gates.obj, type = vcov.type)
   
   # extract coefficients
   coefficients                 <- lmtest::coeftest(gates.obj, vcov. = vcov)
