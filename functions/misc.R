@@ -77,6 +77,10 @@ quantile.group <- function(x,
 #' @param learner The machine learner that shall be used
 #' @param M.set main set
 #' @param A.set auxiliary set
+#' @param vcov.type_BLP a character string specifying the estimation type of the error covariance matrix in BLP. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
+#' @param vcov.type_GATES a character string specifying the estimation type of the error covariance matrix in GATES. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
+#' @param equal.group.variances_CLAN logical. If TRUE, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is FALSE.
+
 #' @param quantile.cutoffs Cutoff points of quantiles that shall be used for GATES grouping
 #' 
 #' TODO: instructions on how mlr3 input is supposed to work (needs to be a string!)
@@ -88,6 +92,9 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                                              learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',
                                              M.set, A.set,
                                              Z.clan = NULL, 
+                                             vcov.type_BLP = "const",
+                                             vcov.type_GATES = "const",
+                                             equal.group.variances_CLAN = FALSE,
                                              proportion.in.main.set = 0.5, 
                                              quantile.cutoffs = c(0.25, 0.5, 0.75),
                                              significance.level = 0.05){
@@ -117,6 +124,7 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                          propensity.scores = propensity.scores[M.set],
                          proxy.baseline = proxy.baseline, 
                          proxy.cate = proxy.cate, 
+                         vcov.type_BLP = vcov.type_BLP,
                          significance.level = significance.level)
   
   
@@ -130,12 +138,15 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                              propensity.scores = propensity.scores[M.set],
                              group.membership.main.sample = group.membership.main.sample, 
                              proxy.baseline = proxy.baseline, proxy.cate = proxy.cate,
+                             vcov.type_GATES = vcov.type_GATES,
                              significance.level = significance.level)
   
   
   ### step 2d: estimate CLAN parameters in the main sample
   clan.obj <- CLAN(Z.clan.main.sample = Z.clan[M.set,], 
-                   group.membership.main.sample = group.membership.main.sample)
+                   group.membership.main.sample = group.membership.main.sample,
+                   equal.group.variances_CLAN = equal.group.variances_CLAN,
+                   significance.level = significance.level)
   
   
   ### step 2e: get parameters over which we maximize to find the "best" ML method ----

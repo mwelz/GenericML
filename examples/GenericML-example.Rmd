@@ -21,7 +21,7 @@ rm(list = ls()) ; cat("\014")
 # Install the required packages if they are not already installed
 required.packages <- c("ggplot2", "mlr3", "mlr3learners", 
                        "mvtnorm", "glmnet", "ranger", "e1071",
-                       "kknn", "MASS", "nnet", "xgboost")
+                       "kknn", "MASS", "nnet", "xgboost", "sandwich", "lmtest")
 new.packages      <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 rm(required.packages, new.packages)

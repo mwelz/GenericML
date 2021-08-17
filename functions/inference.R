@@ -5,6 +5,7 @@
 #' @param proxy.baseline a vector of proxy baseline estimates of length _M_
 #' @param proxy.cate a vector of proxy CATE estimates of length _M_
 #' @param propensity.scores a vector of propensity scores of length _|M|_
+#' @param vcov.type_BLP a character string specifying the estimation type of the error covariance matrix. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
 #' @return BLP coefficients with inference statements
 #' 
 #' @export
@@ -12,6 +13,7 @@
 #' TODO: implement same with HT transformation! 
 BLP.classic <- function(D, Y, propensity.scores, 
                         proxy.baseline, proxy.cate, 
+                        vcov.type_BLP = "const",
                         significance.level = 0.05){
   
   # prepare weights
@@ -25,9 +27,12 @@ BLP.classic <- function(D, Y, propensity.scores,
   # fit weighted linear regression by OLS
   blp.obj <- lm(Y ~., data = data.frame(Y, X), weights = weights)
   
-  # extract coefficients
-  coefficients     <- summary(blp.obj)$coefficients
+  # get estimate of error covariance matrix (potentially heteroskedasticity robust)
+  vcov <- sandwich::vcovHC(x = blp.obj, type = vcov.type_BLP)
   
+  # extract coefficients
+  coefficients <- lmtest::coeftest(blp.obj, vcov. = vcov)
+
   # generic targets
   coefficients.temp <- coefficients[c("beta.1", "beta.2"), 1:3]
   colnames(coefficients.temp) <- c("Estimate", "Std. Error", "z value")
@@ -59,6 +64,7 @@ BLP.classic <- function(D, Y, propensity.scores,
 #' @param proxy.cate a vector of proxy CATE estimates of length _M_
 #' @param group.membership.main.sample a logical matrix with _M_ rows that indicate 
 #' the group memberships (such a matrix is returned by the function quantile.group())
+#' @param vcov.type_GATES a character string specifying the estimation type of the error covariance matrix. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
 #' @return GATES coefficients 
 #' 
 #' @export
@@ -67,6 +73,7 @@ BLP.classic <- function(D, Y, propensity.scores,
 GATES.classic <- function(D, Y, 
                           propensity.scores, 
                           proxy.baseline, proxy.cate,
+                          vcov.type_GATES = "const",
                           group.membership.main.sample,
                           significance.level = 0.05){
   
@@ -84,8 +91,11 @@ GATES.classic <- function(D, Y,
   # fit weighted linear regression by OLS
   gates.obj <- lm(Y ~., data = data.frame(Y, X), weights = weights)
   
+  # get estimate of error covariance matrix (potentially heteroskedasticity robust)
+  vcov <- sandwich::vcovHC(x = gates.obj, type = vcov.type_GATES)
+  
   # extract coefficients
-  coefficients                 <- summary(gates.obj)$coefficients
+  coefficients                 <- lmtest::coeftest(gates.obj, vcov. = vcov)
   gates.coefficients           <- coefficients[paste0("gamma.", 1:ncol(groups)), 1]
   gates.coefficients.quantiles <- colnames(groups)
   names(gates.coefficients.quantiles) <- paste0("gamma.", 1:ncol(groups))
@@ -104,11 +114,10 @@ GATES.classic <- function(D, Y,
                                         "Std. Error", "z value", "Pr(<z)", "Pr(>z)")]
   
   # prepare generic target parameters for the difference
-  covmat  <- stats::vcov(gates.obj)
   diff    <- coefficients[paste0("gamma.", ncol(groups)), "Estimate"] - 
     coefficients["gamma.1", "Estimate"]
-  diff.se <- sqrt(covmat[paste0("gamma.", ncol(groups)), paste0("gamma.", ncol(groups))] +
-                    covmat["gamma.1", "gamma.1"] - 2 * covmat[paste0("gamma.", ncol(groups)), "gamma.1"])
+  diff.se <- sqrt(vcov[paste0("gamma.", ncol(groups)), paste0("gamma.", ncol(groups))] +
+                    vcov["gamma.1", "gamma.1"] - 2 * vcov[paste0("gamma.", ncol(groups)), "gamma.1"])
   ci.lo   <- diff - qnorm(1-significance.level/2) * diff.se
   ci.up   <- diff + qnorm(1-significance.level/2) * diff.se
   zstat   <- diff / diff.se
@@ -132,11 +141,13 @@ GATES.classic <- function(D, Y,
 #' @param Z.clan.main.sample a matrix with _|M|_ rows. Each column represents a variable for which CLAN shall be performed.
 #' @param group.membership.main.sample a logical matrix with _M_ rows that indicate 
 #' the group memberships (such a matrix is returned by the function quantile.group())
+#' @param equal.group.variances_CLAN logical. If TRUE, the the two within-group variances of the most and least affected group are assumed to be equal. Default is FALSE.
 #' @return The two CLAN parameters ("most" affected and "least" affected) for each variable in Z.clan.main.sample
 #' 
 #' @export
 CLAN <- function(Z.clan.main.sample, 
                  group.membership.main.sample, 
+                 equal.group.variances_CLAN = FALSE,
                  significance.level = 0.05){
   
   K <- ncol(group.membership.main.sample)
@@ -172,7 +183,7 @@ CLAN <- function(Z.clan.main.sample,
     # get summary statistics for difference between most and least affected group
     ttest.diff <- stats::t.test(x = Z.clan.main.sample[group.membership.main.sample[, K], j], 
                                 y = Z.clan.main.sample[group.membership.main.sample[, 1], j], 
-                                var.equal = FALSE) # 2-sample Welch t-test
+                                var.equal = equal.group.variances_CLAN) # 2-sample t-test
     
     diff        <- ttest.deltaK$estimate - ttest.delta1$estimate # difference in means
     diff.se     <- ttest.diff$stderr

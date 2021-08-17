@@ -8,6 +8,9 @@
 #' @param num.splits number of sample splits. Default is 100.
 #' @param Z.clan A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z.clan = Z`, i.e. CLAN is performed for all variables in `Z`.
 #' @param quantile.cutoffs The cutoff points of quantiles that shall be used for GATES grouping. Default is `c(0.25, 0.5, 0.75)`, which corresponds to the quartiles.
+#' @param vcov.type_BLP a character string specifying the estimation type of the error covariance matrix in BLP. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
+#' @param vcov.type_GATES a character string specifying the estimation type of the error covariance matrix in GATES. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
+#' @param equal.group.variances_CLAN logical. If TRUE, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is FALSE.
 #' @param proportion.in.main.set proportion of samples that shall be in main set. Default is 0.5.
 #' @param significance.level significance level for VEIN. Default is 0.05.
 #' @param store.learners Logical. If TRUE, all intermediate results of the learners will be stored. Default is FALSE.
@@ -20,6 +23,9 @@ GenericML <- function(Z, D, Y,
                       num.splits = 100,
                       Z.clan = NULL,
                       quantile.cutoffs = c(0.25, 0.5, 0.75),
+                      vcov.type_BLP = "const",
+                      vcov.type_GATES = "const",
+                      equal.group.variances_CLAN = FALSE,
                       proportion.in.main.set = 0.5, 
                       significance.level = 0.05,
                       store.learners = FALSE,
@@ -39,6 +45,9 @@ GenericML <- function(Z, D, Y,
                                learners = learners.genericML, 
                                num.splits = num.splits,
                                Z.clan = Z.clan, 
+                               vcov.type_BLP = vcov.type_BLP,
+                               vcov.type_GATES = vcov.type_GATES,
+                               equal.group.variances_CLAN = equal.group.variances_CLAN,
                                proportion.in.main.set = proportion.in.main.set, 
                                quantile.cutoffs = quantile.cutoffs,
                                significance.level = significance.level,

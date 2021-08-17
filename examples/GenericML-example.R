@@ -10,7 +10,7 @@ rm(list = ls()) ; gc(); cat("\014")
 # Install the required packages if they are not already installed
 required.packages <- c("ggplot2", "mlr3", "mlr3learners", 
                        "mvtnorm", "glmnet", "ranger", "e1071",
-                       "kknn", "MASS", "nnet", "xgboost")
+                       "kknn", "MASS", "nnet", "xgboost", "sandwich", "lmtest")
 new.packages      <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 rm(required.packages, new.packages)
@@ -64,6 +64,13 @@ num.splits               <- 100
 # specify the significance level
 significance.level       <- 0.05
 
+# specify which estimator of the error covariance matrix shall be used in BLP and GATES
+vcov.type_BLP   <- "const"
+vcov.type_GATES <- "const" # homoskedasticity here
+
+# specify whether of not it should be assumed that the group variances of the most and least affected groups are equal in CLAN. 
+equal.group.variances_CLAN = FALSE
+
 # specify the proportion of samples that shall be selected in the main set
 proportion.in.main.set   <- 0.5
 
@@ -79,6 +86,9 @@ genML <- GenericML(Z = Z, D = D, Y = Y,
                    num.splits = num.splits,
                    Z.clan = Z.clan,
                    quantile.cutoffs = quantile.cutoffs,
+                   vcov.type_BLP = vcov.type_BLP,
+                   vcov.type_GATES = vcov.type_GATES,
+                   equal.group.variances_CLAN = equal.group.variances_CLAN,
                    proportion.in.main.set = proportion.in.main.set, 
                    significance.level = significance.level,
                    store.splits = store.splits,
