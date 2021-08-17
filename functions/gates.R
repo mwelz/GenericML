@@ -113,7 +113,7 @@ GATES.HT <- function(D, Y,
   
   # prepare matrix X1
   X1.big <- cbind(S = proxy.cate, B = proxy.baseline, p = propensity.scores)
-  X1     <- X1.big[, X1.variables]
+  X1     <- X1.big[, X1.variables, drop = FALSE]
   
   # matrix X_1 * H
   X1H           <- X1 * H
