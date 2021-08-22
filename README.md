@@ -9,7 +9,7 @@ R implementation of Generic Machine Learning (Chernozhukov, V., Demirer, M., Duf
 ## TODO
 
 - [ ] Make it optional for user to supply propensity scores;
-- [ ] Implement stratified sampling for sample splitting;
+- [x] Implement stratified sampling for sample splitting (function done, but implementation in main procedure still needs to be done);
 - [ ] Make it optional to use arbitrary covariates in `X1`;
 - [ ] Make it optional that BLP can also use fixed effects and clustering;
 - [ ] Make generic targets as differences optional;
