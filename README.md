@@ -8,10 +8,13 @@ R implementation of Generic Machine Learning (Chernozhukov, V., Demirer, M., Duf
 
 ## TODO
 
-- [x] Make it optional to have heteroskedastic errors in the linear models (also for two-sample t-tests);
+- [ ] Make it optional for user to supply propensity scores;
+- [ ] Implement stratified sampling for sample splitting;
+- [ ] Make it optional to use arbitrary covariates in `X1`;
+- [ ] Make it optional that BLP can also use fixed effects and clustering;
+- [ ] Make generic targets as differences optional;
+- [ ] Parallelize the main loop;
 - [ ] Implement deep neural networks as regression learner. Currently not supported by `mlr3`;
-- [x] Implement the Horvitz-Thompson transformation;
-- [x] Add noise in case of low variation of the `S` and `B` learner;
 - [ ] Add optional monotonization of the confindence bounds;
 - [ ] Error handling. Current implementation might throw an error in case of undersampling;
 - [ ] Implement S3 class structure and reorganize repo;
