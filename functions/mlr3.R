@@ -1,16 +1,5 @@
-#' Estimates the propensity score
-#' 
-#' @param Z a matrix or data frame of covariates
-#' @param D a binary vector of treatment status
-#' @param learner the classification machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("classif.ranger", num.trees = 500) for a classification forest, which is also the default. 
-#' @return Estimates of Pr(D = 1 | Z) and an 'mlr3' object of the employed model 
-#' 
-#' @export
-propensity.score <- function(Z, D, learner = "random.forest"){
-  
-  # input checks
-  if(length(unique(D)) != 2) stop("Treatment assignment 'D' does not have 2 unique values.")
-  if(!all(c(0, 1) %in% unique(D))) stop("Treatment assignment 'D' is non-binary.")
+# helper function in case the propensity scores are estimated via mlr3
+propensity.score_mlr3 <- function(Z, D, learner = "random.forest"){
   
   # specify the task
   task.propensity.score <- mlr3::TaskClassif$new(id = "propensity.score", 
@@ -31,10 +20,6 @@ propensity.score <- function(Z, D, learner = "random.forest"){
   } else if(learner == "tree"){
     
     learner <- mlr3::lrn("classif.rpart")
-    
-  } else{
-    
-    stop("Invalid argument for 'learner'. Needs to be either 'glm', 'random.forest', 'tree', or an mlr3 object")
     
   } # END IF
   
@@ -57,6 +42,55 @@ propensity.score <- function(Z, D, learner = "random.forest"){
                                   learner = learner)))
   
 } # END FUN
+
+
+#' Estimates the propensity score
+#' 
+#' @param Z a matrix or data frame of covariates
+#' @param D a binary vector of treatment status
+#' @param estimator the estimator to be used. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to 'constant' (estimates the propensity scores by mean(D)), 'elastic.net', 'random.forest', 'tree', or mlr3 syntax. Example for the latter: mlr3::lrn("classif.ranger", num.trees = 500) for a classification forest.
+#' @return Estimates of Pr(D = 1 | Z) and an 'mlr3' object of the employed model (if applicable)
+#' 
+#' @export
+propensity.score <- function(Z, D, estimator = "constant"){
+  
+  # input checks
+  if(length(unique(D)) != 2) stop("Treatment assignment 'D' does not have 2 unique values.")
+  if(!all(c(0, 1) %in% unique(D))) stop("Treatment assignment 'D' is non-binary.")
+  
+  if(!is.character(estimator)){
+    
+    ### case 1: propensity scores are supplied by the user
+    if(length(estimator) != length(D)) stop("User-supplied propensity scores in 'estimator' are not of same length as vectors Z and D!")
+    if(any(estimator <= 0 | estimator >= 1)) stop("User-supplied propensity scores in 'estimator' must be contained in interval (0,1)!")
+    
+    out <- list(propensity.scores = estimator,
+                mlr3.objects = NULL)
+    
+  } else if(estimator == "constant"){
+    
+    ### case 2: propensity scores are estimated by mean of D
+    out <- list(propensity.scores = rep(mean(D), length(Z)),
+                mlr3.objects = NULL)
+    
+  } else{
+    
+    ### case 3: propensity scores are estimated by mlr3 (or illegal input)
+    
+    # for the following choices of the learner, we require mlr3:
+    if(estimator %in% c("elastic.net", "random.forest", "tree") |
+       substr(estimator, start = 1, stop = 6) == "mlr3::"){
+      
+      out <- propensity.score_mlr3(Z = Z, D = D, learner = make.mlr3.string(estimator, regr = FALSE))
+      
+    } else stop("The argument 'estimator' must be equal to either 'constant', 'elastic.net', random.forest', 'tree', an mlr3 string, or a numeric vector of the same length as Z and D!")
+    
+  } # IF
+  
+  # return
+  return(out)
+
+} # FUN
 
 
 

@@ -10,7 +10,7 @@ make.mlr3.string <- function(learner.str, regr = TRUE){
     learner <- paste0(substr(learner.str, start = 1, stop = 11), ifelse(regr, "regr.", "classif."), 
                       substr(learner.str, start = 12, stop = 1e8))
     
-    learner <-eval(parse(text = learner))
+    learner <- eval(parse(text = learner))
     
   } # END IF
   

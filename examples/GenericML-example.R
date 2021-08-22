@@ -48,7 +48,7 @@ Y  <- ifelse(D == 1, Y1, Y0)
 # quantile cutoffs for the GATES grouping of the estimated CATEs 
 quantile.cutoffs         <- c(0.2, 0.4, 0.6, 0.8) # 20%, 40%, 60%, 80% quantiles
 
-# specify the learner of the propensity score (non-penalized logistic regression here)
+# specify the learner of the propensity score (non-penalized logistic regression here). Propensity scores can also directly be supplied.
 learner.propensity.score <- "mlr3::lrn('glmnet', lambda = 0, alpha = 1)" 
 
 # specify the considered learners of the BCA and the CATE (here: elastic net, random forest, and SVM)
