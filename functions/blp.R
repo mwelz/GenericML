@@ -7,7 +7,8 @@
 #' @param proxy.cate a vector of proxy CATE estimates of length _M_
 #' @param HT.transformation logical. If TRUE, a HT transformation is applied (BLP2 in the paper). Default is FALSE.
 #' @param X1.variables a character string specifying the variables in the matrix X1. Needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores. Note that a constant 1 will be silently included in X1.
-#' @param vcov.type a character string specifying the estimation type of the error covariance matrix. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
+#' @param vcov.estimator the covariance matrix estimator to be used; specifies a covariance estimating function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are c("vcovBS", "vcovCL", "vcovHAC", "vcovHC"). Default is "vcovHC".
+#' @param vcov.control list of arguments that shall be passed to the function specified in vcov.estimator (which is in turn a covariance estimating function in the sandwich package). Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
 #' @param significance.level significance level for construction of confidence intervals
 #' @return BLP coefficients with inference statements
 #' 
@@ -18,7 +19,8 @@ BLP <- function(D, Y,
                 proxy.cate, 
                 HT.transformation  = FALSE,
                 X1.variables       = c("B"),
-                vcov.type          = "const",
+                vcov.estimator     = "vcovHC",
+                vcov.control       = list(type = "const"),
                 significance.level = 0.05){
   
   # input check
@@ -31,7 +33,8 @@ BLP <- function(D, Y,
                       proxy.baseline     = proxy.baseline,
                       proxy.cate         = proxy.cate, 
                       X1.variables       = X1.variables,
-                      vcov.type          = vcov.type,
+                      vcov.estimator     = vcov.estimator,
+                      vcov.control       = vcov.control,
                       significance.level = significance.level))
 
 } # FUN
@@ -41,7 +44,8 @@ BLP <- function(D, Y,
 BLP.classic <- function(D, Y, propensity.scores, 
                         proxy.baseline, proxy.cate, 
                         X1.variables = c("B"),
-                        vcov.type = "const",
+                        vcov.estimator = "vcovHC",
+                        vcov.control = list(type = "const"),
                         significance.level = 0.05){
   
   # prepare weights
@@ -59,9 +63,11 @@ BLP.classic <- function(D, Y, propensity.scores,
   # fit weighted linear regression by OLS
   blp.obj <- lm(Y ~., data = data.frame(Y, X), weights = weights)
   
-  # get estimate of error covariance matrix (potentially heteroskedasticity robust)
-  vcov <- sandwich::vcovHC(x = blp.obj, type = vcov.type)
-  
+  # get estimate of covariance matrix of the error terms
+  vcov <- get.vcov(x              = blp.obj,
+                   vcov.estimator = vcov.estimator,
+                   vcov.control   = vcov.control)
+
   # extract coefficients
   coefficients <- lmtest::coeftest(blp.obj, vcov. = vcov)
   
@@ -79,7 +85,8 @@ BLP.classic <- function(D, Y, propensity.scores,
 BLP.HT <- function(D, Y, propensity.scores, 
                    proxy.baseline, proxy.cate, 
                    X1.variables = c("B"),
-                   vcov.type = "const",
+                   vcov.estimator = "vcovHC",
+                   vcov.control = list(type = "const"),
                    significance.level = 0.05){
   
   # HT transformation
@@ -102,8 +109,10 @@ BLP.HT <- function(D, Y, propensity.scores,
   blp.obj <- lm(formula =  as.formula(paste0("YH ~ ", paste0(colnames(X), collapse = " + "), " + 0")),
                 data = data.frame(YH = Y*H, X))
 
-  # get estimate of error covariance matrix (potentially heteroskedasticity robust)
-  vcov <- sandwich::vcovHC(x = blp.obj, type = vcov.type)
+  # get estimate of covariance matrix of the error terms
+  vcov <- get.vcov(x              = blp.obj,
+                   vcov.estimator = vcov.estimator,
+                   vcov.control   = vcov.control)
   
   # extract coefficients
   coefficients <- lmtest::coeftest(blp.obj, vcov. = vcov)

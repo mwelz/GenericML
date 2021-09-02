@@ -80,8 +80,10 @@ quantile.group <- function(x,
 #' @param Z.clan A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z.clan = Z`, i.e. CLAN is performed for all variables in `Z`.
 #' @param X1.variables a character string specifying the variables in the matrix X1. Needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores. Unless a HT transformation is employed in GATES, a constant 1 is silently included in X1 as well.
 #' @param HT.transformation logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.
-#' @param vcov.type_BLP a character string specifying the estimation type of the error covariance matrix in BLP. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
-#' @param vcov.type_GATES a character string specifying the estimation type of the error covariance matrix in GATES. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
+#' @param vcov.estimator_BLP the covariance matrix estimator to be used in the BLP regression; specifies a covariance estimating function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are c("vcovBS", "vcovCL", "vcovHAC", "vcovHC"). Default is "vcovHC".
+#' @param vcov.control_BLP list of arguments that shall be passed to the function specified in vcov.estimator_BLP (which is in turn a covariance estimating function in the sandwich package). Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
+#' @param vcov.estimator_GATES same as vcov.estimator_BLP, just for GATES regression
+#' @param vcov.control_GATES same as vcov.control_BLP, just for GATES regression
 #' @param equal.group.variances_CLAN logical. If TRUE, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is FALSE.
 #' @param proportion.in.main.set proportion of samples that shall be in main set. Default is 0.5.
 #' @param quantile.cutoffs Cutoff points of quantiles that shall be used for GATES grouping
@@ -99,8 +101,10 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                                              Z.clan                     = NULL, 
                                              X1.variables               = c("B"),
                                              HT.transformation          = FALSE,
-                                             vcov.type_BLP              = "const",
-                                             vcov.type_GATES            = "const",
+                                             vcov.estimator_BLP         = "vcovHC",
+                                             vcov.control_BLP           = list(type = "const"),
+                                             vcov.estimator_GATES       = "vcovHC",
+                                             vcov.control_GATES         = list(type = "const"),
                                              equal.group.variances_CLAN = FALSE,
                                              proportion.in.main.set     = 0.5, 
                                              quantile.cutoffs           = c(0.25, 0.5, 0.75),
@@ -137,10 +141,11 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                  proxy.cate         = proxy.cate, 
                  HT.transformation  = HT.transformation,
                  X1.variables       = X1.variables,
-                 vcov.type          = vcov.type_BLP,
+                 vcov.estimator     = vcov.estimator_BLP,
+                 vcov.control       = vcov.control_BLP,
                  significance.level = significance.level)
   
-  
+
   ### step 2c: estimate GATES parameters by OLS ----
   # group the proxy estimators for the CATE in the main sample by quantiles
   group.membership.main.sample <- quantile.group(proxy.cate, 
@@ -155,7 +160,8 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                      group.membership.main.sample = group.membership.main.sample,
                      HT.transformation  = HT.transformation,
                      X1.variables       = X1.variables,
-                     vcov.type          = vcov.type_GATES,
+                     vcov.estimator     = vcov.estimator_GATES,
+                     vcov.control       = vcov.control_GATES,
                      significance.level = significance.level)
   
   

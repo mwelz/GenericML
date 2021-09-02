@@ -9,7 +9,8 @@
 #' the group memberships (such a matrix is returned by the function quantile.group())
 #' @param HT.transformation logical. If TRUE, a HT transformation is applied (GATES2 in the paper). Default is FALSE.
 #' @param X1.variables a character string specifying the variables in the matrix X1. Needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores. If no HT transformation is applied, a constant 1 is silently included in X1.
-#' @param vcov.type a character string specifying the estimation type of the error covariance matrix. See sandwich::vcovHC for details. Default is "const" (for homoskedasticity)
+#' @param vcov.estimator the covariance matrix estimator to be used; specifies a covariance estimating function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are c("vcovBS", "vcovCL", "vcovHAC", "vcovHC"). Default is "vcovHC".
+#' @param vcov.control list of arguments that shall be passed to the function specified in vcov.estimator (which is in turn a covariance estimating function in the sandwich package). Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
 #' @param significance.level significance level for construction of confidence intervals
 #' @return GATES coefficients 
 #' 
@@ -21,7 +22,8 @@ GATES <- function(D, Y,
                   group.membership.main.sample,
                   HT.transformation  = FALSE,
                   X1.variables       = c("B"),
-                  vcov.type          = "const",
+                  vcov.estimator     = "vcovHC",
+                  vcov.control       = list(type = "const"),
                   significance.level = 0.05){
   
   # input check
@@ -35,7 +37,8 @@ GATES <- function(D, Y,
                       proxy.cate         = proxy.cate, 
                       group.membership.main.sample = group.membership.main.sample,
                       X1.variables       = X1.variables,
-                      vcov.type          = vcov.type,
+                      vcov.estimator     = vcov.estimator,
+                      vcov.control       = vcov.control,
                       significance.level = significance.level))
   
 } # FUN
@@ -47,7 +50,8 @@ GATES.classic <- function(D, Y,
                           proxy.baseline, proxy.cate,
                           group.membership.main.sample,
                           X1.variables = c("B"),
-                          vcov.type = "const",
+                          vcov.estimator = "vcovHC",
+                          vcov.control = list(type = "const"),
                           significance.level = 0.05){
   
   # make the group membership a binary matrix
@@ -71,8 +75,10 @@ GATES.classic <- function(D, Y,
   # fit weighted linear regression by OLS
   gates.obj <- lm(Y ~., data = data.frame(Y, X), weights = weights)
   
-  # get estimate of error covariance matrix (potentially heteroskedasticity robust)
-  vcov <- sandwich::vcovHC(x = gates.obj, type = vcov.type)
+  # get estimate of covariance matrix of the error terms
+  vcov <- get.vcov(x              = gates.obj,
+                   vcov.estimator = vcov.estimator,
+                   vcov.control   = vcov.control)
   
   # extract the relevant coefficients
   coefficients                 <- lmtest::coeftest(gates.obj, vcov. = vcov)
@@ -99,7 +105,8 @@ GATES.HT <- function(D, Y,
                      proxy.baseline, proxy.cate,
                      group.membership.main.sample,
                      X1.variables = c("B"),
-                     vcov.type = "const",
+                     vcov.estimator = "vcovHC",
+                     vcov.control = list(type = "const"),
                      significance.level = 0.05){
  
   # make the group membership a binary matrix
@@ -127,8 +134,10 @@ GATES.HT <- function(D, Y,
   gates.obj <- lm(formula =  as.formula(paste0("YH ~ ", paste0(colnames(X), collapse = " + "), " + 0")),
                 data = data.frame(YH = Y*H, X))
   
-  # get estimate of error covariance matrix (potentially heteroskedasticity robust)
-  vcov <- sandwich::vcovHC(x = gates.obj, type = vcov.type)
+  # get estimate of covariance matrix of the error terms
+  vcov <- get.vcov(x              = gates.obj,
+                   vcov.estimator = vcov.estimator,
+                   vcov.control   = vcov.control)
   
   # extract the relevant coefficients
   coefficients                 <- lmtest::coeftest(gates.obj, vcov. = vcov)
