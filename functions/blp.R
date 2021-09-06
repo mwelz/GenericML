@@ -26,7 +26,7 @@ BLP <- function(D, Y,
                 significance.level = 0.05){
   
   # input check
-  input.checks.X1(X1.variables$functions_of_Z)
+  input.checks.X1(X1.variables)
   
   # fit model according to strategy 1 or 2 in the paper
   do.call(what = get(ifelse(HT.transformation, "BLP.HT", "BLP.classic")),

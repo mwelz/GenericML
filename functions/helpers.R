@@ -147,6 +147,14 @@ generic.ml.across.learners <- function(Z, D, Y,
   genericML.by.split <- list()
   N     <- length(Y)
   N.set <- 1:N
+   
+  # make the custom covariates a matrix to prevent bug later
+  if(!is.null(X1.variables_BLP$custom_covariates)){
+    X1.variables_BLP$custom_covariates <- as.matrix(X1.variables_BLP$custom_covariates)
+  } # IF
+  if(!is.null(X1.variables_GATES$custom_covariates)){
+    X1.variables_GATES$custom_covariates <- as.matrix(X1.variables_GATES$custom_covariates)
+  } # IF
   
   if(store.splits) splits.mat <- matrix(NA_character_, N, num.splits)
   
@@ -299,17 +307,20 @@ VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
 
 
 # helper that throws error in case of illegal input in 'X1.variables'
-input.checks.X1 <- function(X1.variables_functions_of_Z){
+input.checks.X1 <- function(X1.variables){
   
-  legalinput <- X1.variables_functions_of_Z %in% c("S", "B", "p")
+  legalinput <- X1.variables$functions_of_Z %in% c("S", "B", "p")
   
   if(!all(legalinput)){
     
     stop(paste0("Entries '", 
-               paste(X1.variables_functions_of_Z[!legalinput], collapse = "', '"), 
+               paste(X1.variables$functions_of_Z[!legalinput], collapse = "', '"), 
                "' of 'X1.variables' are not contained in c('S', 'B', 'p')!"))
     
   } # IF
+  
+  if(!is.vector(X1.variables$fixed_effects)) stop("The fixed effects need to be a vector")
+  
 } # FUN
 
 
