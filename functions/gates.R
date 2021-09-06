@@ -8,7 +8,7 @@
 #' @param group.membership.main.sample a logical matrix with _M_ rows that indicate 
 #' the group memberships (such a matrix is returned by the function quantile.group())
 #' @param HT.transformation logical. If TRUE, a HT transformation is applied (GATES2 in the paper). Default is FALSE.
-#' @param X1.variables a character string specifying the variables in the matrix X1. Needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores. If no HT transformation is applied, a constant 1 is silently included in X1.
+#' @param X1.variables a list controlling the variables that shall be used in the matrix X1. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers, strings, or a factor thereof that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL). Note that in the final matrix X1, a constant 1 will be silently included if no HT transformation is applied so that the regression model has an intercept.
 #' @param vcov.estimator the covariance matrix estimator to be used; specifies a covariance estimating function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are c("vcovBS", "vcovCL", "vcovHAC", "vcovHC"). Default is "vcovHC".
 #' @param vcov.control list of arguments that shall be passed to the function specified in vcov.estimator (which is in turn a covariance estimating function in the sandwich package). Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
 #' @param significance.level significance level for construction of confidence intervals
@@ -21,7 +21,9 @@ GATES <- function(D, Y,
                   proxy.cate,
                   group.membership.main.sample,
                   HT.transformation  = FALSE,
-                  X1.variables       = c("B"),
+                  X1.variables       = list(functions_of_Z = c("B"),
+                                            custom_covariates = NULL,
+                                            fixed_effects = NULL),
                   vcov.estimator     = "vcovHC",
                   vcov.control       = list(type = "const"),
                   significance.level = 0.05){
@@ -49,7 +51,9 @@ GATES.classic <- function(D, Y,
                           propensity.scores, 
                           proxy.baseline, proxy.cate,
                           group.membership.main.sample,
-                          X1.variables = c("B"),
+                          X1.variables = list(functions_of_Z = c("B"),
+                                              custom_covariates = NULL,
+                                              fixed_effects = NULL),
                           vcov.estimator = "vcovHC",
                           vcov.control = list(type = "const"),
                           significance.level = 0.05){
@@ -64,13 +68,15 @@ GATES.classic <- function(D, Y,
   weights <- 1 / (propensity.scores * (1 - propensity.scores))
   
   # prepare matrix X1
-  X1.big <- cbind(S = proxy.cate, B = proxy.baseline, p = propensity.scores)
-  X1     <- X1.big[, X1.variables]
+  X1     <- get.df.from.X1.variables(functions.of.Z_mat = cbind(S = proxy.cate, 
+                                                                B = proxy.baseline, 
+                                                                p = propensity.scores),
+                                     X1.variables = X1.variables)
   
   # prepare covariate matrix
   X <- data.frame(X1, 
                   (D - propensity.scores) * groups)
-  colnames(X) <- c(X1.variables, paste0("gamma.", 1:K))
+  colnames(X) <- c(colnames(X1), paste0("gamma.", 1:K))
   
   # fit weighted linear regression by OLS
   gates.obj <- lm(Y ~., data = data.frame(Y, X), weights = weights)
@@ -104,7 +110,9 @@ GATES.HT <- function(D, Y,
                      propensity.scores, 
                      proxy.baseline, proxy.cate,
                      group.membership.main.sample,
-                     X1.variables = c("B"),
+                     X1.variables = list(functions_of_Z = c("B"),
+                                         custom_covariates = NULL,
+                                         fixed_effects = NULL),
                      vcov.estimator = "vcovHC",
                      vcov.control = list(type = "const"),
                      significance.level = 0.05){
@@ -119,15 +127,34 @@ GATES.HT <- function(D, Y,
   H <- (D - propensity.scores) / (propensity.scores * (1 - propensity.scores))
   
   # prepare matrix X1
-  X1.big <- cbind(S = proxy.cate, B = proxy.baseline, p = propensity.scores)
-  X1     <- X1.big[, X1.variables, drop = FALSE]
+  X1 <- get.df.from.X1.variables(functions.of.Z_mat = cbind(S = proxy.cate, 
+                                                            B = proxy.baseline, 
+                                                            p = propensity.scores),
+                                 X1.variables = X1.variables)
   
-  # matrix X_1 * H
-  X1H           <- X1 * H
-  colnames(X1H) <- paste0(colnames(X1), ".H")
+  # construct the matrix X1H (the fixed effects are not multiplied by H, if applicable)
+  if(is.null(X1.variables$fixed_effects)){
+    
+    # matrix X_1 * H
+    X1H           <- X1 * H
+    colnames(X1H) <- paste0(colnames(X1), ".H")
+    
+  } else{
+    
+    fixed.effects     <- X1$fixed.effects  # retain the fixed effects 
+    X1                <- X1[,!colnames(X1) %in% "fixed.effects", drop = FALSE]
+    X1H               <- X1 * H
+    colnames(X1H)     <- paste0(colnames(X1), ".H")
+    
+    # perform one-hot encoding on fixed effect categories and drop first category to avoid dummy trap
+    X1H <- data.frame(X1H, 
+                      as.matrix(model.matrix(~ fixed.effects + 0, data = fixed.effects))[,-1])
+    
+  } # IF
   
+
   # prepare covariate matrix
-  X <- data.frame(X1,  groups)
+  X <- data.frame(X1H,  groups)
   colnames(X) <- c(colnames(X1H), paste0("gamma.", 1:K))
   
   # fit linear regression by OLS (no intercept!)
