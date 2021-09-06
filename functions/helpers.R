@@ -294,15 +294,15 @@ VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
 
 
 # helper that throws error in case of illegal input in 'X1.variables'
-input.checks.X1 <- function(X1.variables){
+input.checks.X1 <- function(X1.variables_functions_of_Z){
   
-  legalinput <- X1.variables %in% c("S", "B", "p")
+  legalinput <- X1.variables_functions_of_Z %in% c("S", "B", "p")
   
   if(!all(legalinput)){
     
     stop(paste0("Entries '", 
-                X1.variables[!legalinput], 
-                "' of 'X1.variables' are not contained in c('S', 'B', 'p')!"))
+               paste(X1.variables_functions_of_Z[!legalinput], collapse = "', '"), 
+               "' of 'X1.variables' are not contained in c('S', 'B', 'p')!"))
     
   } # IF
 } # FUN
@@ -324,4 +324,21 @@ get.vcov <- function(x,
   do.call(what = eval(parse(text = paste0("sandwich::", vcov.estimator))),
           args = vcov.control)
 
+} # FUN
+
+
+# helper function to prepare the custom part of the regressor matrix in BLP and GATES
+get.df.from.X1.variables <- function(functions.of.Z_mat,
+                                     X1.variables){
+  
+  custom        <- X1.variables$custom_covariates
+  fixed.eff     <- X1.variables$fixed_effects
+  out           <- data.frame(functions.of.Z_mat[, X1.variables$functions_of_Z])
+  colnames(out) <- X1.variables$functions_of_Z
+  
+  if(!is.null(fixed.eff)) out$fixed.effects <- factor(fixed.eff)
+  if(!is.null(custom))    out <- data.frame(out, custom)
+  
+  out
+  
 } # FUN
