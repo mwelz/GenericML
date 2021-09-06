@@ -2,8 +2,8 @@
 #' Demonstration of our implementation of Generic ML.
 #' Note that this implementation is **not** yet an R package, although we intend to create a package for the CRAN based on it.
 #' 
-#' Author: mwelz & aalfons
-#' Last changed: Aug 17, 2021
+#' Author: mwelz & aalfons & mdemirer
+#' Last changed: Sep 6, 2021
 #' ------------------------------------------------------------
 rm(list = ls()) ; gc(); cat("\014")
 
@@ -64,8 +64,13 @@ num.splits               <- 100
 # specify if a HT transformation shall be used when estimating BLP and GATES
 HT.transformation <- FALSE
 
-# specify the variables in the matrix X1. Needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores. Unless a HT transformation is employed in GATES, a constant 1 is silently included in X1 as well.
-X1.variables <- c("B")
+# A list controlling the variables that shall be used in the matrix X1 for the BLP and GATES regressions. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers, strings, or a factor thereof that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept (unless HT transformation is applied in GATES).
+X1.variables_BLP    <- list(functions_of_Z = c("B"),
+                            custom_covariates = NULL,
+                            fixed_effects = NULL)
+X1.variables_GATES  <- list(functions_of_Z = c("B"),
+                            custom_covariates = NULL,
+                            fixed_effects = NULL)
 
 # specify the significance level
 significance.level       <- 0.05
@@ -73,9 +78,11 @@ significance.level       <- 0.05
 # specify minimum variation of predictions before Gaussian noise with variance var(Y)/20 is added.
 minimum.variation <- 1e-05
 
-# specify which estimator of the error covariance matrix shall be used in BLP and GATES
-vcov.type_BLP   <- "const"
-vcov.type_GATES <- "const" # homoskedasticity here
+# specify which estimator of the error covariance matrix shall be used in BLP and GATES (standard OLS covariance matrix estimator here)
+vcov.control_BLP   <- list(estimator = "vcovHC",
+                        arguments = list(type = "const"))
+vcov.control_GATES <- list(estimator = "vcovHC",
+                        arguments = list(type = "const"))
 
 # specify whether of not it should be assumed that the group variances of the most and least affected groups are equal in CLAN. 
 equal.group.variances_CLAN <- FALSE
@@ -94,11 +101,12 @@ genML <- GenericML(Z = Z, D = D, Y = Y,
                    learners.genericML = learners.genericML,
                    num.splits = num.splits,
                    Z.clan = Z.clan,
-                   X1.variables = X1.variables,
-                   HT.transformation = HT.transformation,
-                   quantile.cutoffs = quantile.cutoffs,
-                   vcov.type_BLP = vcov.type_BLP,
-                   vcov.type_GATES = vcov.type_GATES,
+                   HT.transformation = HT.transformation, 
+                   X1.variables_BLP = X1.variables_BLP, 
+                   X1.variables_GATES = X1.variables_GATES,
+                   vcov.control_BLP = vcov.control_BLP, 
+                   vcov.control_GATES = vcov.control_GATES,
+                   quantile.cutoffs = quantile.cutoffs, 
                    equal.group.variances_CLAN = equal.group.variances_CLAN,
                    proportion.in.main.set = proportion.in.main.set, 
                    significance.level = significance.level,
