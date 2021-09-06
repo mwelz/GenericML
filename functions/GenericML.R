@@ -8,7 +8,8 @@
 #' @param num.splits number of sample splits. Default is 100.
 #' @param Z.clan A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z.clan = Z`, i.e. CLAN is performed for all variables in `Z`.
 #' @param HT.transformation logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.
-#' @param X1.variables a character string specifying the variables in the matrix X1. Needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores. Unless a HT transformation is employed in GATES, a constant 1 is silently included in X1 as well.
+#' @param X1.variables_BLP a list controlling the variables that shall be used in the matrix X1 for the BLP regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers, strings, or a factor thereof that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.
+#' @param X1.variables_GATES a list controlling the variables that shall be used in the matrix X1 for the GATES regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers, strings, or a factor thereof that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL). Note that in the final matrix X1, a constant 1 will be silently included if no HT transformation is applied so that the regression model has an intercept.
 #' @param quantile.cutoffs The cutoff points of quantiles that shall be used for GATES grouping. Default is `c(0.25, 0.5, 0.75)`, which corresponds to the quartiles.
 #' @param vcov.estimator_BLP the covariance matrix estimator to be used in the BLP regression; specifies a covariance estimating function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are c("vcovBS", "vcovCL", "vcovHAC", "vcovHC"). Default is "vcovHC".
 #' @param vcov.control_BLP list of arguments that shall be passed to the function specified in vcov.estimator_BLP (which is in turn a covariance estimating function in the sandwich package). Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
@@ -28,7 +29,12 @@ GenericML <- function(Z, D, Y,
                       num.splits = 100,
                       Z.clan = NULL,
                       HT.transformation = FALSE,
-                      X1.variables = c("B"),
+                      X1.variables_BLP           = list(functions_of_Z = c("B"),
+                                                        custom_covariates = NULL,
+                                                        fixed_effects = NULL),
+                      X1.variables_GATES         = list(functions_of_Z = c("B"),
+                                                        custom_covariates = NULL,
+                                                        fixed_effects = NULL),
                       quantile.cutoffs = c(0.25, 0.5, 0.75),
                       vcov.estimator_BLP         = "vcovHC",
                       vcov.control_BLP           = list(type = "const"),
@@ -54,7 +60,8 @@ GenericML <- function(Z, D, Y,
                                learners                   = learners.genericML, 
                                num.splits                 = num.splits,
                                Z.clan                     = Z.clan, 
-                               X1.variables               = X1.variables,
+                               X1.variables_BLP           = X1.variables_BLP,
+                               X1.variables_GATES         = X1.variables_GATES,
                                HT.transformation          = HT.transformation,
                                vcov.estimator_BLP         = vcov.estimator_BLP,
                                vcov.control_BLP           = vcov.control_BLP,

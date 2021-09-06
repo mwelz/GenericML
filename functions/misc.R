@@ -78,14 +78,14 @@ quantile.group <- function(x,
 #' @param M.set main set
 #' @param A.set auxiliary set
 #' @param Z.clan A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z.clan = Z`, i.e. CLAN is performed for all variables in `Z`.
-#' @param X1.variables a character string specifying the variables in the matrix X1. Needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores. Unless a HT transformation is employed in GATES, a constant 1 is silently included in X1 as well.
+#' @param X1.variables_BLP a list controlling the variables that shall be used in the matrix X1 for the BLP regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers, strings, or a factor thereof that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.
+#' @param X1.variables_GATES a list controlling the variables that shall be used in the matrix X1 for the GATES regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers, strings, or a factor thereof that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL). Note that in the final matrix X1, a constant 1 will be silently included if no HT transformation is applied so that the regression model has an intercept.
 #' @param HT.transformation logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.
 #' @param vcov.estimator_BLP the covariance matrix estimator to be used in the BLP regression; specifies a covariance estimating function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are c("vcovBS", "vcovCL", "vcovHAC", "vcovHC"). Default is "vcovHC".
 #' @param vcov.control_BLP list of arguments that shall be passed to the function specified in vcov.estimator_BLP (which is in turn a covariance estimating function in the sandwich package). Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
 #' @param vcov.estimator_GATES same as vcov.estimator_BLP, just for GATES regression
 #' @param vcov.control_GATES same as vcov.control_BLP, just for GATES regression
 #' @param equal.group.variances_CLAN logical. If TRUE, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is FALSE.
-#' @param proportion.in.main.set proportion of samples that shall be in main set. Default is 0.5.
 #' @param quantile.cutoffs Cutoff points of quantiles that shall be used for GATES grouping
 #' @param significance.level Significance level. Default is 0.05
 #' @param minimum.variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
@@ -99,14 +99,18 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                                              learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',
                                              M.set, A.set,
                                              Z.clan                     = NULL, 
-                                             X1.variables               = c("B"),
+                                             X1.variables_BLP           = list(functions_of_Z = c("B"),
+                                                                               custom_covariates = NULL,
+                                                                               fixed_effects = NULL),
+                                             X1.variables_GATES         = list(functions_of_Z = c("B"),
+                                                                               custom_covariates = NULL,
+                                                                               fixed_effects = NULL),
                                              HT.transformation          = FALSE,
                                              vcov.estimator_BLP         = "vcovHC",
                                              vcov.control_BLP           = list(type = "const"),
                                              vcov.estimator_GATES       = "vcovHC",
                                              vcov.control_GATES         = list(type = "const"),
                                              equal.group.variances_CLAN = FALSE,
-                                             proportion.in.main.set     = 0.5, 
                                              quantile.cutoffs           = c(0.25, 0.5, 0.75),
                                              significance.level         = 0.05,
                                              minimum.variation          = 1e-05){
@@ -131,7 +135,7 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                          proxy.baseline.estimates = proxy.baseline.obj$baseline.predictions.full.sample, 
                          minimum.variation = minimum.variation)
   proxy.cate <- proxy.cate.obj$CATE.predictions.main.sample
-  
+
   
   ### step 2b: estimate BLP parameters by OLS ----
   blp.obj <- BLP(D = D[M.set], 
@@ -140,7 +144,9 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                  proxy.baseline     = proxy.baseline,
                  proxy.cate         = proxy.cate, 
                  HT.transformation  = HT.transformation,
-                 X1.variables       = X1.variables,
+                 X1.variables       = list(functions_of_Z = X1.variables_BLP$functions_of_Z,
+                                           custom_covariates = X1.variables_BLP$custom_covariates[M.set,],
+                                           fixed_effects = X1.variables_BLP$fixed_effects[M.set]),
                  vcov.estimator     = vcov.estimator_BLP,
                  vcov.control       = vcov.control_BLP,
                  significance.level = significance.level)
@@ -159,7 +165,9 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                      proxy.cate         = proxy.cate,
                      group.membership.main.sample = group.membership.main.sample,
                      HT.transformation  = HT.transformation,
-                     X1.variables       = X1.variables,
+                     X1.variables       = list(functions_of_Z = X1.variables_GATES$functions_of_Z,
+                                               custom_covariates = X1.variables_GATES$custom_covariates[M.set,],
+                                               fixed_effects = X1.variables_GATES$fixed_effects[M.set]),
                      vcov.estimator     = vcov.estimator_GATES,
                      vcov.control       = vcov.control_GATES,
                      significance.level = significance.level)
