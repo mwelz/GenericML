@@ -126,10 +126,10 @@ generic.ml.across.learners <- function(Z, D, Y,
                                                                          custom_covariates = NULL,
                                                                          fixed_effects = NULL),
                                        HT.transformation = FALSE,
-                                       vcov.estimator_BLP         = "vcovHC",
-                                       vcov.control_BLP           = list(type = "const"),
-                                       vcov.estimator_GATES       = "vcovHC",
-                                       vcov.control_GATES         = list(type = "const"),
+                                       vcov.control_BLP           = list(estimator = "vcovHC",
+                                                                         arguments = list(type = "const")),
+                                       vcov.control_GATES         = list(estimator = "vcovHC",
+                                                                         arguments = list(type = "const")),
                                        equal.group.variances_CLAN = FALSE,
                                        proportion.in.main.set = 0.5, 
                                        quantile.cutoffs = c(0.25, 0.5, 0.75),
@@ -186,9 +186,7 @@ generic.ml.across.learners <- function(Z, D, Y,
                                          X1.variables_BLP           = X1.variables_BLP,
                                          X1.variables_GATES         = X1.variables_GATES,
                                          HT.transformation          = HT.transformation,
-                                         vcov.estimator_BLP         = vcov.estimator_BLP,
                                          vcov.control_BLP           = vcov.control_BLP,
-                                         vcov.estimator_GATES       = vcov.estimator_GATES,
                                          vcov.control_GATES         = vcov.control_GATES,
                                          equal.group.variances_CLAN = equal.group.variances_CLAN,
                                          quantile.cutoffs           = quantile.cutoffs,
@@ -319,7 +317,9 @@ input.checks.X1 <- function(X1.variables){
     
   } # IF
   
-  if(!is.vector(X1.variables$fixed_effects)) stop("The fixed effects need to be a vector")
+  if(!is.null(X1.variables$fixed_effects) & !is.vector(X1.variables$fixed_effects)){
+    stop("The fixed effects need to be a vector")
+  } # IF
   
 } # FUN
 
@@ -327,18 +327,18 @@ input.checks.X1 <- function(X1.variables){
 # helper function that calculates an error covariance matrix estimator of a linear model
 #
 ## @param x a linear model object
-## @param vcov.estimator the covariance matrix estimator to be used; specifies a covariance estimator function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are c("vcovBS", "vcovCL", "vcovHAC", "vcovHC").
-## @param vcov.control list of arguments that shall be passed to the function specified in vcov.estimator (which is in turn a covariance estimating function in the sandwich package). Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
+## @param vcov.control a list with two elements called 'estimator' and 'arguments'. The argument 'estimator' is a string specifying the covariance matrix estimator to be used; specifies a covariance estimator function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are "vcovBS", "vcovCL", "vcovHAC", and "vcovHC". Default is 'vcovHC'. The element 'arguments' is a list of arguments that shall be passed to the function specified in the element 'estimator'. Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
 get.vcov <- function(x,
-                     vcov.estimator = "vcovHC",
-                     vcov.control = list(type = "const")){
+                     vcov.control = list(estimator = "vcovHC",
+                                         arguments = list(type = "const"))){
   
   # append the model so that we can pass this list to do.call
-  vcov.control$x <- x
+  arguments   <- vcov.control$arguments
+  arguments$x <- x
   
   # return the estimate
-  do.call(what = eval(parse(text = paste0("sandwich::", vcov.estimator))),
-          args = vcov.control)
+  do.call(what = eval(parse(text = paste0("sandwich::", vcov.control$estimator))),
+          args = arguments)
 
 } # FUN
 

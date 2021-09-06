@@ -10,9 +10,9 @@ R implementation of Generic Machine Learning (Chernozhukov, V., Demirer, M., Duf
 
 - [x] Make it optional for user to supply propensity scores;
 - [x] Implement stratified sampling for sample splitting (function done, but implementation in main procedure still needs to be done);
-- [ ] Make it optional to use arbitrary covariates in `X1`;
+- [x] Make it optional to use arbitrary covariates in `X1`;
 - [x] Make cluster-robust standard errors optional;
-- [ ] Implement fixed effects in the BLP/GATES regressions. Keep in mind the dummy trap in non-HT specifications;
+- [x] Implement fixed effects in the BLP/GATES regressions;
 - [ ] Make generic targets as differences optional;
 - [ ] Parallelize the main loop;
 - [ ] Implement deep neural networks as regression learner. Currently not supported by `mlr3`;

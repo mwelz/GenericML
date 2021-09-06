@@ -81,9 +81,7 @@ quantile.group <- function(x,
 #' @param X1.variables_BLP a list controlling the variables that shall be used in the matrix X1 for the BLP regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers, strings, or a factor thereof that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.
 #' @param X1.variables_GATES a list controlling the variables that shall be used in the matrix X1 for the GATES regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers, strings, or a factor thereof that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL). Note that in the final matrix X1, a constant 1 will be silently included if no HT transformation is applied so that the regression model has an intercept.
 #' @param HT.transformation logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.
-#' @param vcov.estimator_BLP the covariance matrix estimator to be used in the BLP regression; specifies a covariance estimating function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are c("vcovBS", "vcovCL", "vcovHAC", "vcovHC"). Default is "vcovHC".
-#' @param vcov.control_BLP list of arguments that shall be passed to the function specified in vcov.estimator_BLP (which is in turn a covariance estimating function in the sandwich package). Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
-#' @param vcov.estimator_GATES same as vcov.estimator_BLP, just for GATES regression
+#' @param vcov.control_BLP a list with two elements called 'estimator' and 'arguments'. The argument 'estimator' is a string specifying the covariance matrix estimator to be used in the BLP regression; specifies a covariance estimator function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are "vcovBS", "vcovCL", "vcovHAC", and "vcovHC". Default is 'vcovHC'. The element 'arguments' is a list of arguments that shall be passed to the function specified in the element 'estimator'. Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
 #' @param vcov.control_GATES same as vcov.control_BLP, just for GATES regression
 #' @param equal.group.variances_CLAN logical. If TRUE, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is FALSE.
 #' @param quantile.cutoffs Cutoff points of quantiles that shall be used for GATES grouping
@@ -106,10 +104,10 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                                                                                custom_covariates = NULL,
                                                                                fixed_effects = NULL),
                                              HT.transformation          = FALSE,
-                                             vcov.estimator_BLP         = "vcovHC",
-                                             vcov.control_BLP           = list(type = "const"),
-                                             vcov.estimator_GATES       = "vcovHC",
-                                             vcov.control_GATES         = list(type = "const"),
+                                             vcov.control_BLP           = list(estimator = "vcovHC",
+                                                                            arguments = list(type = "const")),
+                                             vcov.control_GATES         = list(estimator = "vcovHC",
+                                                                            arguments = list(type = "const")),
                                              equal.group.variances_CLAN = FALSE,
                                              quantile.cutoffs           = c(0.25, 0.5, 0.75),
                                              significance.level         = 0.05,
@@ -147,7 +145,6 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                  X1.variables       = list(functions_of_Z = X1.variables_BLP$functions_of_Z,
                                            custom_covariates = X1.variables_BLP$custom_covariates[M.set,],
                                            fixed_effects = X1.variables_BLP$fixed_effects[M.set]),
-                 vcov.estimator     = vcov.estimator_BLP,
                  vcov.control       = vcov.control_BLP,
                  significance.level = significance.level)
   
@@ -168,7 +165,6 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                      X1.variables       = list(functions_of_Z = X1.variables_GATES$functions_of_Z,
                                                custom_covariates = X1.variables_GATES$custom_covariates[M.set,],
                                                fixed_effects = X1.variables_GATES$fixed_effects[M.set]),
-                     vcov.estimator     = vcov.estimator_GATES,
                      vcov.control       = vcov.control_GATES,
                      significance.level = significance.level)
   
