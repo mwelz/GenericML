@@ -1,5 +1,6 @@
 # GenericML
-R implementation of Generic Machine Learning (Chernozhukov, V., Demirer, M., Duflo, E., &amp; Fernández-Val, I., 2021) using the `mlr3` framework. We intend to extend this implementation to a fully-fledged R package for the CRAN.
+R implementation of Generic Machine Learning (Chernozhukov, V., Demirer, M., Duflo, E., &amp; Fernández-Val, I., 2021) using the `mlr3` framework. We intend to extend this implementation to a fully-fledged R package for the CRAN. Please note that this implementation is still work in progress and has not yet been thoroughy tested, so we cannot yet guarantee correctness. If you find a bug, please open an issue or let us know via email.
+
 
 ## Organization of this repo
 
