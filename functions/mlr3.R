@@ -161,7 +161,7 @@ baseline.proxy.estimator <- function(Z, D, Y,
   if(var(predictions) < minimum.variation){
     
     predictions <- predictions +
-      rnorm(length(n), mean = 0, sd = sqrt(var(Y) / 20))
+      rnorm(length(Y), mean = 0, sd = sqrt(var(Y) / 20))
     
   } # IF
   
@@ -300,7 +300,7 @@ CATE.proxy.estimator <- function(Z, D, Y,
   if(var(cate.predictions) < minimum.variation){
     
     cate.predictions <- cate.predictions +
-      rnorm(length(n), mean = 0, sd = sqrt(var(Y) / 20))
+      rnorm(length(Y), mean = 0, sd = sqrt(var(Y) / 20))
     
   } # IF
   

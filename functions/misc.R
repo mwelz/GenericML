@@ -37,8 +37,24 @@ quantile.group <- function(x,
                            cutoffs = c(0.25, 0.5, 0.75),
                            quantile.nam = TRUE){
   # cutoffs are the quantile cutoffs (like c(0.25, 0.5, 0.75))
+  
+  # get quatiles
   q         <- quantile(x, cutoffs)
   q         <- c(-Inf, q, Inf)
+  
+  # check if breaks are unique: if x exhibits low variation, there might be empty quantile bins, which can cause an error in the cut() function. In this case, we add random noise to x to induce variation. NB: this bug has been spotted and fixed by Lucas Kitzmueller. All credits for this fix go to him!
+  if(length(unique(q)) != length(q)){
+    
+    # specify standard deviation of the noise (x may have zero variation)
+    sd <- ifelse(var(x) == 0, 0.001, sqrt(var(x) / 20))
+    
+    # add noise and updare quantiles
+    x <- x + rnorm(length(x), mean = 0, sd = sd)
+    q <- quantile(x, cutoffs)
+    q <- c(-Inf, q, Inf)
+    
+  } # IF
+  
   groups    <- as.character(cut(x, breaks = q, include.lowest = TRUE, right = FALSE, dig.lab = 3))
   group.nam <- unique(groups)
   group.nam <- group.nam[order(
