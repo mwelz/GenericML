@@ -23,11 +23,6 @@ Med <- function(x){
 
 
 
-
-
-
-
-
 #' Partition a vector x into groups based on its quantiles
 #' 
 #' @param x the vector to be partitioned
@@ -101,6 +96,8 @@ quantile.group <- function(x,
 #' @param vcov.control_GATES same as vcov.control_BLP, just for GATES regression
 #' @param equal.group.variances_CLAN logical. If TRUE, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is FALSE.
 #' @param quantile.cutoffs Cutoff points of quantiles that shall be used for GATES grouping
+#' @param CLAN_group.to.subtract.from what shall be the base group to subtract from in CLAN? Either "most" or "least"
+#' @param CLAN_groups.to.be.subtracted the groups to be subtracted from CLAN_group.to.subtract.from. Subset of {1,...,K}, where K equals the number of groups.
 #' @param significance.level Significance level. Default is 0.05
 #' @param minimum.variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
 #' 
@@ -126,6 +123,8 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                                                                             arguments = list(type = "const")),
                                              equal.group.variances_CLAN = FALSE,
                                              quantile.cutoffs           = c(0.25, 0.5, 0.75),
+                                             CLAN_group.to.subtract.from  = CLAN_group.to.subtract.from,
+                                             CLAN_groups.to.be.subtracted = CLAN_groups.to.be.subtracted,
                                              significance.level         = 0.05,
                                              minimum.variation          = 1e-05){
   
@@ -185,11 +184,13 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                      significance.level = significance.level)
   
   
-  ### step 2d: estimate CLAN parameters in the main sample
+  ### step 2d: estimate CLAN parameters in the main sample ----
   clan.obj <- CLAN(Z.clan.main.sample = Z.clan[M.set,], 
-                   group.membership.main.sample = group.membership.main.sample,
-                   equal.group.variances = equal.group.variances_CLAN,
-                   significance.level = significance.level)
+                   group.membership.main.sample = group.membership.main.sample, 
+                   group.to.subtract.from  = CLAN_group.to.subtract.from, 
+                   groups.to.be.subtracted = CLAN_groups.to.be.subtracted,
+                   equal.group.variances   = equal.group.variances_CLAN,
+                   significance.level      = significance.level)
   
   
   ### step 2e: get parameters over which we maximize to find the "best" ML method ----

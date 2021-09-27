@@ -21,7 +21,9 @@ make.mlr3.string <- function(learner.str, regr = TRUE){
 
 
 initializer.for.splits <- function(Z, Z.clan, learners,
-                                   num.splits, quantile.cutoffs){
+                                   num.splits, quantile.cutoffs,
+                                   CLAN_group.to.subtract.from,
+                                   CLAN_groups.to.be.subtracted){
   
   # helper function that initializes object in the generic ML splitting procedure
   
@@ -33,8 +35,14 @@ initializer.for.splits <- function(Z, Z.clan, learners,
     Z.clan.nam <- colnames(Z.clan)
   }
   
-  clan <- array(NA_real_, dim = c(3, 7, num.splits), 
-                dimnames = list(c("delta.1", "delta.K", "delta.K-delta.1"), 
+  K <- length(quantile.cutoffs) + 1
+  group.base <- ifelse(CLAN_group.to.subtract.from == "least", 1, K)
+  
+  clan <- array(NA_real_, dim = c(K + length(CLAN_groups.to.be.subtracted), 7, num.splits), 
+                dimnames = list(c(paste0("delta.", 1:K),
+                                  paste0(
+                                    "delta.", group.base, "-",
+                                    "delta.", CLAN_groups.to.be.subtracted)), 
                                 c("Estimate", "CB lower", "CB upper", "Std. Error", 
                                   "z value", "Pr(<z)", "Pr(>z)"),
                                 NULL))
@@ -133,6 +141,8 @@ generic.ml.across.learners <- function(Z, D, Y,
                                        equal.group.variances_CLAN = FALSE,
                                        proportion.in.main.set = 0.5, 
                                        quantile.cutoffs = c(0.25, 0.5, 0.75),
+                                       CLAN_group.to.subtract.from  = CLAN_group.to.subtract.from,
+                                       CLAN_groups.to.be.subtracted = CLAN_groups.to.be.subtracted,
                                        significance.level = 0.05, 
                                        minimum.variation = 1e-05,
                                        store.learners = FALSE,
@@ -141,7 +151,9 @@ generic.ml.across.learners <- function(Z, D, Y,
   # initialize
   generic.targets <- initializer.for.splits(Z = Z, Z.clan = Z.clan, 
                                             learners = learners, num.splits = num.splits, 
-                                            quantile.cutoffs = quantile.cutoffs)
+                                            quantile.cutoffs = quantile.cutoffs, 
+                                            CLAN_group.to.subtract.from = CLAN_group.to.subtract.from,
+                                            CLAN_groups.to.be.subtracted = CLAN_groups.to.be.subtracted)
   
   num.vars.in.Z.clan <- ifelse(is.null(Z.clan), ncol(Z), ncol(Z.clan))
   genericML.by.split <- list()
@@ -182,16 +194,18 @@ generic.ml.across.learners <- function(Z, D, Y,
                                          propensity.scores = propensity.scores,
                                          learner = learners[i],
                                          M.set = M.set, A.set = A.set,
-                                         Z.clan                     = Z.clan, 
-                                         X1.variables_BLP           = X1.variables_BLP,
-                                         X1.variables_GATES         = X1.variables_GATES,
-                                         HT.transformation          = HT.transformation,
-                                         vcov.control_BLP           = vcov.control_BLP,
-                                         vcov.control_GATES         = vcov.control_GATES,
-                                         equal.group.variances_CLAN = equal.group.variances_CLAN,
-                                         quantile.cutoffs           = quantile.cutoffs,
-                                         significance.level         = significance.level,
-                                         minimum.variation          = minimum.variation)
+                                         Z.clan                       = Z.clan, 
+                                         X1.variables_BLP             = X1.variables_BLP,
+                                         X1.variables_GATES           = X1.variables_GATES,
+                                         HT.transformation            = HT.transformation,
+                                         vcov.control_BLP             = vcov.control_BLP,
+                                         vcov.control_GATES           = vcov.control_GATES,
+                                         equal.group.variances_CLAN   = equal.group.variances_CLAN,
+                                         quantile.cutoffs             = quantile.cutoffs,
+                                         CLAN_group.to.subtract.from  = CLAN_group.to.subtract.from,
+                                         CLAN_groups.to.be.subtracted = CLAN_groups.to.be.subtracted,
+                                         significance.level           = significance.level,
+                                         minimum.variation            = minimum.variation)
         
       generic.targets[[i]]$BLP[,,s]   <- generic.ml.obj$BLP$generic.targets
       generic.targets[[i]]$GATES[,,s] <- generic.ml.obj$GATES$generic.targets
