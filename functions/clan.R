@@ -4,18 +4,20 @@
 #' @param group.membership.main.sample a logical matrix with _M_ rows that indicate 
 #' the group memberships (such a matrix is returned by the function quantile.group())
 #' @param equal.group.variances logical. If TRUE, the the two within-group variances of the most and least affected group are assumed to be equal. Default is FALSE.
-#' @param group.to.subtract.from what shall be the base group to subtract from? Either "most" or "least"
-#' @param groups.to.be.subtracted the groups to be subtracted from group.to.subtract.from. Subset of {1,...,K}, where K equals the number of groups.
+#' @param differences.control a list with two elements called 'group.to.subtract.from' and 'groups.to.be.subtracted'. The first element ('group.to.subtract.from') denotes what shall be the base group to subtract from in CLAN; either "most" or "least". The second element ('groups.to.be.subtracted') are the groups to be subtracted from 'group.to.subtract.from', which is a subset of {1,...,K}, where K equals the number of groups.
 #' @return The two CLAN parameters ("most" affected and "least" affected) for each variable in Z.clan.main.sample
 #' 
 #' @export
 CLAN <- function(Z.clan.main.sample, 
                  group.membership.main.sample, 
                  equal.group.variances = FALSE,
-                 group.to.subtract.from = "most",
-                 groups.to.be.subtracted = 1,
+                 differences.control = list(group.to.subtract.from = "most",
+                                            groups.to.be.subtracted = 1),
                  significance.level = 0.05){
   
+  # extract controls
+  group.to.subtract.from  <- differences.control$group.to.subtract.from
+  groups.to.be.subtracted <- differences.control$groups.to.be.subtracted
 
   K <- ncol(group.membership.main.sample)
   group.base <- ifelse(group.to.subtract.from == "least", 1, K)

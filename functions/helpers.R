@@ -22,8 +22,8 @@ make.mlr3.string <- function(learner.str, regr = TRUE){
 
 initializer.for.splits <- function(Z, Z.clan, learners,
                                    num.splits, quantile.cutoffs,
-                                   CLAN_group.to.subtract.from,
-                                   CLAN_groups.to.be.subtracted){
+                                   differences.control_GATES,
+                                   differences.control_CLAN){
   
   # helper function that initializes object in the generic ML splitting procedure
   
@@ -36,23 +36,28 @@ initializer.for.splits <- function(Z, Z.clan, learners,
   }
   
   K <- length(quantile.cutoffs) + 1
-  group.base <- ifelse(CLAN_group.to.subtract.from == "least", 1, K)
+  CLAN_group.base  <- ifelse(differences.control_CLAN$group.to.subtract.from == "least", 1, K)
+  GATES_group.base <- ifelse(differences.control_GATES$group.to.subtract.from == "least", 1, K)
+  CLAN_groups.to.be.subtracted  <- differences.control_CLAN$groups.to.be.subtracted
+  GATES_groups.to.be.subtracted <- differences.control_GATES$groups.to.be.subtracted
   
   clan <- array(NA_real_, dim = c(K + length(CLAN_groups.to.be.subtracted), 7, num.splits), 
                 dimnames = list(c(paste0("delta.", 1:K),
                                   paste0(
-                                    "delta.", group.base, "-",
+                                    "delta.", CLAN_group.base, "-",
                                     "delta.", CLAN_groups.to.be.subtracted)), 
                                 c("Estimate", "CB lower", "CB upper", "Std. Error", 
                                   "z value", "Pr(<z)", "Pr(>z)"),
                                 NULL))
   
-  gates <- array(NA_real_, dim = c(length(quantile.cutoffs)+2, 7, num.splits),
-                 dimnames = list(
-                   c(paste0("gamma.", 1:(length(quantile.cutoffs)+1)), "gamma.K-gamma.1"),
-                   c("Estimate", "CB lower", "CB upper", "Std. Error", 
-                     "z value", "Pr(<z)", "Pr(>z)"), 
-                   NULL))
+  gates <- array(NA_real_, dim = c(K + length(GATES_groups.to.be.subtracted), 7, num.splits),
+                 dimnames = list(c(paste0("gamma.", 1:K),
+                                   paste0(
+                                     "gamma.", GATES_group.base, "-",
+                                     "gamma.", GATES_groups.to.be.subtracted)), 
+                                 c("Estimate", "CB lower", "CB upper", "Std. Error", 
+                                   "z value", "Pr(<z)", "Pr(>z)"),
+                                 NULL))
   
   blp <- array(NA_real_, dim = c(2, 7, num.splits),
                dimnames = list(c("beta.1", "beta.2"), 
@@ -139,10 +144,12 @@ generic.ml.across.learners <- function(Z, D, Y,
                                        vcov.control_GATES         = list(estimator = "vcovHC",
                                                                          arguments = list(type = "const")),
                                        equal.group.variances_CLAN = FALSE,
-                                       proportion.in.main.set = 0.5, 
-                                       quantile.cutoffs = c(0.25, 0.5, 0.75),
-                                       CLAN_group.to.subtract.from  = CLAN_group.to.subtract.from,
-                                       CLAN_groups.to.be.subtracted = CLAN_groups.to.be.subtracted,
+                                       proportion.in.main.set     = 0.5, 
+                                       quantile.cutoffs           = c(0.25, 0.5, 0.75),
+                                       differences.control_GATES  = list(group.to.subtract.from = "most",
+                                                                         groups.to.be.subtracted = 1),
+                                       differences.control_CLAN   = list(group.to.subtract.from = "most",
+                                                                         groups.to.be.subtracted = 1),
                                        significance.level = 0.05, 
                                        minimum.variation = 1e-05,
                                        store.learners = FALSE,
@@ -152,8 +159,8 @@ generic.ml.across.learners <- function(Z, D, Y,
   generic.targets <- initializer.for.splits(Z = Z, Z.clan = Z.clan, 
                                             learners = learners, num.splits = num.splits, 
                                             quantile.cutoffs = quantile.cutoffs, 
-                                            CLAN_group.to.subtract.from = CLAN_group.to.subtract.from,
-                                            CLAN_groups.to.be.subtracted = CLAN_groups.to.be.subtracted)
+                                            differences.control_GATES = differences.control_GATES,
+                                            differences.control_CLAN = differences.control_CLAN)
   
   num.vars.in.Z.clan <- ifelse(is.null(Z.clan), ncol(Z), ncol(Z.clan))
   genericML.by.split <- list()
@@ -202,8 +209,8 @@ generic.ml.across.learners <- function(Z, D, Y,
                                          vcov.control_GATES           = vcov.control_GATES,
                                          equal.group.variances_CLAN   = equal.group.variances_CLAN,
                                          quantile.cutoffs             = quantile.cutoffs,
-                                         CLAN_group.to.subtract.from  = CLAN_group.to.subtract.from,
-                                         CLAN_groups.to.be.subtracted = CLAN_groups.to.be.subtracted,
+                                         differences.control_GATES    = differences.control_GATES,
+                                         differences.control_CLAN     = differences.control_CLAN,
                                          significance.level           = significance.level,
                                          minimum.variation            = minimum.variation)
         

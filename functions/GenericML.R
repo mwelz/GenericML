@@ -11,8 +11,8 @@
 #' @param X1.variables_BLP a list controlling the variables that shall be used in the matrix X1 for the BLP regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers, strings, or a factor thereof that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.
 #' @param X1.variables_GATES a list controlling the variables that shall be used in the matrix X1 for the GATES regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers, strings, or a factor thereof that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL). Note that in the final matrix X1, a constant 1 will be silently included if no HT transformation is applied so that the regression model has an intercept.
 #' @param quantile.cutoffs The cutoff points of quantiles that shall be used for GATES grouping. Default is `c(0.25, 0.5, 0.75)`, which corresponds to the quartiles.
-#' @param CLAN_group.to.subtract.from what shall be the base group to subtract from in CLAN? Either "most" or "least"
-#' @param CLAN_groups.to.be.subtracted the groups to be subtracted from CLAN_group.to.subtract.from. Subset of {1,...,K}, where K equals the number of groups.
+#' @param differences.control_GATES a list with two elements called 'group.to.subtract.from' and 'groups.to.be.subtracted'. The first element ('group.to.subtract.from') denotes what shall be the base group to subtract from in GATES; either "most" or "least". The second element ('groups.to.be.subtracted') are the groups to be subtracted from 'group.to.subtract.from', which is a subset of {1,...,K}, where K equals the number of groups.
+#' @param differences.control_CLAN same as differences.control_GATES, just for CLAN.
 #' @param vcov.control_BLP a list with two elements called 'estimator' and 'arguments'. The argument 'estimator' is a string specifying the covariance matrix estimator to be used in the BLP regression; specifies a covariance estimator function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are "vcovBS", "vcovCL", "vcovHAC", and "vcovHC". Default is 'vcovHC'. The element 'arguments' is a list of arguments that shall be passed to the function specified in the element 'estimator'. Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
 #' @param vcov.control_GATES same as vcov.control_BLP, just for GATES regression
 #' @param equal.group.variances_CLAN logical. If TRUE, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is FALSE.
@@ -28,16 +28,18 @@ GenericML <- function(Z, D, Y,
                       learners.genericML,
                       num.splits = 100,
                       Z.clan = NULL,
-                      HT.transformation = FALSE,
+                      HT.transformation          = FALSE,
                       X1.variables_BLP           = list(functions_of_Z = c("B"),
                                                         custom_covariates = NULL,
                                                         fixed_effects = NULL),
                       X1.variables_GATES         = list(functions_of_Z = c("B"),
                                                         custom_covariates = NULL,
                                                         fixed_effects = NULL),
-                      quantile.cutoffs = c(0.25, 0.5, 0.75),
-                      CLAN_group.to.subtract.from  = "most",
-                      CLAN_groups.to.be.subtracted = c(1),
+                      quantile.cutoffs           = c(0.25, 0.5, 0.75),
+                      differences.control_GATES  = list(group.to.subtract.from = "most",
+                                                        groups.to.be.subtracted = 1),
+                      differences.control_CLAN   = list(group.to.subtract.from = "most",
+                                                        groups.to.be.subtracted = 1),
                       vcov.control_BLP           = list(estimator = "vcovHC",
                                                         arguments = list(type = "const")),
                       vcov.control_GATES         = list(estimator = "vcovHC",
@@ -70,8 +72,8 @@ GenericML <- function(Z, D, Y,
                                equal.group.variances_CLAN = equal.group.variances_CLAN,
                                proportion.in.main.set     = proportion.in.main.set, 
                                quantile.cutoffs           = quantile.cutoffs,
-                               CLAN_group.to.subtract.from  = CLAN_group.to.subtract.from,
-                               CLAN_groups.to.be.subtracted = CLAN_groups.to.be.subtracted,
+                               differences.control_GATES  = differences.control_GATES,
+                               differences.control_CLAN   = differences.control_CLAN,
                                significance.level         = significance.level,
                                minimum.variation          = minimum.variation,
                                store.learners             = store.learners,
