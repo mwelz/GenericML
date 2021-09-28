@@ -3,7 +3,7 @@
 #' Note that this implementation is **not** yet an R package, although we intend to create a package for the CRAN based on it.
 #' 
 #' Author: mwelz & aalfons & mdemirer
-#' Last changed: Sep 6, 2021
+#' Last changed: Sep 28, 2021
 #' ------------------------------------------------------------
 rm(list = ls()) ; gc(); cat("\014")
 
@@ -72,6 +72,12 @@ X1.variables_GATES  <- list(functions_of_Z = c("B"),
                             custom_covariates = NULL,
                             fixed_effects = NULL)
 
+# consider differences between group K (most affected) with groups 1 and 2, respectively.
+differences.control_GATES  <- list(group.to.subtract.from = "most",
+                                   groups.to.be.subtracted = c(1,2)) 
+differences.control_CLAN  <- list(group.to.subtract.from = "most",
+                                  groups.to.be.subtracted = c(1,2))
+
 # specify the significance level
 significance.level       <- 0.05
 
@@ -95,7 +101,7 @@ store.splits             <- FALSE
 store.learners           <- FALSE
 
 ### 3. run the genericML() functions with these arguments ----
-# runtime: ~121 seconds with R version 4.1.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 20.10
+# runtime: ~121 seconds with R version 4.1.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 20.10. Returns a GenericML object.
 genML <- GenericML(Z = Z, D = D, Y = Y, 
                    learner.propensity.score = learner.propensity.score, 
                    learners.genericML = learners.genericML,
@@ -107,6 +113,8 @@ genML <- GenericML(Z = Z, D = D, Y = Y,
                    vcov.control_BLP = vcov.control_BLP, 
                    vcov.control_GATES = vcov.control_GATES,
                    quantile.cutoffs = quantile.cutoffs, 
+                   differences.control_GATES = differences.control_GATES,
+                   differences.control_CLAN = differences.control_CLAN,
                    equal.group.variances_CLAN = equal.group.variances_CLAN,
                    proportion.in.main.set = proportion.in.main.set, 
                    significance.level = significance.level,
@@ -146,7 +154,7 @@ round(genML$VEIN$best.learners$BLP, 5)
 # beta.1  1.98654  1.89041  2.08317               1         0.00000
 # beta.2  0.01947 -0.14071  0.18628               1         0.78648
 # We see that `beta.1` (the estimate of the ATE) is estimated at ~1.99. True ATE is 2, which is contained in the 90% confidence bounds.  Moreover, `beta.2` is clearly not significant (adjusted $p$-values of both one sided tests are much larger than 0.05). Hence, there is (correctly) no indication of treatment effect heterogeneity. Moreover, the function `genericML.plot()` visualizes these results for the BLP:
-genericML.plot(genML, type = "BLP", title = "VEIN of BLP") 
+plot.GenericML(genML, type = "BLP", title = "VEIN of BLP") 
 
 
 # VEIN of GATES
@@ -158,38 +166,43 @@ round(genML$VEIN$best.learners$GATES, 5)
 # gamma.4          1.99459  1.77094  2.22709               1         0.00000
 # gamma.5          2.02006  1.78922  2.24912               1         0.00000
 # gamma.K-gamma.1  0.00069 -0.32917  0.32709               1         0.98721
+# gamma.5-gamma.2  0.02119 -0.30804  0.34744               1         0.88855
 # All point estimates for the $\gamma$ coefficients are close to each other. Difference between most and least affected group is insignificant (adjusted $p$-values of ~1). Hence, there is (correctly) no indication of treatment effect heterogeneity. We again visualize these results with `genericML.plot()`:
-genericML.plot(genML, type = "GATES", title = "VEIN of GATES") 
+plot.GenericML(genML, type = "GATES", title = "VEIN of GATES") 
 
 
 # VEIN of CLAN for variable 'z1'
 genML$VEIN$best.learners$CLAN$z1
-#                    Estimate    CB lower   CB upper Pr(<z) adjusted Pr(>z) adjusted
-# delta.1          0.00726143 -0.08740091 0.09945609       1.0000000       0.8227289
-# delta.K         -0.03885376 -0.12268665 0.04409473       0.3642137       1.0000000
-# delta.K-delta.1 -0.03247315 -0.16097983 0.09603352       0.6204056       1.0000000
+#                     Estimate    CB lower   CB upper Pr(<z) adjusted Pr(>z) adjusted
+# delta.1          0.007261430 -0.08740091 0.09945609       1.0000000       0.8227289
+# delta.2          0.044316241 -0.04544816 0.13238694       1.0000000       0.3263867
+# delta.3          0.028375655 -0.05937453 0.11406139       1.0000000       0.5128145
+# delta.4          0.004020818 -0.07849039 0.08880387       1.0000000       0.8738944
+# delta.5         -0.038853760 -0.12268665 0.04409473       0.3642137       1.0000000
+# delta.5-delta.1 -0.032473153 -0.16097983 0.09603352       0.6204056       1.0000000
+# delta.5-delta.2 -0.093908691 -0.21812029 0.03004042       0.1383916       1.0000000
 # This correctly indicates that there is no heterogeneity along `z1` (all p-values are much larger than 0.05)
-genericML.plot(genML, type = "CLAN", CLAN.variable = "z1", title = "CLAN of 'z1'") 
+plot.GenericML(genML, type = "CLAN", CLAN.variable = "z1", title = "CLAN of 'z1'") 
 
 
 # VEIN of CLAN for variable 'random'
-genericML.plot(genML, type = "CLAN", CLAN.variable = "random", title = "CLAN of 'random'") 
+plot.GenericML(genML, type = "CLAN", CLAN.variable = "random", title = "CLAN of 'random'") 
 # Correctly no evidence for heterogeneity along `random`.
 
 
 ### 5. store all plots ----
 
 pdf(file = paste0(getwd(), "/examples/plots/VEIN-BLP.pdf"))
-genericML.plot(genML, type = "BLP", title = "VEIN of BLP") 
+plot.GenericML(genML, type = "BLP", title = "VEIN of BLP") 
 dev.off()
 
 pdf(file = paste0(getwd(), "/examples/plots/VEIN-GATES.pdf"))
-genericML.plot(genML, type = "GATES", title = "VEIN of GATES") 
+plot.GenericML(genML, type = "GATES", title = "VEIN of GATES") 
 dev.off()
 
 for(varname in colnames(Z.clan)){
   pdf(file = paste0(getwd(), "/examples/plots/VEIN-CLAN-", varname, ".pdf"))
-  print(genericML.plot(genML, type = "CLAN", CLAN.variable = varname,
+  print(plot.GenericML(genML, type = "CLAN", CLAN.variable = varname,
                  title = paste0("CLAN of '", varname, "'"))) 
   dev.off()
 }
