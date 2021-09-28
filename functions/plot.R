@@ -1,15 +1,17 @@
 #' Makes plot for generic ML
 #' 
-#' @param genericML.obj an object as returned by genericML()
+#' @param GenericML.obj an object as returned by genericML()
 #' @param learner the learner whose results are to be returned. Default is 'best'
 #' @param type the analysis to be plotted. Either 'GATES', 'BLP', or 'CLAN'. Default is 'GATES'.
 #' @param CLAN.variable CLAN variable to be plotted. Only applicable if type = 'CLAN'.
+#' @param groups.to.be.plotted The groups to be plotted for GATES and CLAN. Default is 'all'. If there are K groups, this variable can be set to a subset of {"G1", "G2",...,"GK", "GK-G1", "GK-G2",...}, but this set depends on the choices of the arguments 'differences.control_GATES' and 'differences.control_CLAN' of the GenericML() function that generated GenericML.obj.
 #' @param limits the limits of the y-axis of the plot.
 #' @param title the title of the plot.
-genericML.plot <- function(genericML.obj,
+GenericML.plot <- function(GenericML.obj,
                            learner = "best",
                            type = "GATES",
                            CLAN.variable = NULL,
+                           groups.to.be.plotted = "all",
                            limits = NULL,
                            title = NULL){
   
@@ -17,7 +19,7 @@ genericML.plot <- function(genericML.obj,
   if(type == "CLAN"){
     
     if(is.null(CLAN.variable)) stop("No CLAN variable specified")
-    if(!CLAN.variable %in% names(genericML.obj$VEIN$best.learners$CLAN)) stop("This variable was not used for CLAN.")
+    if(!CLAN.variable %in% names(GenericML.obj$VEIN$best.learners$CLAN)) stop("This variable was not used for CLAN.")
     
   } # IF
   
@@ -25,32 +27,32 @@ genericML.plot <- function(genericML.obj,
   
   if(learner == "best" & type != "CLAN"){
     
-    data <- genericML.obj$VEIN$best.learners[[type]]
+    data <- GenericML.obj$VEIN$best.learners[[type]]
     
     
   } else if(learner == "best" & type == "CLAN"){
     
-    data <- genericML.obj$VEIN$best.learners[[type]][[CLAN.variable]]
+    data <- GenericML.obj$VEIN$best.learners[[type]][[CLAN.variable]]
     
-  } else if(!(learner %in% genericML.obj$arguments$learners.genericML)){
+  } else if(!(learner %in% GenericML.obj$arguments$learners.genericML)){
     
     stop("This learner is not used in the generic ML procedure.")
     
   } else if(learner != "best" & type == "CLAN" ){
     
-    data <- genericML.obj$VEIN$all.learners[[type]][[learner]][[CLAN.variable]]
+    data <- GenericML.obj$VEIN$all.learners[[type]][[learner]][[CLAN.variable]]
     
   } else{
     
-    data <- genericML.obj$VEIN$all.learners[[type]][[learner]]
+    data <- GenericML.obj$VEIN$all.learners[[type]][[learner]]
     
   } # IF
   
   
   if(learner == "best"){
-    data.blp <- genericML.obj$VEIN$best.learners$BLP
+    data.blp <- GenericML.obj$VEIN$best.learners$BLP
   } else{
-    data.blp <- genericML.obj$VEIN$all.learners$BLP[[learner]]
+    data.blp <- GenericML.obj$VEIN$all.learners$BLP[[learner]]
   } # IF
   
   
@@ -67,19 +69,45 @@ genericML.plot <- function(genericML.obj,
   } # IF
   
   # adjusted confidence level
-  confidence.level <- 1 - 2 * genericML.obj$arguments$significance.level
+  confidence.level <- 1 - 2 * GenericML.obj$arguments$significance.level
   
   
   ## 1.1 make plot for GATES or CLAN ----
   
   if(type != "BLP"){
     
-    K  <- nrow(data) - 1
+    if(type == "GATES"){
+      group.nam <- gsub("gamma.", "G", rownames(data))
+    } else{
+      group.nam <- gsub("delta.", "G", rownames(data))
+    } # IF
+    
+    # create data frame for ggplot
     df <- data.frame(point.estimate = data[, "Estimate"],
                      ci.lower = data[, "CB lower"],
                      ci.upper = data[, "CB upper"],
-                     group = c(paste0("G", 1:K), paste0("G", K, "-G1")))
+                     group = factor(group.nam, levels = group.nam))
     
+    if(all(groups.to.be.plotted == "all")){
+      
+      groups.to.be.plotted_new <- group.nam
+      
+    } else if(!all(groups.to.be.plotted %in% group.nam)){
+      
+      stop(
+      paste0("In 'groups.to.be.plotted', the input group(s) '", 
+             paste0(groups.to.be.plotted[!groups.to.be.plotted %in% group.nam], collapse = "','"),
+             "' is/are not a subset of c('", paste(group.nam, collapse = "','"), "')."))
+      
+    } else{
+      groups.to.be.plotted_new <- groups.to.be.plotted
+    } # IF
+      
+
+    # subset data frame for the plot
+    df <- df[group.nam %in% groups.to.be.plotted_new,,drop = FALSE] 
+    
+    # make the plot
     p <- ggplot(mapping = aes(x = group,
                               y = point.estimate), data = df) +
       geom_hline(aes(yintercept = 0),
