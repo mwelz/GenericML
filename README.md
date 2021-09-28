@@ -14,12 +14,12 @@ R implementation of Generic Machine Learning (Chernozhukov, V., Demirer, M., Duf
 - [x] Make it optional to use arbitrary covariates in `X1`;
 - [x] Make cluster-robust standard errors optional;
 - [x] Implement fixed effects in the BLP/GATES regressions;
-- [ ] Make generic targets as differences optional;
+- [x] Make generic targets as differences optional;
 - [ ] Parallelize the main loop;
-- [ ] Implement deep neural networks as regression learner. Currently not supported by `mlr3`;
+- [x] Implement deep neural networks as regression learner. Currently not supported by `mlr3` (NB: cannot be done in current version of `mlr3`);
 - [ ] Add optional monotonization of the confindence bounds;
-- [ ] Error handling. Current implementation might throw an error in case of undersampling;
-- [ ] Implement S3 class structure and reorganize repo;
+- [x] Error handling. Current implementation might throw an error in case of undersampling (TODO: still needs to be done for `CLAN`!);
+- [x] Implement S3 class structure and reorganize repo (TODO: also make classes for BLP, GATES, CLAN);
 - [ ] Make an R package.
 
 ## Authors
