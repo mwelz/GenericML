@@ -226,12 +226,10 @@ generic.targets_GATES <- function(coeftest.object, K, vcov,
     diff <- coeftest.object["gamma.1", "Estimate"] -
       coeftest.object[paste0("gamma.", groups.to.be.subtracted), "Estimate"]
     
-    temp <- vcov[paste0("gamma.", groups.to.be.subtracted), 
-                 paste0("gamma.", groups.to.be.subtracted)]
-    
     diff.se <- as.numeric(
       sqrt(vcov["gamma.1", "gamma.1"] + 
-                      diag(temp, nrow = length(temp)) -
+                      diag(vcov[paste0("gamma.", groups.to.be.subtracted), 
+                                paste0("gamma.", groups.to.be.subtracted), drop = FALSE]) -
                       2 * vcov["gamma.1", paste0("gamma.", groups.to.be.subtracted)]))
     
     nam <- paste0("gamma.1-gamma.", groups.to.be.subtracted)
@@ -241,12 +239,10 @@ generic.targets_GATES <- function(coeftest.object, K, vcov,
     diff <- coeftest.object[paste0("gamma.", K), "Estimate"] -
       coeftest.object[paste0("gamma.", groups.to.be.subtracted), "Estimate"]
     
-    temp <- vcov[paste0("gamma.", groups.to.be.subtracted), 
-                 paste0("gamma.", groups.to.be.subtracted)]
-    
     diff.se <- as.numeric(
       sqrt(vcov[paste0("gamma.", K), paste0("gamma.", K)] + 
-                      diag(temp, nrow = length(temp)) -
+                      diag(vcov[paste0("gamma.", groups.to.be.subtracted), 
+                                paste0("gamma.", groups.to.be.subtracted), drop = FALSE]) -
                       2 * vcov[paste0("gamma.", K), paste0("gamma.", groups.to.be.subtracted)]))
     
     nam <- paste0("gamma.", K, "-gamma.", groups.to.be.subtracted)
