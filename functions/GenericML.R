@@ -85,7 +85,10 @@ GenericML <- function(Z, D, Y,
   ### step 3: perform VEIN analysis ---- 
   vein <- VEIN(gen.ml.different.learners$generic.targets, best.learners)
   
-  return(list(VEIN = vein,
+  # return instance of S3 class 'GenericML'
+  return(
+    structure(
+     list(VEIN = vein,
               best.learners = best.learners,
               propensity.scores = list(estimates = propensity.scores,
                                        mlr3.objects = propensity.scores.obj$mlr3.objects),
@@ -95,6 +98,11 @@ GenericML <- function(Z, D, Y,
                                proportion.in.main.set = 0.5, 
                                significance.level = 0.05,
                                learners.genericML = learners.genericML,
-                               learner.propensity.score = learner.propensity.score)))
-  
+                               learner.propensity.score = learner.propensity.score,
+                               num.splits = num.splits,
+                               HT.transformation = HT.transformation,
+                               X1.variables_BLP = X1.variables_BLP,
+                               X1.variables_GATES = X1.variables_GATES)),
+     class = "GenericML"))
+
 } # FUN

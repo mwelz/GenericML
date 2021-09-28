@@ -12,3 +12,5 @@ source(paste0(getwd(), "/functions/gates.R"))
 source(paste0(getwd(), "/functions/misc.R"))
 source(paste0(getwd(), "/functions/mlr3.R"))
 source(paste0(getwd(), "/functions/plot.R"))
+source(paste0(getwd(), "/functions/S3.R"))
+

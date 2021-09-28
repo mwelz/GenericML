@@ -7,7 +7,7 @@
 #' @param groups.to.be.plotted The groups to be plotted for GATES and CLAN. Default is 'all'. If there are K groups, this variable can be set to a subset of {"G1", "G2",...,"GK", "GK-G1", "GK-G2",...}, but this set depends on the choices of the arguments 'differences.control_GATES' and 'differences.control_CLAN' of the GenericML() function that generated GenericML.obj.
 #' @param limits the limits of the y-axis of the plot.
 #' @param title the title of the plot.
-GenericML.plot <- function(GenericML.obj,
+plot.GenericML <- function(GenericML.obj,
                            learner = "best",
                            type = "GATES",
                            CLAN.variable = NULL,
