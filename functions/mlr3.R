@@ -122,34 +122,30 @@ baseline.proxy.estimator <- function(Z, D, Y,
                                      minimum.variation = 1e-05){
   
   # input checks
-  if(length(unique(D)) != 2) stop("Treatment assignment 'D' does not have 2 unique values.")
-  if(!all(c(0, 1) %in% unique(D))) stop("Treatment assignment 'D' is non-binary.")
+  InputChecks_D(D)
+  InputChecks_Y(Y)
+  InputChecks_Z(Z)
+  InputChecks_equal.length3(D, Y ,Z)
+
+  # call main function
+  baseline.proxy.estimator_NoChecks(Z = Z, D = D, Y = Y, 
+                                    auxiliary.sample = auxiliary.sample,
+                                    learner = get.learner_regr(learner),
+                                    minimum.variation = minimum.variation)
+
+} # END FUN
+
+
+# helper that skips the input checks
+baseline.proxy.estimator_NoChecks <- function(Z, D, Y, 
+                                              auxiliary.sample,
+                                              learner, # must be mlr3 object
+                                              minimum.variation = 1e-05){
   
   # specify the task
   task.proxy.baseline.estimator <- mlr3::TaskRegr$new(id = "proxy.baseline", 
                                                       backend = data.frame(Y, Z), 
                                                       target = "Y")
-  
-  # specify the machine learner
-  if(is.environment(learner)){
-    learner <- learner
-  } else if(learner == "elastic.net"){
-    
-    learner <- mlr3::lrn("regr.cv_glmnet", s = "lambda.min")
-    
-  } else if(learner == "random.forest"){
-    
-    learner <- mlr3::lrn("regr.ranger", num.trees = 500)
-    
-  } else if(learner == "tree"){
-    
-    learner <- mlr3::lrn("regr.rpart")
-    
-  } else{
-    
-    stop("Invalid argument for 'learner'. Needs to be either 'glm', 'random.forest', 'tree', or an mlr3 object")
-    
-  } # END IF
   
   # specify that the learner predicts Y
   learner$predict_type = "response"
@@ -177,15 +173,15 @@ baseline.proxy.estimator <- function(Z, D, Y,
   } # IF
   
   # return 
-  return(list(baseline.predictions.main.sample = predictions[main.sample],
-              baseline.predictions.auxiliary.sample = predictions[auxiliary.sample],
-              baseline.predictions.full.sample = predictions,
-              auxiliary.sample = auxiliary.sample,
-              mlr3.objects = list(task = task.proxy.baseline.estimator, 
-                                  learner = learner)))
-  
-} # END FUN
+  return(structure(
+    list(baseline.predictions.main.sample = predictions[main.sample],
+         baseline.predictions.auxiliary.sample = predictions[auxiliary.sample],
+         baseline.predictions.full.sample = predictions,
+         auxiliary.sample = auxiliary.sample,
+         mlr3.objects = list(task = task.proxy.baseline.estimator, 
+                             learner = learner)), class = "proxy_baseline"))
 
+} # FUN
 
 
 #' Estimates the CATE proxy estimator E[Y | D=1, Z] - E[Y | D=0, Z] on the auxiliary sample
@@ -207,8 +203,27 @@ CATE.proxy.estimator <- function(Z, D, Y,
                                  minimum.variation = 1e-05){
   
   # input checks
-  if(length(unique(D)) != 2) stop("Treatment assignment 'D' does not have 2 unique values.")
-  if(!all(c(0, 1) %in% unique(D))) stop("Treatment assignment 'D' is non-binary.")
+  InputChecks_D(D)
+  InputChecks_Y(Y)
+  InputChecks_Z(Z)
+  InputChecks_equal.length3(D, Y ,Z)
+
+  # run main function
+  CATE.proxy.estimator_NoChecks(Z = Z, D = D, Y = Y, 
+                                auxiliary.sample = auxiliary.sample, 
+                                learner = get.learner_regr(learner), # must be mlr3 object
+                                proxy.baseline.estimates = proxy.baseline.estimates, 
+                                minimum.variation = minimum.variation)
+  
+} # END FUN
+
+
+# helper that skips the input checks
+CATE.proxy.estimator_NoChecks <- function(Z, D, Y, 
+                                          auxiliary.sample, 
+                                          learner = "random.forest", 
+                                          proxy.baseline.estimates = NULL, 
+                                          minimum.variation = 1e-05){
   
   # indices of the treated units in the auxiliary sample
   auxiliary.sample.logical <- 1:length(Y) %in% auxiliary.sample
@@ -216,27 +231,6 @@ CATE.proxy.estimator <- function(Z, D, Y,
   
   # identify the main sample
   main.sample <- setdiff(1:length(Y), auxiliary.sample)
-  
-  # specify the machine learner
-  if(is.environment(learner)){
-    learner <- learner
-  } else if(learner == "elastic.net"){
-    
-    learner <- mlr3::lrn("regr.cv_glmnet", s = "lambda.min")
-    
-  } else if(learner == "random.forest"){
-    
-    learner <- mlr3::lrn("regr.ranger", num.trees = 500)
-    
-  } else if(learner == "tree"){
-    
-    learner <- mlr3::lrn("regr.rpart")
-    
-  } else{
-    
-    stop("Invalid argument for 'learner'. Needs to be either 'glm', 'random.forest', 'tree', or an mlr3 object")
-    
-  } # END IF
   
   # specify that the learner predicts Y
   learner$predict_type = "response"
@@ -315,11 +309,12 @@ CATE.proxy.estimator <- function(Z, D, Y,
     
   } # IF
   
-  return(list(CATE.predictions.main.sample = cate.predictions[main.sample],
-              CATE.predictions.auxiliary.sample = cate.predictions[auxiliary.sample],
-              CATE.predictions.full.sample = cate.predictions,
-              Y1.predictions = predictions.Y1,
-              Y0.predictions = predictions.Y0,
-              auxiliary.sample = auxiliary.sample))
+  return(structure(
+    list(CATE.predictions.main.sample = cate.predictions[main.sample],
+         CATE.predictions.auxiliary.sample = cate.predictions[auxiliary.sample],
+         CATE.predictions.full.sample = cate.predictions,
+         Y1.predictions = predictions.Y1,
+         Y0.predictions = predictions.Y0,
+         auxiliary.sample = auxiliary.sample), class = "proxy_CATE"))
   
-} # END FUN
+} # FUN

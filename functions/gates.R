@@ -39,6 +39,7 @@ GATES <- function(D, Y,
   InputChecks_X1(X1.variables)
   InputChecks_vcov.control(vcov.control)
   InputChecks_differences.control(differences.control, K = ncol(group.membership.main.sample))
+  InputChecks_group.membership(group.membership.main.sample)
   
   # fit model according to strategy 1 or 2 in the paper
   GATES_NoChecks(D = D, Y = Y,

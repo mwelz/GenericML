@@ -63,17 +63,24 @@ GenericML <- function(Z, D, Y,
   InputChecks_differences.control(differences.control_GATES, K = length(quantile.cutoffs) + 1)
   InputChecks_differences.control(differences.control_CLAN, K = length(quantile.cutoffs) + 1)
   
+  # render the learners mlr3 environments
+  learners <- lapply(1:length(learners.genericML), 
+                     function(x) get.learner_regr(make.mlr3.string(learners.genericML[x])))
+  
+  
   ### step 1: compute propensity scores ----
   propensity.scores.obj <- propensity.score_NoChecks(
     Z = Z, D = D, estimator = learner.propensity.score)
   propensity.scores     <- propensity.scores.obj$propensity.scores
+  
   
   ### step 2: for each ML method, do the generic ML analysis ----
   
   gen.ml.different.learners <- 
     generic.ml.across.learners(Z = Z, D = D, Y = Y, 
                                propensity.scores          = propensity.scores, 
-                               learners                   = learners.genericML, 
+                               learners                   = learners, 
+                               learners.names             = learners.genericML,
                                num.splits                 = num.splits,
                                Z_CLAN                     = Z_CLAN, 
                                X1.variables_BLP           = X1.variables_BLP,
@@ -93,6 +100,7 @@ GenericML <- function(Z, D, Y,
   
   # extract the best learners
   best.learners <- get.best.learners(gen.ml.different.learners$generic.targets)
+  
   
   ### step 3: perform VEIN analysis ---- 
   vein <- VEIN(gen.ml.different.learners$generic.targets, best.learners)

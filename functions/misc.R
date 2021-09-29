@@ -74,7 +74,7 @@ quantile.group <- function(x,
   } else{
     colnames(group.mat) <- group.nam
   }
-  return(group.mat)
+  return(structure(group.mat, type = "quantile_group"))
 } # FUN
 
 
@@ -130,90 +130,155 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                                              significance.level         = 0.05,
                                              minimum.variation          = 1e-05){
   
-  ### step 1: input checks ---- 
+  # input checks 
+  InputChecks_D(D)
+  InputChecks_Y(Y)
+  InputChecks_Z(Z)
+  InputChecks_equal.length3(D, Y, Z)
+  InputChecks_X1(X1.variables_BLP)
+  InputChecks_X1(X1.variables_GATES)
+  InputChecks_vcov.control(vcov.control_BLP)
+  InputChecks_vcov.control(vcov.control_GATES)
+  InputChecks_differences.control(differences.control_GATES, K = length(quantile.cutoffs) + 1)
+  InputChecks_differences.control(differences.control_CLAN, K = length(quantile.cutoffs) + 1)
+  
   if(is.null(Z_CLAN)) Z_CLAN <- Z # if no input provided, set it equal to Z
-  
-  ### step 2a: learn proxy predictors by using the auxiliary set ----
-  
-  # get the proxy baseline estimator for the main sample
-  proxy.baseline.obj <- baseline.proxy.estimator(Z = Z, D = D, Y = Y, 
-                                                 auxiliary.sample = A.set, 
-                                                 learner = make.mlr3.string(learner, regr = TRUE), 
-                                                 minimum.variation = minimum.variation)
-  proxy.baseline     <- proxy.baseline.obj$baseline.predictions.main.sample
-  
-  # get the proxy estimator of the CATE for the main sample
-  proxy.cate.obj <- 
-    CATE.proxy.estimator(Z = Z, D = D, Y = Y,
-                         auxiliary.sample = A.set, 
-                         learner = make.mlr3.string(learner, regr = TRUE),
-                         proxy.baseline.estimates = proxy.baseline.obj$baseline.predictions.full.sample, 
-                         minimum.variation = minimum.variation)
-  proxy.cate <- proxy.cate.obj$CATE.predictions.main.sample
-
-  
-  ### step 2b: estimate BLP parameters by OLS ----
-  blp.obj <- BLP_NoChecks(
-    D = D[M.set], 
-    Y = Y[M.set], 
-    propensity.scores  = propensity.scores[M.set], 
-    proxy.baseline     = proxy.baseline,
-    proxy.cate         = proxy.cate, 
-    HT.transformation  = HT.transformation,
-    X1.variables       = list(functions_of_Z = X1.variables_BLP$functions_of_Z,
-                              custom_covariates = X1.variables_BLP$custom_covariates[M.set,],
-                              fixed_effects = X1.variables_BLP$fixed_effects[M.set]),
-    vcov.control       = vcov.control_BLP,
-    significance.level = significance.level)
-                 
-  
-
-  ### step 2c: estimate GATES parameters by OLS ----
-  # group the proxy estimators for the CATE in the main sample by quantiles
-  group.membership.main.sample <- quantile.group(proxy.cate, 
-                                                 cutoffs = quantile.cutoffs, 
-                                                 quantile.nam = TRUE) 
-  
-  gates.obj <- GATES_NoChecks(
-    D = D[M.set],
-    Y = Y[M.set], 
-    propensity.scores   = propensity.scores[M.set], 
-    proxy.baseline      = proxy.baseline,
-    proxy.cate          = proxy.cate,
-    group.membership.main.sample = group.membership.main.sample,
-    HT.transformation   = HT.transformation,
-    X1.variables        = list(functions_of_Z = X1.variables_GATES$functions_of_Z,
-                               custom_covariates = X1.variables_GATES$custom_covariates[M.set,],
-                               fixed_effects = X1.variables_GATES$fixed_effects[M.set]),
-    vcov.control        = vcov.control_GATES,
-    differences.control = differences.control_GATES,
-    significance.level  = significance.level)
+  learner <- get.learner_regr(make.mlr3.string(learner, regr = TRUE))
   
   
-  ### step 2d: estimate CLAN parameters in the main sample ----
-  clan.obj <- CLAN(Z_CLAN.main.sample = Z_CLAN[M.set,,drop = FALSE], 
-                   group.membership.main.sample = group.membership.main.sample, 
-                   equal.group.variances   = equal.group.variances_CLAN,
-                   differences.control     = differences.control_CLAN,
-                   significance.level      = significance.level)
-  
-  
-  ### step 2e: get parameters over which we maximize to find the "best" ML method ----
-  best.obj <- best.ml.method.parameters(BLP.obj = blp.obj, 
-                                        GATES.obj = gates.obj, 
-                                        proxy.cate.main.sample = proxy.cate,
-                                        group.membership.main.sample = group.membership.main.sample)
-  
-  ### organize output in a list ----
-  return(list(BLP = blp.obj, 
-              GATES = gates.obj, 
-              CLAN = clan.obj,
-              best = best.obj,
-              CATE.proxy = proxy.cate.obj,
-              baseline.proxy = proxy.baseline,
-              group.membership_M.set = group.membership.main.sample))
+  # call the main function
+  get.generic.ml.for.given.learner_NoChecks(Z = Z, D = D, Y = Y, 
+                                            propensity.scores = propensity.scores,
+                                            learner = learner,
+                                            M.set = M.set, A.set = A.set,
+                                            Z_CLAN                     = Z_CLAN, 
+                                            X1.variables_BLP           = X1.variables_BLP,
+                                            X1.variables_GATES         = X1.variables_GATES,
+                                            HT.transformation          = HT.transformation,
+                                            vcov.control_BLP           = vcov.control_BLP,
+                                            vcov.control_GATES         = vcov.control_GATES,
+                                            equal.group.variances_CLAN = equal.group.variances_CLAN,
+                                            quantile.cutoffs           = quantile.cutoffs,
+                                            differences.control_GATES  = differences.control_GATES,
+                                            differences.control_CLAN   = differences.control_CLAN,  
+                                            significance.level         = significance.level,
+                                            minimum.variation          = minimum.variation)
   
 } # END FUN
+
+
+# helper that skips the input checks
+get.generic.ml.for.given.learner_NoChecks <- 
+  function(Z, D, Y, 
+           propensity.scores,
+           learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',
+           M.set, A.set,
+           Z_CLAN                     = NULL, 
+           X1.variables_BLP           = list(functions_of_Z = c("B"),
+                                             custom_covariates = NULL,
+                                             fixed_effects = NULL),
+           X1.variables_GATES         = list(functions_of_Z = c("B"),
+                                             custom_covariates = NULL,
+                                             fixed_effects = NULL),
+           HT.transformation          = FALSE,
+           vcov.control_BLP           = list(estimator = "vcovHC",
+                                             arguments = list(type = "const")),
+           vcov.control_GATES         = list(estimator = "vcovHC",
+                                             arguments = list(type = "const")),
+           equal.group.variances_CLAN = FALSE,
+           quantile.cutoffs           = c(0.25, 0.5, 0.75),
+           differences.control_GATES  = list(group.to.subtract.from = "most",
+                                             groups.to.be.subtracted = 1),
+           differences.control_CLAN   = list(group.to.subtract.from = "most",
+                                             groups.to.be.subtracted = 1),  
+           significance.level         = 0.05,
+           minimum.variation          = 1e-05){
+    
+    
+    ### step 1a: learn proxy predictors by using the auxiliary set ----
+    
+    # get the proxy baseline estimator for the main sample
+    proxy.baseline.obj <- baseline.proxy.estimator_NoChecks(
+      Z = Z, D = D, Y = Y, 
+      auxiliary.sample = A.set, 
+      learner = learner, 
+      minimum.variation = minimum.variation)
+    proxy.baseline     <- proxy.baseline.obj$baseline.predictions.main.sample
+    
+    # get the proxy estimator of the CATE for the main sample
+    proxy.cate.obj <- CATE.proxy.estimator_NoChecks(
+      Z = Z, D = D, Y = Y,
+      auxiliary.sample = A.set, 
+      learner = learner,
+      proxy.baseline.estimates = proxy.baseline.obj$baseline.predictions.full.sample, 
+      minimum.variation = minimum.variation)
+    proxy.cate <- proxy.cate.obj$CATE.predictions.main.sample
+    
+    
+    ### step 1b: estimate BLP parameters by OLS ----
+    blp.obj <- BLP_NoChecks(
+      D = D[M.set], 
+      Y = Y[M.set], 
+      propensity.scores  = propensity.scores[M.set], 
+      proxy.baseline     = proxy.baseline,
+      proxy.cate         = proxy.cate, 
+      HT.transformation  = HT.transformation,
+      X1.variables       = list(functions_of_Z = X1.variables_BLP$functions_of_Z,
+                                custom_covariates = X1.variables_BLP$custom_covariates[M.set,],
+                                fixed_effects = X1.variables_BLP$fixed_effects[M.set]),
+      vcov.control       = vcov.control_BLP,
+      significance.level = significance.level)
+    
+    
+    
+    ### step 1c: estimate GATES parameters by OLS ----
+    # group the proxy estimators for the CATE in the main sample by quantiles
+    group.membership.main.sample <- quantile.group(proxy.cate, 
+                                                   cutoffs = quantile.cutoffs, 
+                                                   quantile.nam = TRUE) 
+    
+    gates.obj <- GATES_NoChecks(
+      D = D[M.set],
+      Y = Y[M.set], 
+      propensity.scores   = propensity.scores[M.set], 
+      proxy.baseline      = proxy.baseline,
+      proxy.cate          = proxy.cate,
+      group.membership.main.sample = group.membership.main.sample,
+      HT.transformation   = HT.transformation,
+      X1.variables        = list(functions_of_Z = X1.variables_GATES$functions_of_Z,
+                                 custom_covariates = X1.variables_GATES$custom_covariates[M.set,],
+                                 fixed_effects = X1.variables_GATES$fixed_effects[M.set]),
+      vcov.control        = vcov.control_GATES,
+      differences.control = differences.control_GATES,
+      significance.level  = significance.level)
+    
+    
+    ### step 1d: estimate CLAN parameters in the main sample ----
+    clan.obj <- CLAN_NoChecks(
+      Z_CLAN.main.sample = Z_CLAN[M.set,,drop = FALSE], 
+      group.membership.main.sample = group.membership.main.sample, 
+      equal.group.variances   = equal.group.variances_CLAN,
+      differences.control     = differences.control_CLAN,
+      significance.level      = significance.level)
+    
+    
+    ### step 1e: get parameters over which we maximize to find the "best" ML method ----
+    best.obj <- best.ml.method.parameters(BLP.obj = blp.obj, 
+                                          GATES.obj = gates.obj, 
+                                          proxy.cate.main.sample = proxy.cate,
+                                          group.membership.main.sample = group.membership.main.sample)
+    
+    ### organize output in a list ----
+    return(list(BLP = blp.obj, 
+                GATES = gates.obj, 
+                CLAN = clan.obj,
+                best = best.obj,
+                CATE.proxy = proxy.cate.obj,
+                baseline.proxy = proxy.baseline,
+                group.membership_M.set = group.membership.main.sample))
+    
+  } # FUN
+  
 
 
 #' returns the two parameters that are used to find the best ML method

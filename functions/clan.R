@@ -15,10 +15,34 @@ CLAN <- function(Z_CLAN.main.sample,
                                             groups.to.be.subtracted = 1),
                  significance.level = 0.05){
   
+  # input checks
+  InputChecks_group.membership(group.membership.main.sample)
+  InputChecks_equal.length2(Z_CLAN.main.sample, group.membership.main.sample)
+  InputChecks_differences.control(differences.control, K = ncol(group.membership.main.sample))
+  
+  # run main function
+  CLAN_NoChecks(Z_CLAN.main.sample = Z_CLAN.main.sample, 
+                group.membership.main.sample = group.membership.main.sample, 
+                equal.group.variances = equal.group.variances,
+                differences.control = differences.control,
+                significance.level = significance.level)
+
+} # END FUN
+
+
+
+# performs CLAN without calling the input checks
+CLAN_NoChecks <- function(Z_CLAN.main.sample, 
+                          group.membership.main.sample, 
+                          equal.group.variances = FALSE,
+                          differences.control = list(group.to.subtract.from = "most",
+                                                     groups.to.be.subtracted = 1),
+                          significance.level = 0.05){
+  
   # extract controls
   group.to.subtract.from  <- differences.control$group.to.subtract.from
   groups.to.be.subtracted <- differences.control$groups.to.be.subtracted
-
+  
   K <- ncol(group.membership.main.sample)
   group.base <- ifelse(group.to.subtract.from == "least", 1, K)
   
@@ -62,7 +86,7 @@ CLAN <- function(Z_CLAN.main.sample,
       } # IF
       
       ct           <- ct + 1 # update counter
-
+      
     } # FOR
     
     
@@ -80,7 +104,7 @@ CLAN <- function(Z_CLAN.main.sample,
         diff <- ci.lo <- ci.up <- mean(x) - mean(y)
         diff.se <- z.diff      <- 0.0
         p.left <- p.right      <- 0.5
-
+        
       } else{
         
         ttest.diff   <- stats::t.test(x = x, y = y, 
@@ -101,13 +125,13 @@ CLAN <- function(Z_CLAN.main.sample,
       ct           <- ct + 1 # update counter
       
     } # FOR
-
+    
     colnames(out.mat)     <- c("Estimate", "CB lower", "CB upper", 
                                "Std. Error", "z value", "Pr(<z)", "Pr(>z)")
     rownames(out.mat)     <- c(paste0("delta.", 1:K),
                                paste0(
-                               "delta.", group.base, "-",
-                               "delta.", groups.to.be.subtracted))
+                                 "delta.", group.base, "-",
+                                 "delta.", groups.to.be.subtracted))
     # "delta.K-delta.1")
     generic.targets[[j]]  <- out.mat
     clan.coefficients[,j] <- out.mat[,1] 
@@ -119,6 +143,6 @@ CLAN <- function(Z_CLAN.main.sample,
   
   return(structure(
     list(clan.coefficients = clan.coefficients,
-              generic.targets   = generic.targets), class = "CLAN"))
+         generic.targets   = generic.targets), class = "CLAN"))
   
-} # END FUN
+} # FUN

@@ -126,10 +126,11 @@ initialize.gen.ml <- function(generic.ml.across.learners.obj){
 } # END FUN
 
 
-
+# the learners need to be mlr3 objects!
 generic.ml.across.learners <- function(Z, D, Y, 
                                        propensity.scores, 
-                                       learners, 
+                                       learners, # need to be mlr3 objects!
+                                       learners.names,
                                        num.splits = 50,
                                        Z_CLAN = NULL, 
                                        X1.variables_BLP           = list(functions_of_Z = c("B"),
@@ -157,12 +158,15 @@ generic.ml.across.learners <- function(Z, D, Y,
   
   # initialize
   generic.targets <- initializer.for.splits(Z = Z, Z_CLAN = Z_CLAN, 
-                                            learners = learners, num.splits = num.splits, 
+                                            learners = learners.names, num.splits = num.splits, 
                                             quantile.cutoffs = quantile.cutoffs, 
                                             differences.control_GATES = differences.control_GATES,
                                             differences.control_CLAN = differences.control_CLAN)
   
-  num.vars.in.Z_CLAN <- ifelse(is.null(Z_CLAN), ncol(Z), ncol(Z_CLAN))
+  # if no input provided, set Z_CLAN it equal to Z
+  if(is.null(Z_CLAN)) Z_CLAN <- Z 
+  
+  num.vars.in.Z_CLAN <- ncol(Z_CLAN)
   genericML.by.split <- list()
   N     <- length(Y)
   N.set <- 1:N
@@ -197,9 +201,9 @@ generic.ml.across.learners <- function(Z, D, Y,
     for(i in 1:length(learners)){
       
       generic.ml.obj <- 
-        get.generic.ml.for.given.learner(Z = Z, D = D, Y = Y, 
+        get.generic.ml.for.given.learner_NoChecks(Z = Z, D = D, Y = Y, 
                                          propensity.scores = propensity.scores,
-                                         learner = learners[i],
+                                         learner = learners[[i]],
                                          M.set = M.set, A.set = A.set,
                                          Z_CLAN                       = Z_CLAN, 
                                          X1.variables_BLP             = X1.variables_BLP,
@@ -220,7 +224,7 @@ generic.ml.across.learners <- function(Z, D, Y,
       
       if(store.learners){
         
-        genericML.by.split[[learners[i]]][[s]] <- generic.ml.obj
+        genericML.by.split[[learners.names[i]]][[s]] <- generic.ml.obj 
         
       }
       

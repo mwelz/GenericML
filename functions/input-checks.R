@@ -217,3 +217,71 @@ InputChecks_differences.control <- function(differences.control, K){
   }
   
 } # FUN
+
+
+InputChecks_group.membership <- function(group.membership){
+  
+  if(is.null(attr(x, which = "type"))) stop(paste0("The object ",
+                                                   deparse(substitute(group.membership)),
+                                                   " needs to be returned by quantile.group()"))
+  
+  if(attr(x, which = "type") != "quantile_group") stop(paste0("The object ",
+                                                              deparse(substitute(group.membership)),
+                                                              " needs to be returned by quantile.group()"))
+  
+
+} # FUN
+
+
+InputChecks_proxy.estimators <- function(proxy.estimators, baseline = TRUE){
+  
+  if(baseline){
+    
+    if(!inherits(group.membership, what = "proxy_baseline")){
+      
+      stop(paste0("The object ",
+                  deparse(substitute(group.membership)),
+                  " needs to be an instance of baseline.proxy.estimator()"))
+    }
+    
+  } else{
+    
+    if(!inherits(group.membership, what = "proxy_CATE")){
+      
+      stop(paste0("The object ",
+                  deparse(substitute(group.membership)),
+                  " needs to be an instance of CATE.proxy.estimator()"))
+    }
+    
+  }
+  
+} # FUN
+
+
+# checks if learner is correctly specified. If yes, that learner is returned
+get.learner_regr <- function(learner){
+  
+  # specify the machine learner
+  if(is.environment(learner)){
+    learner <- learner
+  } else if(learner == "elastic.net"){
+    
+    learner <- mlr3::lrn("regr.cv_glmnet", s = "lambda.min")
+    
+  } else if(learner == "random.forest"){
+    
+    learner <- mlr3::lrn("regr.ranger", num.trees = 500)
+    
+  } else if(learner == "tree"){
+    
+    learner <- mlr3::lrn("regr.rpart")
+    
+  } else{
+    
+    stop("Invalid argument for 'learner'. Needs to be either 'elastic.net', 'random.forest', 'tree', or an mlr3 object")
+    
+  } # END IF
+  
+  return(learner)
+  
+} # FUN
