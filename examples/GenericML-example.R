@@ -152,7 +152,7 @@ genML$best.learners$best.learner.for.GATES
 round(genML$VEIN$best.learners$BLP, 5)
 #        Estimate CB lower CB upper Pr(<z) adjusted Pr(>z) adjusted
 # beta.1  1.98654  1.89041  2.08317               1         0.00000
-# beta.2  0.01947 -0.14071  0.18628               1         0.78648
+# beta.2  0.01947 -0.14071  0.18630               1         0.78646
 # We see that `beta.1` (the estimate of the ATE) is estimated at ~1.99. True ATE is 2, which is contained in the 90% confidence bounds.  Moreover, `beta.2` is clearly not significant (adjusted $p$-values of both one sided tests are much larger than 0.05). Hence, there is (correctly) no indication of treatment effect heterogeneity. Moreover, the function `genericML.plot()` visualizes these results for the BLP:
 plot.GenericML(genML, type = "BLP", title = "VEIN of BLP") 
 
@@ -160,12 +160,12 @@ plot.GenericML(genML, type = "BLP", title = "VEIN of BLP")
 # VEIN of GATES
 round(genML$VEIN$best.learners$GATES, 5)
 #                 Estimate CB lower CB upper Pr(<z) adjusted Pr(>z) adjusted
-# gamma.1          1.99756  1.76517  2.22686               1         0.00000
-# gamma.2          1.98240  1.75276  2.21204               1         0.00000
-# gamma.3          1.98286  1.74370  2.21676               1         0.00000
-# gamma.4          1.99459  1.77094  2.22709               1         0.00000
-# gamma.5          2.02006  1.78922  2.24912               1         0.00000
-# gamma.K-gamma.1  0.00069 -0.32917  0.32709               1         0.98721
+# gamma.1          1.99756  1.76514  2.22686               1         0.00000
+# gamma.2          1.98240  1.75278  2.21202               1         0.00000
+# gamma.3          1.98286  1.74367  2.21676               1         0.00000
+# gamma.4          1.99459  1.77094  2.22710               1         0.00000
+# gamma.5          2.02006  1.78923  2.24911               1         0.00000
+# gamma.5-gamma.1  0.00069 -0.32918  0.32710               1         0.98722
 # gamma.5-gamma.2  0.02119 -0.30804  0.34744               1         0.88855
 # All point estimates for the $\gamma$ coefficients are close to each other. Difference between most and least affected group is insignificant (adjusted $p$-values of ~1). Hence, there is (correctly) no indication of treatment effect heterogeneity. We again visualize these results with `genericML.plot()`:
 plot.GenericML(genML, type = "GATES", title = "VEIN of GATES") 
