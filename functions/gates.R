@@ -133,7 +133,8 @@ GATES.classic <- function(D, Y,
   names(gates.coefficients.quantiles) <- paste0("gamma.", 1:K)
   
   # return
-  return(list(lm.obj = gates.obj, 
+  return(structure(
+    list(lm.obj = gates.obj, 
               gates.coefficients = gates.coefficients,
               gates.coefficients.quantiles = gates.coefficients.quantiles,
               generic.targets = generic.targets_GATES(coeftest.object = coefficients, 
@@ -141,7 +142,7 @@ GATES.classic <- function(D, Y,
                                                       vcov = vcov, 
                                                       significance.level = significance.level,
                                                       differences.control = differences.control),
-              coefficients = coefficients))
+              coefficients = coefficients), class = "GATES"))
   
 } # END FUN
 
@@ -215,7 +216,8 @@ GATES.HT <- function(D, Y,
   names(gates.coefficients.quantiles) <- paste0("gamma.", 1:K)
   
   # return
-  return(list(lm.obj = gates.obj, 
+  return(structure(
+    list(lm.obj = gates.obj, 
               gates.coefficients = gates.coefficients,
               gates.coefficients.quantiles = gates.coefficients.quantiles,
               generic.targets = generic.targets_GATES(coeftest.object = coefficients, 
@@ -223,7 +225,7 @@ GATES.HT <- function(D, Y,
                                                       vcov = vcov, 
                                                       significance.level = significance.level,
                                                       differences.control = differences.control),
-              coefficients = coefficients))
+              coefficients = coefficients), class = "GATES"))
   
 } # END FUN
 

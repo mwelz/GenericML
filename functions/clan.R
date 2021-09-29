@@ -117,7 +117,8 @@ CLAN <- function(Z_CLAN.main.sample,
   names(generic.targets) <- colnames(clan.coefficients) <- colnames(Z_CLAN.main.sample)
   rownames(clan.coefficients) <- rownames(out.mat)
   
-  return(list(clan.coefficients = clan.coefficients,
-              generic.targets   = generic.targets))
+  return(structure(
+    list(clan.coefficients = clan.coefficients,
+              generic.targets   = generic.targets), class = "CLAN"))
   
 } # END FUN

@@ -105,10 +105,11 @@ BLP.classic <- function(D, Y, propensity.scores,
   coefficients <- lmtest::coeftest(blp.obj, vcov. = vcov)
   
   # return
-  return(list(lm.obj = blp.obj, 
+  return(structure(
+    list(lm.obj = blp.obj, 
               blp.coefficients = blp.obj$coefficients[c("beta.1", "beta.2")],
               generic.targets = generic.targets_BLP(coefficients, significance.level = significance.level),
-              coefficients = coefficients))
+              coefficients = coefficients), class = "BLP"))
   
 } # END FUN
 
@@ -167,10 +168,11 @@ BLP.HT <- function(D, Y, propensity.scores,
   coefficients <- lmtest::coeftest(blp.obj, vcov. = vcov)
   
   # return
-  return(list(lm.obj = blp.obj, 
+  return(structure(
+    list(lm.obj = blp.obj, 
               blp.coefficients = blp.obj$coefficients[c("beta.1", "beta.2")],
               generic.targets = generic.targets_BLP(coefficients, significance.level = significance.level),
-              coefficients = coefficients))
+              coefficients = coefficients), class = "BLP"))
   
 } # END FUN
 
