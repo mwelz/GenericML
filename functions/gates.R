@@ -31,7 +31,44 @@ GATES <- function(D, Y,
                   significance.level  = 0.05){
   
   # input check
-  input.checks.X1(X1.variables)
+  InputChecks_D(D)
+  InputChecks_Y(Y)
+  InputChecks_equal.length2(D, Y)
+  InputChecks_equal.length3(propensity.scores, proxy.baseline, proxy.cate)
+  InputChecks_equal.length2(Y, propensity.scores)
+  InputChecks_X1(X1.variables)
+  InputChecks_vcov.control(vcov.control)
+  InputChecks_differences.control(differences.control, K = ncol(group.membership.main.sample))
+  
+  # fit model according to strategy 1 or 2 in the paper
+  GATES_NoChecks(D = D, Y = Y,
+                 propensity.scores   = propensity.scores, 
+                 proxy.baseline      = proxy.baseline,
+                 proxy.cate          = proxy.cate, 
+                 group.membership.main.sample = group.membership.main.sample,
+                 X1.variables        = X1.variables,
+                 vcov.control        = vcov.control,
+                 differences.control = differences.control,
+                 significance.level  = significance.level)
+  
+} # FUN
+
+
+# helper function that skips the input checks
+GATES_NoChecks <- function(D, Y, 
+                           propensity.scores, 
+                           proxy.baseline,
+                           proxy.cate,
+                           group.membership.main.sample,
+                           HT.transformation   = FALSE,
+                           X1.variables        = list(functions_of_Z = c("B"),
+                                                      custom_covariates = NULL,
+                                                      fixed_effects = NULL),
+                           vcov.control        = list(estimator = "vcovHC",
+                                                      arguments = list(type = "const")),
+                           differences.control = list(group.to.subtract.from = "most",
+                                                      groups.to.be.subtracted = 1),
+                           significance.level  = 0.05){
   
   # fit model according to strategy 1 or 2 in the paper
   do.call(what = get(ifelse(HT.transformation, "GATES.HT", "GATES.classic")),

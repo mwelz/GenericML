@@ -8,8 +8,8 @@
 #' @param num.splits number of sample splits. Default is 100.
 #' @param Z_CLAN A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z_CLAN = Z`, i.e. CLAN is performed for all variables in `Z`.
 #' @param HT.transformation logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.
-#' @param X1.variables_BLP a list controlling the variables that shall be used in the matrix X1 for the BLP regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers, strings, or a factor thereof that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.
-#' @param X1.variables_GATES a list controlling the variables that shall be used in the matrix X1 for the GATES regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers, strings, or a factor thereof that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL). Note that in the final matrix X1, a constant 1 will be silently included if no HT transformation is applied so that the regression model has an intercept.
+#' @param X1.variables_BLP a list controlling the variables that shall be used in the matrix X1 for the BLP regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The second element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.
+#' @param X1.variables_GATES a list controlling the variables that shall be used in the matrix X1 for the GATES regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The second element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included if no HT transformation is applied so that the regression model has an intercept.
 #' @param quantile.cutoffs The cutoff points of quantiles that shall be used for GATES grouping. Default is `c(0.25, 0.5, 0.75)`, which corresponds to the quartiles.
 #' @param differences.control_GATES a list with two elements called 'group.to.subtract.from' and 'groups.to.be.subtracted'. The first element ('group.to.subtract.from') denotes what shall be the base group to subtract from in GATES; either "most" or "least". The second element ('groups.to.be.subtracted') are the groups to be subtracted from 'group.to.subtract.from', which is a subset of {1,...,K}, where K equals the number of groups.
 #' @param differences.control_CLAN same as differences.control_GATES, just for CLAN.
@@ -51,9 +51,21 @@ GenericML <- function(Z, D, Y,
                       store.learners = FALSE,
                       store.splits = FALSE){
   
+  ### step 0: input checks ----
+  InputChecks_D(D)
+  InputChecks_Y(Y)
+  InputChecks_Z(Z)
+  InputChecks_equal.length3(D, Y, Z)
+  InputChecks_X1(X1.variables_BLP)
+  InputChecks_X1(X1.variables_GATES)
+  InputChecks_vcov.control(vcov.control_BLP)
+  InputChecks_vcov.control(vcov.control_GATES)
+  InputChecks_differences.control(differences.control_GATES, K = length(quantile.cutoffs) + 1)
+  InputChecks_differences.control(differences.control_CLAN, K = length(quantile.cutoffs) + 1)
+  
   ### step 1: compute propensity scores ----
-  propensity.scores.obj <- propensity.score(Z = Z, D = D, 
-                                            estimator = learner.propensity.score)
+  propensity.scores.obj <- propensity.score_NoChecks(
+    Z = Z, D = D, estimator = learner.propensity.score)
   propensity.scores     <- propensity.scores.obj$propensity.scores
   
   ### step 2: for each ML method, do the generic ML analysis ----

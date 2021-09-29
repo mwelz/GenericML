@@ -153,17 +153,19 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
 
   
   ### step 2b: estimate BLP parameters by OLS ----
-  blp.obj <- BLP(D = D[M.set], 
-                 Y = Y[M.set], 
-                 propensity.scores  = propensity.scores[M.set], 
-                 proxy.baseline     = proxy.baseline,
-                 proxy.cate         = proxy.cate, 
-                 HT.transformation  = HT.transformation,
-                 X1.variables       = list(functions_of_Z = X1.variables_BLP$functions_of_Z,
-                                           custom_covariates = X1.variables_BLP$custom_covariates[M.set,],
-                                           fixed_effects = X1.variables_BLP$fixed_effects[M.set]),
-                 vcov.control       = vcov.control_BLP,
-                 significance.level = significance.level)
+  blp.obj <- BLP_NoChecks(
+    D = D[M.set], 
+    Y = Y[M.set], 
+    propensity.scores  = propensity.scores[M.set], 
+    proxy.baseline     = proxy.baseline,
+    proxy.cate         = proxy.cate, 
+    HT.transformation  = HT.transformation,
+    X1.variables       = list(functions_of_Z = X1.variables_BLP$functions_of_Z,
+                              custom_covariates = X1.variables_BLP$custom_covariates[M.set,],
+                              fixed_effects = X1.variables_BLP$fixed_effects[M.set]),
+    vcov.control       = vcov.control_BLP,
+    significance.level = significance.level)
+                 
   
 
   ### step 2c: estimate GATES parameters by OLS ----
@@ -172,19 +174,20 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                                                  cutoffs = quantile.cutoffs, 
                                                  quantile.nam = TRUE) 
   
-  gates.obj <- GATES(D = D[M.set],
-                     Y = Y[M.set], 
-                     propensity.scores   = propensity.scores[M.set], 
-                     proxy.baseline      = proxy.baseline,
-                     proxy.cate          = proxy.cate,
-                     group.membership.main.sample = group.membership.main.sample,
-                     HT.transformation   = HT.transformation,
-                     X1.variables        = list(functions_of_Z = X1.variables_GATES$functions_of_Z,
-                                               custom_covariates = X1.variables_GATES$custom_covariates[M.set,],
-                                               fixed_effects = X1.variables_GATES$fixed_effects[M.set]),
-                     vcov.control        = vcov.control_GATES,
-                     differences.control = differences.control_GATES,
-                     significance.level  = significance.level)
+  gates.obj <- GATES_NoChecks(
+    D = D[M.set],
+    Y = Y[M.set], 
+    propensity.scores   = propensity.scores[M.set], 
+    proxy.baseline      = proxy.baseline,
+    proxy.cate          = proxy.cate,
+    group.membership.main.sample = group.membership.main.sample,
+    HT.transformation   = HT.transformation,
+    X1.variables        = list(functions_of_Z = X1.variables_GATES$functions_of_Z,
+                               custom_covariates = X1.variables_GATES$custom_covariates[M.set,],
+                               fixed_effects = X1.variables_GATES$fixed_effects[M.set]),
+    vcov.control        = vcov.control_GATES,
+    differences.control = differences.control_GATES,
+    significance.level  = significance.level)
   
   
   ### step 2d: estimate CLAN parameters in the main sample ----

@@ -54,9 +54,20 @@ propensity.score_mlr3 <- function(Z, D, learner = "random.forest"){
 #' @export
 propensity.score <- function(Z, D, estimator = "constant"){
   
-  # input checks
-  if(length(unique(D)) != 2) stop("Treatment assignment 'D' does not have 2 unique values.")
-  if(!all(c(0, 1) %in% unique(D))) stop("Treatment assignment 'D' is non-binary.")
+  # input checks 
+  InputChecks_D(D)
+  InputChecks_Z(Z)
+  InputChecks_equal.length2(Z, D)
+  
+  # function without input checks
+  propensity.score_NoChecks(Z = Z, D = D, estimator = estimator)
+
+} # FUN
+
+
+
+# same as above, but w/o input checks
+propensity.score_NoChecks <- function(Z, D, estimator = "constant"){
   
   if(!is.character(estimator)){
     
@@ -89,7 +100,7 @@ propensity.score <- function(Z, D, estimator = "constant"){
   
   # return
   return(out)
-
+  
 } # FUN
 
 

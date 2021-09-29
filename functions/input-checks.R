@@ -1,5 +1,33 @@
 # void functions for input checks
 
+InputChecks_equal.length3 <- function(x, y, z){
+  
+  X <- as.matrix(x)
+  Y <- as.matrix(y)
+  Z <- as.matrix(z)
+  
+  if(!(nrow(X) == nrow(Y) & nrow(X) == nrow(Z) & nrow(Z) == nrow(Y))){
+    stop(paste0(deparse(substitute(x)), ", ",
+                deparse(substitute(y)), ", ",
+                deparse(substitute(z)),
+                " need to have an equal number of observations"), call. = FALSE)
+  }
+} # FUN
+
+InputChecks_equal.length2 <- function(x, y){
+  
+  X <- as.matrix(x)
+  Y <- as.matrix(y)
+
+  if(!(nrow(X) == nrow(Y))){
+    stop(paste0(deparse(substitute(x)), ", ",
+                deparse(substitute(y)),
+                " need to have an equal number of observations"), call. = FALSE)
+  }
+} # FUN
+
+
+
 InputChecks_D <- function(D){
   
   # input checks
@@ -46,7 +74,7 @@ InputChecks_Z_CLAN <- function(Z_CLAN){
 
 
 # helper that throws error in case of illegal input in 'X1.variables'
-input.checks.X1 <- function(X1.variables, num.obs){
+InputChecks_X1 <- function(X1.variables, num.obs){
   
   if(!all(c("functions_of_Z", "custom_covariates", "fixed_effects") %in% names(X1.variables))){
       stop(paste0("The list ", deparse(substitute(X1.variables)), "must consist of three elements called ",
@@ -117,3 +145,75 @@ input.checks.X1 <- function(X1.variables, num.obs){
 } # FUN
 
 
+
+InputChecks_vcov.control <- function(vcov.control){
+  
+  if(!is.list(vcov.control)) stop(paste0(deparse(substitute(vcov.control))),
+                                  " must be a list", call. = FALSE)
+  
+  if(length(vcov.control) != 2) stop(paste0("The list ", deparse(substitute(vcov.control))),
+                                     " must be of length 2", call. = FALSE)
+  
+  if(!all(c("estimator", "arguments") %in% names(vcov.control))){
+    
+    stop(paste0("The list ", deparse(substitute(vcov.control))), 
+         " must have two elements called 'estimator' and 'arguments', respectively", call. = FALSE)
+    
+  } # IF
+  
+  
+  if(!vcov.control$estimator %in% c("vcovBS", "vcovCL", "vcovHAC", "vcovHC")){
+    stop(paste0("The element ", deparse(substitute(vcov.control))), "$estimator",
+         " needs to be in c('vcovBS', 'vcovCL', 'vcovHAC', 'vcovHC')", call. = FALSE)
+  } # IF
+  
+  if(!is.list(vcov.control$arguments)){
+    
+    stop(paste0(deparse(substitute(vcov.control))),
+         "$arguments must be a list", call. = FALSE)
+    
+  } else{
+    
+    if(!"type" %in% names(vcov.control$arguments)) stop(paste0("The list ", deparse(substitute(vcov.control))),
+                                                 "$arguments must contain an element called 'type'", 
+                                                 call. = FALSE)
+    
+  } # IF
+  
+} # FUN
+
+
+InputChecks_differences.control <- function(differences.control, K){
+  
+  if(!is.list(differences.control)) stop(paste0(deparse(substitute(differences.control))),
+                                         " must be a list", call. = FALSE)
+  
+  if(length(differences.control) != 2) stop(paste0("The list ", deparse(substitute(differences.control))),
+                                       " must be of length 2", call. = FALSE)
+  
+  if(!all(c("group.to.subtract.from", "groups.to.be.subtracted") %in% names(differences.control))){
+    
+    stop(paste0("The list ", deparse(substitute(differences.control))), 
+         " must have two elements called 'group.to.subtract.from' and 'groups.to.be.subtracted', respectively", call. = FALSE)
+    
+  } # IF
+  
+  
+  if(!differences.control$group.to.subtract.from %in% c("most", "least")){
+    stop(paste0("The element ", deparse(substitute(differences.control)), "$group.to.subtract.from",
+         " must be equal to 'most' or 'least'"), call. = FALSE)
+  }
+  
+  if(!(is.vector(differences.control$groups.to.be.subtracted) | is.numeric(differences.control$groups.to.be.subtracted))){
+    
+    stop(paste0(deparse(substitute(differences.control)), "$groups.to.be.subtracted",
+                " must be a numeric vector"), call. = FALSE)
+    
+  }
+  
+  if(any(differences.control$groups.to.be.subtracted < 1) | any(differences.control$groups.to.be.subtracted > K)){
+    stop(paste0("The numeric vector ", deparse(substitute(differences.control)), "$groups.to.be.subtracted",
+                " must be a subset of {1,2,...,K}, where K = ", K, " is the number of groups with the supplied arguments (controlled through the argument 'quantile.cutoffs')"), call. = FALSE)
+  }
+  
+} # FUN

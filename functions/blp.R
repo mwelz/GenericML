@@ -26,8 +26,39 @@ BLP <- function(D, Y,
   
   
   
-  # input check
-  input.checks.X1(X1.variables)
+  # input checks
+  InputChecks_Y(Y)
+  InputChecks_D(D)
+  InputChecks_equal.length2(Y, D)
+  InputChecks_equal.length2(proxy.baseline, proxy.cate)
+  InputChecks_equal.length2(proxy.baseline, Y)
+  InputChecks_vcov.control(vcov.control)
+  InputChecks_X1(X1.variables)
+  
+  # fit model according to strategy 1 or 2 in the paper
+  BLP_NoChecks(D = D, Y = Y, 
+               propensity.scores  = propensity.scores, 
+               proxy.baseline     = proxy.baseline,
+               proxy.cate         = proxy.cate, 
+               X1.variables       = X1.variables,
+               vcov.control       = vcov.control,
+               significance.level = significance.level)
+  
+} # FUN
+
+
+# helper function to perform BLP w/o input checks
+BLP_NoChecks <- function(D, Y, 
+                         propensity.scores, 
+                         proxy.baseline,
+                         proxy.cate, 
+                         HT.transformation  = FALSE,
+                         X1.variables       = list(functions_of_Z = c("B"),
+                                                   custom_covariates = NULL,
+                                                   fixed_effects = NULL),
+                         vcov.control       = list(estimator = "vcovHC",
+                                                   arguments = list(type = "const")),
+                         significance.level = 0.05){
   
   # fit model according to strategy 1 or 2 in the paper
   do.call(what = get(ifelse(HT.transformation, "BLP.HT", "BLP.classic")),
@@ -38,7 +69,7 @@ BLP <- function(D, Y,
                       X1.variables       = X1.variables,
                       vcov.control       = vcov.control,
                       significance.level = significance.level))
-
+  
 } # FUN
 
 
