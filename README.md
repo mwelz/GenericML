@@ -18,8 +18,8 @@ R implementation of Generic Machine Learning (Chernozhukov, V., Demirer, M., Duf
 - [ ] Parallelize the main loop;
 - [x] Implement deep neural networks as regression learner. Currently not supported by `mlr3` (NB: cannot be done in current version of `mlr3`);
 - [ ] Add optional monotonization of the confindence bounds;
-- [x] Error handling. Current implementation might throw an error in case of undersampling (TODO: still needs to be done for `CLAN`!);
-- [x] Implement S3 class structure and reorganize repo (TODO: also make classes for BLP, GATES, CLAN);
+- [x] Error handling. Current implementation might throw an error in case of undersampling;
+- [x] Implement S3 class structure and reorganize repo;
 - [ ] Make an R package.
 
 ## Authors
