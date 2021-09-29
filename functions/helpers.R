@@ -350,7 +350,7 @@ get.df.from.X1.variables <- function(functions.of.Z_mat,
   
   custom        <- X1.variables$custom_covariates
   fixed.eff     <- X1.variables$fixed_effects
-  out           <- data.frame(functions.of.Z_mat[, X1.variables$functions_of_Z])
+  out           <- data.frame(functions.of.Z_mat[, X1.variables$functions_of_Z, drop = FALSE])
   colnames(out) <- X1.variables$functions_of_Z
   
   if(!is.null(fixed.eff)) out$fixed.effects <- factor(fixed.eff)
