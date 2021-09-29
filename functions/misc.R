@@ -88,7 +88,7 @@ quantile.group <- function(x,
 #' @param learner The machine learner that shall be used
 #' @param M.set main set
 #' @param A.set auxiliary set
-#' @param Z.clan A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z.clan = Z`, i.e. CLAN is performed for all variables in `Z`.
+#' @param Z_CLAN A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z_CLAN = Z`, i.e. CLAN is performed for all variables in `Z`.
 #' @param X1.variables_BLP a list controlling the variables that shall be used in the matrix X1 for the BLP regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers, strings, or a factor thereof that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.
 #' @param X1.variables_GATES a list controlling the variables that shall be used in the matrix X1 for the GATES regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers, strings, or a factor thereof that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL). Note that in the final matrix X1, a constant 1 will be silently included if no HT transformation is applied so that the regression model has an intercept.
 #' @param HT.transformation logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.
@@ -102,14 +102,14 @@ quantile.group <- function(x,
 #' @param minimum.variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
 #' 
 #' TODO: instructions on how mlr3 input is supposed to work (needs to be a string!)
-#' TODO: comments on CLAN: If there are categorical variables, apply one-hot-encoding to Z.clan. The interpretation then becomes: Is there a factor that is overproportionally present in the least or most affected group?
+#' TODO: comments on CLAN: If there are categorical variables, apply one-hot-encoding to Z_CLAN. The interpretation then becomes: Is there a factor that is overproportionally present in the least or most affected group?
 #' 
 #' @export
 get.generic.ml.for.given.learner <- function(Z, D, Y, 
                                              propensity.scores,
                                              learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',
                                              M.set, A.set,
-                                             Z.clan                     = NULL, 
+                                             Z_CLAN                     = NULL, 
                                              X1.variables_BLP           = list(functions_of_Z = c("B"),
                                                                                custom_covariates = NULL,
                                                                                fixed_effects = NULL),
@@ -131,7 +131,7 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                                              minimum.variation          = 1e-05){
   
   ### step 1: input checks ---- 
-  if(is.null(Z.clan)) Z.clan <- Z # if no input provided, set it equal to Z
+  if(is.null(Z_CLAN)) Z_CLAN <- Z # if no input provided, set it equal to Z
   
   ### step 2a: learn proxy predictors by using the auxiliary set ----
   
@@ -188,7 +188,7 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
   
   
   ### step 2d: estimate CLAN parameters in the main sample ----
-  clan.obj <- CLAN(Z.clan.main.sample = Z.clan[M.set,], 
+  clan.obj <- CLAN(Z_CLAN.main.sample = Z_CLAN[M.set,], 
                    group.membership.main.sample = group.membership.main.sample, 
                    equal.group.variances   = equal.group.variances_CLAN,
                    differences.control     = differences.control_CLAN,

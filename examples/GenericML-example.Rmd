@@ -73,7 +73,7 @@ The core of this implementation is the function `GenericML()`, which is based on
 * `learner.propensity.score` The machine learner to be used for estimating the propensity scores. Either `'elastic.net'`, `'random.forest'`, or `'tree'`. Can alternatively be specified by using `mlr3` syntax, for example `'mlr3::lrn("ranger", num.trees = 500)'`. See https://mlr3learners.mlr-org.com for a list of `mlr3` learners. Default is `'elastic.net'`.
 * `learners.genericML` A vector of strings specifying the machine learners to be used for estimating the BCA and CATE. Either `'elastic.net'`, `'random.forest'`, or `'tree'`. Can alternatively be specified by using `mlr3` syntax, for example `'mlr3::lrn("ranger", num.trees = 500)'`. See https://mlr3learners.mlr-org.com for a list of `mlr3` learners.
 * `num.splits` number of sample splits. Default is 100.
-* `Z.clan` A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z.clan = Z`, i.e. CLAN is performed for all variables in `Z`.
+* `Z_CLAN` A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z_CLAN = Z`, i.e. CLAN is performed for all variables in `Z`.
 * `HT.transformation` logical. If `TRUE`, a HT transformation is applied in BLP and GATES. Default is `FALSE.`
 * `X1.variables_BLP` a list controlling the variables that shall be used in the matrix X1 for the BLP regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers, strings, or a factor thereof that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.
 * `X1.variables_GATES` a list controlling the variables that shall be used in the matrix X1 for the GATES regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers, strings, or a factor thereof that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL). Note that in the final matrix X1, a constant 1 will be silently included if no HT transformation is applied so that the regression model has an intercept.
@@ -103,7 +103,7 @@ learners.genericML       <- c("elastic.net", "mlr3::lrn('ranger', num.trees = 10
 
 # specify the data that shall be used for the CLAN
 # here, we use all variables of Z and uniformly distributed random noise
-Z.clan <- cbind(Z, random = runif(num.obs))
+Z_CLAN <- cbind(Z, random = runif(num.obs))
 
 # specify the number of splits 
 num.splits               <- 100
@@ -159,7 +159,7 @@ genML <- GenericML(Z = Z, D = D, Y = Y,
                    learner.propensity.score = learner.propensity.score, 
                    learners.genericML = learners.genericML,
                    num.splits = num.splits,
-                   Z.clan = Z.clan,
+                   Z_CLAN = Z_CLAN,
                    HT.transformation = HT.transformation, 
                    X1.variables_BLP = X1.variables_BLP, 
                    X1.variables_GATES = X1.variables_GATES,
@@ -241,7 +241,7 @@ Observe that also the estimate of the ATE, along its 90% confidence bounds, are 
 
 #### VEIN of CLAN
 
-CLAN of the variable `z1` (which was a variable in the input object `Z.clan`):
+CLAN of the variable `z1` (which was a variable in the input object `Z_CLAN`):
 
 ```{r}
 genML$VEIN$best.learners$CLAN$z1
@@ -254,7 +254,7 @@ The CLAN correctly indicates that there is no heterogeneity along `z1` (all $p$-
 plot.GenericML(genML, type = "CLAN", CLAN.variable = "z1", title = "CLAN of 'z1'") 
 ```
 
-Visualizing the CLAN for the variable `random`, which was a column in `Z.clan`:
+Visualizing the CLAN for the variable `random`, which was a column in `Z_CLAN`:
 
 ```{r, out.width="50%"}
 plot.GenericML(genML, type = "CLAN", CLAN.variable = "random", title = "CLAN of 'random'") 

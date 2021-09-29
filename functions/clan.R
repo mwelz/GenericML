@@ -1,14 +1,14 @@
 #' Estimates the CLAN parameters in the main sample
 #' 
-#' @param Z.clan.main.sample a matrix with _|M|_ rows. Each column represents a variable for which CLAN shall be performed.
+#' @param Z_CLAN.main.sample a matrix with _|M|_ rows. Each column represents a variable for which CLAN shall be performed.
 #' @param group.membership.main.sample a logical matrix with _M_ rows that indicate 
 #' the group memberships (such a matrix is returned by the function quantile.group())
 #' @param equal.group.variances logical. If TRUE, the the two within-group variances of the most and least affected group are assumed to be equal. Default is FALSE.
 #' @param differences.control a list with two elements called 'group.to.subtract.from' and 'groups.to.be.subtracted'. The first element ('group.to.subtract.from') denotes what shall be the base group to subtract from in CLAN; either "most" or "least". The second element ('groups.to.be.subtracted') are the groups to be subtracted from 'group.to.subtract.from', which is a subset of {1,...,K}, where K equals the number of groups.
-#' @return The two CLAN parameters ("most" affected and "least" affected) for each variable in Z.clan.main.sample
+#' @return The two CLAN parameters ("most" affected and "least" affected) for each variable in Z_CLAN.main.sample
 #' 
 #' @export
-CLAN <- function(Z.clan.main.sample, 
+CLAN <- function(Z_CLAN.main.sample, 
                  group.membership.main.sample, 
                  equal.group.variances = FALSE,
                  differences.control = list(group.to.subtract.from = "most",
@@ -23,14 +23,14 @@ CLAN <- function(Z.clan.main.sample,
   group.base <- ifelse(group.to.subtract.from == "least", 1, K)
   
   # initialize
-  generic.targets   <- rep(list(NULL), ncol(Z.clan.main.sample))
+  generic.targets   <- rep(list(NULL), ncol(Z_CLAN.main.sample))
   clan.coefficients <- matrix(NA_real_, 
                               nrow =  K + length(groups.to.be.subtracted), 
-                              ncol = ncol(Z.clan.main.sample))
+                              ncol = ncol(Z_CLAN.main.sample))
   z                 <- qnorm(1-significance.level/2) # the quantile
   
   # loop over the CLAN variables
-  for(j in 1:ncol(Z.clan.main.sample)){
+  for(j in 1:ncol(Z_CLAN.main.sample)){
     
     # initialize matrix
     out.mat <- matrix(NA_real_,
@@ -42,7 +42,7 @@ CLAN <- function(Z.clan.main.sample,
     ### 1. get summary statistics for most and least affected group ----
     for(k in 1:K){
       
-      ttest.deltak <- stats::t.test(Z.clan.main.sample[group.membership.main.sample[, k], j])
+      ttest.deltak <- stats::t.test(Z_CLAN.main.sample[group.membership.main.sample[, k], j])
       ci.lo        <- ttest.deltak$estimate - z * ttest.deltak$stderr 
       ci.up        <- ttest.deltak$estimate + z * ttest.deltak$stderr 
       p.right      <- pnorm(ttest.deltak$statistic, lower.tail = FALSE) # right p-value: Pr(Z>z)
@@ -58,8 +58,8 @@ CLAN <- function(Z.clan.main.sample,
     ### 2. get summary statistics for differences ----
     
     for(k in groups.to.be.subtracted){
-      ttest.diff   <- stats::t.test(x = Z.clan.main.sample[group.membership.main.sample[, group.base], j], 
-                                    y = Z.clan.main.sample[group.membership.main.sample[, k], j], 
+      ttest.diff   <- stats::t.test(x = Z_CLAN.main.sample[group.membership.main.sample[, group.base], j], 
+                                    y = Z_CLAN.main.sample[group.membership.main.sample[, k], j], 
                                     var.equal = equal.group.variances) # 2-sample t-test
       
       diff         <- ifelse(group.base == 1, 
@@ -88,7 +88,7 @@ CLAN <- function(Z.clan.main.sample,
     
   } # END FOR
   
-  names(generic.targets) <- colnames(clan.coefficients) <- colnames(Z.clan.main.sample)
+  names(generic.targets) <- colnames(clan.coefficients) <- colnames(Z_CLAN.main.sample)
   rownames(clan.coefficients) <- rownames(out.mat)
   
   return(list(clan.coefficients = clan.coefficients,

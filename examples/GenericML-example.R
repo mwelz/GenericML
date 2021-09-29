@@ -56,7 +56,7 @@ learners.genericML       <- c("elastic.net", "mlr3::lrn('ranger', num.trees = 10
 
 # specify the data that shall be used for the CLAN
 # here, we use all variables of Z and uniformly distributed random noise
-Z.clan <- cbind(Z, random = runif(num.obs))
+Z_CLAN <- cbind(Z, random = runif(num.obs))
 
 # specify the number of splits 
 num.splits               <- 100
@@ -106,7 +106,7 @@ genML <- GenericML(Z = Z, D = D, Y = Y,
                    learner.propensity.score = learner.propensity.score, 
                    learners.genericML = learners.genericML,
                    num.splits = num.splits,
-                   Z.clan = Z.clan,
+                   Z_CLAN = Z_CLAN,
                    HT.transformation = HT.transformation, 
                    X1.variables_BLP = X1.variables_BLP, 
                    X1.variables_GATES = X1.variables_GATES,
@@ -200,7 +200,7 @@ pdf(file = paste0(getwd(), "/examples/plots/VEIN-GATES.pdf"))
 plot.GenericML(genML, type = "GATES", title = "VEIN of GATES") 
 dev.off()
 
-for(varname in colnames(Z.clan)){
+for(varname in colnames(Z_CLAN)){
   pdf(file = paste0(getwd(), "/examples/plots/VEIN-CLAN-", varname, ".pdf"))
   print(plot.GenericML(genML, type = "CLAN", CLAN.variable = varname,
                  title = paste0("CLAN of '", varname, "'"))) 

@@ -20,19 +20,19 @@ make.mlr3.string <- function(learner.str, regr = TRUE){
 
 
 
-initializer.for.splits <- function(Z, Z.clan, learners,
+initializer.for.splits <- function(Z, Z_CLAN, learners,
                                    num.splits, quantile.cutoffs,
                                    differences.control_GATES,
                                    differences.control_CLAN){
   
   # helper function that initializes object in the generic ML splitting procedure
   
-  if(is.null(Z.clan)){
+  if(is.null(Z_CLAN)){
     d <- ncol(Z)
-    Z.clan.nam <- colnames(Z)
+    Z_CLAN.nam <- colnames(Z)
   } else{
-    d <- ncol(Z.clan)
-    Z.clan.nam <- colnames(Z.clan)
+    d <- ncol(Z_CLAN)
+    Z_CLAN.nam <- colnames(Z_CLAN)
   }
   
   K <- length(quantile.cutoffs) + 1
@@ -69,7 +69,7 @@ initializer.for.splits <- function(Z, Z.clan, learners,
                 dimnames = list(NULL, c("lambda", "lambda.bar"), NULL))
   
   clan.lists <- lapply(1:d, function(...) clan )
-  names(clan.lists) <- Z.clan.nam
+  names(clan.lists) <- Z_CLAN.nam
   
   out.ls <- lapply(1:length(learners), function(...){
     
@@ -131,7 +131,7 @@ generic.ml.across.learners <- function(Z, D, Y,
                                        propensity.scores, 
                                        learners, 
                                        num.splits = 50,
-                                       Z.clan = NULL, 
+                                       Z_CLAN = NULL, 
                                        X1.variables_BLP           = list(functions_of_Z = c("B"),
                                                                          custom_covariates = NULL,
                                                                          fixed_effects = NULL),
@@ -156,13 +156,13 @@ generic.ml.across.learners <- function(Z, D, Y,
                                        store.splits = FALSE){
   
   # initialize
-  generic.targets <- initializer.for.splits(Z = Z, Z.clan = Z.clan, 
+  generic.targets <- initializer.for.splits(Z = Z, Z_CLAN = Z_CLAN, 
                                             learners = learners, num.splits = num.splits, 
                                             quantile.cutoffs = quantile.cutoffs, 
                                             differences.control_GATES = differences.control_GATES,
                                             differences.control_CLAN = differences.control_CLAN)
   
-  num.vars.in.Z.clan <- ifelse(is.null(Z.clan), ncol(Z), ncol(Z.clan))
+  num.vars.in.Z_CLAN <- ifelse(is.null(Z_CLAN), ncol(Z), ncol(Z_CLAN))
   genericML.by.split <- list()
   N     <- length(Y)
   N.set <- 1:N
@@ -201,7 +201,7 @@ generic.ml.across.learners <- function(Z, D, Y,
                                          propensity.scores = propensity.scores,
                                          learner = learners[i],
                                          M.set = M.set, A.set = A.set,
-                                         Z.clan                       = Z.clan, 
+                                         Z_CLAN                       = Z_CLAN, 
                                          X1.variables_BLP             = X1.variables_BLP,
                                          X1.variables_GATES           = X1.variables_GATES,
                                          HT.transformation            = HT.transformation,
@@ -224,7 +224,7 @@ generic.ml.across.learners <- function(Z, D, Y,
         
       }
       
-      for(j in 1:num.vars.in.Z.clan){
+      for(j in 1:num.vars.in.Z_CLAN){
         generic.targets[[i]]$CLAN[[j]][,,s] <- generic.ml.obj$CLAN$generic.targets[[j]]
       }
       
@@ -312,7 +312,7 @@ VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
       gen.ml.ls$CLAN[[learner]][[z.clan]][,"Pr(<z) adjusted"] <- p.left.adj
       gen.ml.ls$CLAN[[learner]][[z.clan]][,"Pr(>z) adjusted"] <- p.right.adj
       
-    } # FOR Z.clan
+    } # FOR Z_CLAN
     
   } # FOR learners
   
