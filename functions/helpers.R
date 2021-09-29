@@ -325,26 +325,6 @@ VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
 } # END FUN
 
 
-# helper that throws error in case of illegal input in 'X1.variables'
-input.checks.X1 <- function(X1.variables){
-  
-  legalinput <- X1.variables$functions_of_Z %in% c("S", "B", "p")
-  
-  if(!all(legalinput)){
-    
-    stop(paste0("Entries '", 
-               paste(X1.variables$functions_of_Z[!legalinput], collapse = "', '"), 
-               "' of 'X1.variables' are not contained in c('S', 'B', 'p')!"))
-    
-  } # IF
-  
-  if(!is.null(X1.variables$fixed_effects) & !is.vector(X1.variables$fixed_effects)){
-    stop("The fixed effects need to be a vector")
-  } # IF
-  
-} # FUN
-
-
 # helper function that calculates an error covariance matrix estimator of a linear model
 #
 ## @param x a linear model object
