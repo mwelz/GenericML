@@ -19,6 +19,9 @@
 #' @param proportion.in.main.set proportion of samples that shall be in main set. Default is 0.5.
 #' @param significance.level significance level for VEIN. Default is 0.05.
 #' @param minimum.variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
+#' @param parallel logical. If TRUE, parallel computing will be used. Currently only supported on Unix systems.
+#' @param num.cores number of cores to be used in parallelization (if applicable). 
+#' @param seed random seed.
 #' @param store.learners Logical. If TRUE, all intermediate results of the learners will be stored. Default is FALSE.
 #' @param store.splits Logical. If `TRUE`, information on the sample splits will be stored. Default is `FALSE`.
 #' 
@@ -48,6 +51,9 @@ GenericML <- function(Z, D, Y,
                       proportion.in.main.set = 0.5, 
                       significance.level = 0.05,
                       minimum.variation = 1e-05,
+                      parallel = .Platform$OS.type == "unix",
+                      num.cores = parallel::detectCores(), 
+                      seed = NULL,
                       store.learners = FALSE,
                       store.splits = FALSE){
   
@@ -63,6 +69,12 @@ GenericML <- function(Z, D, Y,
   InputChecks_vcov.control(vcov.control_GATES)
   InputChecks_differences.control(differences.control_GATES, K = length(quantile.cutoffs) + 1)
   InputChecks_differences.control(differences.control_CLAN, K = length(quantile.cutoffs) + 1)
+  
+  if(parallel & .Platform$OS.type != "unix"){
+    warning("Parallelization is currently only supported on Unix systems (you are using Windows). Therefore, no parallelization will be employed", call. = FALSE)
+    parallel <- FALSE
+    
+  } # IF
   
   # render the learners mlr3 environments
   learners <- lapply(1:length(learners.genericML), 
@@ -96,6 +108,9 @@ GenericML <- function(Z, D, Y,
                                differences.control_CLAN   = differences.control_CLAN,
                                significance.level         = significance.level,
                                minimum.variation          = minimum.variation,
+                               parallel                   = parallel,
+                               num.cores                  = num.cores,
+                               seed                       = seed,
                                store.learners             = store.learners,
                                store.splits               = store.splits)
   
