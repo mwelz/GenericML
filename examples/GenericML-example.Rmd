@@ -20,7 +20,7 @@ rm(list = ls()) ; cat("\014")
 
 # Install the required packages if they are not already installed
 required.packages <- c("ggplot2", "mlr3", "mlr3learners", 
-                       "mvtnorm", "glmnet", "ranger", "e1071",
+                       "mvtnorm", "glmnet", "ranger", "e1071", "parallel",
                        "kknn", "MASS", "nnet", "xgboost", "sandwich", "lmtest")
 new.packages      <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
@@ -86,6 +86,9 @@ The core of this implementation is the function `GenericML()`, which is based on
 * `proportion.in.main.set` proportion of samples that shall be in main set. Default is 0.5.
 * `significance.level` significance level for VEIN. Default is 0.05.
 * `minimum.variation` minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
+* `parallel` logical. If TRUE, parallel computing will be used. Currently only supported on Unix systems.
+* `num.cores` number of cores to be used in parallelization (if applicable). 
+* `seed` random seed.
 * `store.learners` Logical. If `TRUE`, all intermediate results of the learners will be stored. Default is `FALSE.`
 * `store.splits` Logical. If `TRUE`, information on the sample splits will be stored. Default is `FALSE`.
 
@@ -147,6 +150,10 @@ proportion.in.main.set   <- 0.5
 store.splits             <- FALSE
 store.learners           <- FALSE
 
+# parallelization options (currently only supported on Unix systems)
+parallel  <- TRUE
+num.cores <- parallel::detectCores() # maximum number
+seed      <- 12345
 ```
 
 ### Run the core function on the generated data
@@ -154,7 +161,7 @@ store.learners           <- FALSE
 We pass the arguments we specified above to `GenericML()`, which returns an instance of the S3 class `GenericML`.
 
 ```{r}
-# runtime: ~121 seconds with R version 4.1.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 20.10.
+# runtime: ~30 seconds with R version 4.1.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 20.10.
 genML <- GenericML(Z = Z, D = D, Y = Y, 
                    learner.propensity.score = learner.propensity.score, 
                    learners.genericML = learners.genericML,
@@ -172,6 +179,9 @@ genML <- GenericML(Z = Z, D = D, Y = Y,
                    proportion.in.main.set = proportion.in.main.set, 
                    significance.level = significance.level,
                    minimum.variation = minimum.variation,
+                   parallel = parallel,
+                   num.cores = num.cores,
+                   seed = seed,
                    store.splits = store.splits,
                    store.learners = store.learners)
 genML
@@ -213,8 +223,6 @@ This list contains VEIN objects for the BLP (Best Linear Predictor), GATES (Sort
 round(genML$VEIN$best.learners$BLP, 5)
 ```
 
-We see that `beta.1` (the estimate of the ATE) is estimated at ~1.99. True ATE is 2, which is contained in the 90% confidence bounds.  Moreover, `beta.2` is clearly not significant (adjusted $p$-values of both one-tailed tests are much larger than 0.05). Hence, there is (correctly) no indication of treatment effect heterogeneity. Moreover, the method `plot.GenericML()` visualizes these results for the BLP:
- 
 We see that `beta.1` (the estimate of the ATE) is estimated at ~1.99. True ATE is 2, which is contained in the 90% confidence bounds.
 
 Moreover, `beta.2` is clearly not significant (the adjusted $p$-values of both one-tailed tests are much larger than 0.05). Hence, there is (correctly) no indication of treatment effect heterogeneity. Moreover, the method `plot.GenericML()` visualizes these results for the BLP:
@@ -231,7 +239,7 @@ Note that the method `plot.GenericML()` can visualize the VEIN for each consider
 round(genML$VEIN$best.learners$GATES, 5)
 ```
 
-All point estimates for the $\gamma$ coefficients are close to each other. The difference between the most and least affected group is insignificant (adjusted $p$-values of ~1). Hence, there is (correctly) no indication of treatment effect heterogeneity. We again visualize these results with `plot.GenericML()`:
+All point estimates for the $\gamma$ coefficients are close to each other. The difference between the most and least affected group is insignificant (adjusted $p$-values of much larger than 0.05). Hence, there is (correctly) no indication of treatment effect heterogeneity. We again visualize these results with `plot.GenericML()`:
 
 ```{r, out.width="50%"}
 plot.GenericML(genML, type = "GATES", title = "VEIN of GATES") 

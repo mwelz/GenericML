@@ -3,13 +3,13 @@
 #' Note that this implementation is **not** yet an R package, although we intend to create a package for the CRAN based on it.
 #' 
 #' Author: mwelz & aalfons & mdemirer
-#' Last changed: Sep 28, 2021
+#' Last changed: Oct 1, 2021
 #' ------------------------------------------------------------
 rm(list = ls()) ; gc(); cat("\014")
 
 # Install the required packages if they are not already installed
 required.packages <- c("ggplot2", "mlr3", "mlr3learners", 
-                       "mvtnorm", "glmnet", "ranger", "e1071",
+                       "mvtnorm", "glmnet", "ranger", "e1071", "parallel",
                        "kknn", "MASS", "nnet", "xgboost", "sandwich", "lmtest")
 new.packages      <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
@@ -100,8 +100,13 @@ proportion.in.main.set   <- 0.5
 store.splits             <- FALSE
 store.learners           <- FALSE
 
+# parallelization options (currently only supported on Unix systems)
+parallel  <- TRUE
+num.cores <- parallel::detectCores() # maximum number
+seed      <- 12345
+
 ### 3. run the genericML() functions with these arguments ----
-# runtime: ~121 seconds with R version 4.1.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 20.10. Returns a GenericML object.
+# runtime: ~30 seconds with R version 4.1.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 20.10. Returns a GenericML object.
 genML <- GenericML(Z = Z, D = D, Y = Y, 
                    learner.propensity.score = learner.propensity.score, 
                    learners.genericML = learners.genericML,
@@ -119,8 +124,12 @@ genML <- GenericML(Z = Z, D = D, Y = Y,
                    proportion.in.main.set = proportion.in.main.set, 
                    significance.level = significance.level,
                    minimum.variation = minimum.variation,
+                   parallel = parallel,
+                   num.cores = num.cores,
+                   seed = seed,
                    store.splits = store.splits,
                    store.learners = store.learners)
+
 
 # save relevant objects
 save(genML, ATE, Y, D, Z, file = paste0(getwd(), "/examples/GenericML-example.Rdata"))
@@ -133,9 +142,9 @@ save(genML, ATE, Y, D, Z, file = paste0(getwd(), "/examples/GenericML-example.Rd
 # the line below returns the medians of the estimated  \Lambda and \bar{\Lambda}
 genML$best.learners$lambda.overview
 #                                            lambda lambda.bar
-# elastic.net                          0.0003603402   3.981820
-# mlr3::lrn('ranger', num.trees = 100) 0.0016003558   4.010251
-# mlr3::lrn('svm')                     0.0019966309   3.957013
+# elastic.net                          0.0005447184   4.057166
+# mlr3::lrn('ranger', num.trees = 100) 0.0017996034   4.122161
+# mlr3::lrn('svm')                     0.0027576893   4.003175
 
 
 # We can see that the SVM is the best learner for estimating the CATEs, as it maximizes the median of $\hat{\Lambda}$:
@@ -151,8 +160,8 @@ genML$best.learners$best.learner.for.GATES
 # VEIN of BLP
 round(genML$VEIN$best.learners$BLP, 5)
 #        Estimate CB lower CB upper Pr(<z) adjusted Pr(>z) adjusted
-# beta.1  1.98654  1.89041  2.08317               1         0.00000
-# beta.2  0.01947 -0.14071  0.18630               1         0.78646
+# beta.1  1.99831  1.90088  2.09235         1.00000               0
+# beta.2 -0.07577 -0.25851  0.09942         0.39691               1
 # We see that `beta.1` (the estimate of the ATE) is estimated at ~1.99. True ATE is 2, which is contained in the 90% confidence bounds.  Moreover, `beta.2` is clearly not significant (adjusted $p$-values of both one sided tests are much larger than 0.05). Hence, there is (correctly) no indication of treatment effect heterogeneity. Moreover, the function `genericML.plot()` visualizes these results for the BLP:
 plot.GenericML(genML, type = "BLP", title = "VEIN of BLP") 
 
@@ -160,13 +169,13 @@ plot.GenericML(genML, type = "BLP", title = "VEIN of BLP")
 # VEIN of GATES
 round(genML$VEIN$best.learners$GATES, 5)
 #                 Estimate CB lower CB upper Pr(<z) adjusted Pr(>z) adjusted
-# gamma.1          1.99756  1.76514  2.22686               1         0.00000
-# gamma.2          1.98240  1.75278  2.21202               1         0.00000
-# gamma.3          1.98286  1.74367  2.21676               1         0.00000
-# gamma.4          1.99459  1.77094  2.22710               1         0.00000
-# gamma.5          2.02006  1.78923  2.24911               1         0.00000
-# gamma.5-gamma.1  0.00069 -0.32918  0.32710               1         0.98722
-# gamma.5-gamma.2  0.02119 -0.30804  0.34744               1         0.88855
+# gamma.1          2.08011  1.85372  2.30546         1.00000               0
+# gamma.2          2.02422  1.79883  2.25093         1.00000               0
+# gamma.3          2.02841  1.80349  2.25302         1.00000               0
+# gamma.4          1.99967  1.77220  2.22714         1.00000               0
+# gamma.5          2.00009  1.77124  2.23108         1.00000               0
+# gamma.5-gamma.1 -0.09581 -0.41242  0.22079         0.55310               1
+# gamma.5-gamma.2 -0.03477 -0.35661  0.28765         0.83259               1
 # All point estimates for the $\gamma$ coefficients are close to each other. Difference between most and least affected group is insignificant (adjusted $p$-values of ~1). Hence, there is (correctly) no indication of treatment effect heterogeneity. We again visualize these results with `genericML.plot()`:
 plot.GenericML(genML, type = "GATES", title = "VEIN of GATES") 
 
@@ -174,13 +183,13 @@ plot.GenericML(genML, type = "GATES", title = "VEIN of GATES")
 # VEIN of CLAN for variable 'z1'
 genML$VEIN$best.learners$CLAN$z1
 #                     Estimate    CB lower   CB upper Pr(<z) adjusted Pr(>z) adjusted
-# delta.1          0.007261430 -0.08740091 0.09945609       1.0000000       0.8227289
-# delta.2          0.044316241 -0.04544816 0.13238694       1.0000000       0.3263867
-# delta.3          0.028375655 -0.05937453 0.11406139       1.0000000       0.5128145
-# delta.4          0.004020818 -0.07849039 0.08880387       1.0000000       0.8738944
-# delta.5         -0.038853760 -0.12268665 0.04409473       0.3642137       1.0000000
-# delta.5-delta.1 -0.032473153 -0.16097983 0.09603352       0.6204056       1.0000000
-# delta.5-delta.2 -0.093908691 -0.21812029 0.03004042       0.1383916       1.0000000
+# delta.1          0.06650372 -0.02094149 0.15272878       1.0000000       0.1263697
+# delta.2          0.02688579 -0.05411311 0.10581023       1.0000000       0.5066747
+# delta.3         -0.01365927 -0.09678708 0.07454970       0.7615066       1.0000000
+# delta.4         -0.02629104 -0.11415557 0.06076981       0.5453248       1.0000000
+# delta.5         -0.01681817 -0.11457091 0.08078098       0.7367807       1.0000000
+# delta.5-delta.1 -0.07435721 -0.20602773 0.05678943       0.2683655       1.0000000
+# delta.5-delta.2 -0.06602855 -0.19615157 0.05862608       0.2991876       1.0000000
 # This correctly indicates that there is no heterogeneity along `z1` (all p-values are much larger than 0.05)
 plot.GenericML(genML, type = "CLAN", CLAN.variable = "z1", title = "CLAN of 'z1'") 
 
