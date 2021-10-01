@@ -63,8 +63,8 @@ InputChecks_Z_CLAN <- function(Z_CLAN){
   
   if(!is.null(Z_CLAN)){
     
-    if(!(is.matrix(Z_CLAN) | is.data.frame(Z_CLAN) | is.vector(Z_CLAN))){
-      stop("Y must be either a vector, data frame, or matrix", call. = FALSE)
+    if(!(is.matrix(Z_CLAN) | is.data.frame(Z_CLAN) )){
+      stop("Z_CLAN must be either a data frame or matrix", call. = FALSE)
     }
   }
   

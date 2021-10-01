@@ -55,6 +55,7 @@ GenericML <- function(Z, D, Y,
   InputChecks_D(D)
   InputChecks_Y(Y)
   InputChecks_Z(Z)
+  InputChecks_Z_CLAN(Z_CLAN)
   InputChecks_equal.length3(D, Y, Z)
   InputChecks_X1(X1.variables_BLP)
   InputChecks_X1(X1.variables_GATES)
