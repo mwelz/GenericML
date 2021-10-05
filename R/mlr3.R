@@ -195,6 +195,7 @@ baseline.proxy.estimator_NoChecks <- function(Z, D, Y,
 #' @param minimum.variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
 #' @return Estimates of the CATE, both for the auxiliary sample and all observations, and an 'mlr3' object of each employed model
 #'
+#'
 #' @export
 CATE.proxy.estimator <- function(Z, D, Y,
                                  auxiliary.sample,
