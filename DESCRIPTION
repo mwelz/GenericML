@@ -1,0 +1,36 @@
+Package: GenericML
+Title: Generic Machine Learning Inference
+Version: 0.0.1
+Authors@R: 
+    c(person(given = "Max",
+           family = "Welz",
+           role = c("aut", "cre"),
+           email = "welz@ese.eur.nl",
+           comment = c(ORCID = "0000-0003-2945-1860")),
+      person(given = "Andreas",
+             family = "Alfons",
+             role = "aut",
+             email = "alfons@ese.eur.nl",
+             comment = c(ORCID = "0000-0002-2513-3788")), 
+      person(given = "Mert",
+             family = "Demirer",
+             role = "aut",
+             email = "mdemirer@mit.edu"), 
+      person(given = "Victor",
+             family = "Chernozhukov",
+             role = "aut",
+             email = "vchern@mit.edu")) 
+Author: Max Welz [aut, cre], Andreas Alfons [aut], Mert Demirer [aut], Victor Chernozhukov [aut]
+Maintainer: Max Welz <welz@ese.eur.nl>           
+Description:  R implementation of Generic Machine Learning (Chernozhukov, V., Demirer, M., Duflo, E., &amp; Fernández-Val, I., 2020) using the mlr3 framework.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Depends: ggplot2
+Imports: 
+    lmtest,
+    mlr3,
+    splitstackshape,
+    stats

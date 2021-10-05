@@ -1,11 +1,11 @@
 # void functions for input checks
 
 InputChecks_equal.length3 <- function(x, y, z){
-  
+
   X <- as.matrix(x)
   Y <- as.matrix(y)
   Z <- as.matrix(z)
-  
+
   if(!(nrow(X) == nrow(Y) & nrow(X) == nrow(Z) & nrow(Z) == nrow(Y))){
     stop(paste0(deparse(substitute(x)), ", ",
                 deparse(substitute(y)), ", ",
@@ -15,7 +15,7 @@ InputChecks_equal.length3 <- function(x, y, z){
 } # FUN
 
 InputChecks_equal.length2 <- function(x, y){
-  
+
   X <- as.matrix(x)
   Y <- as.matrix(y)
 
@@ -29,45 +29,45 @@ InputChecks_equal.length2 <- function(x, y){
 
 
 InputChecks_D <- function(D){
-  
+
   # input checks
   if((!all(c(0, 1) %in% unique(D))) | (length(unique(D)) != 2)) stop("Treatment assignment D is not binary", call. = FALSE)
   if(!is.numeric(D)) stop("D is not numeric", call. = FALSE)
-  
+
 } # FUN
 
 
 InputChecks_Y <- function(Y){
-  
+
   if(!is.numeric(Y)) stop("Y is not numeric", call. = FALSE)
   if(!(is.matrix(Y) | is.data.frame(Y) | is.vector(Y))) stop("Y must be either a vector, data frame, or matrix", call. = FALSE)
-  
+
   if(is.matrix(Y) | is.data.frame(Y)){
-    
+
     if(ncol(Y) != 1) stop("The matrix/data frame Y must have only one column", call. = FALSE)
-    
+
   } # IF
 
 } # FUN
 
 
 InputChecks_Z <- function(Z){
-  
+
   if(!is.numeric(Z)) stop("Z is not numeric", call. = FALSE)
   if(!(is.matrix(Z) | is.data.frame(Z))) stop("Z must be either a data frame or matrix", call. = FALSE)
-  
+
 } # FUN
 
 
 InputChecks_Z_CLAN <- function(Z_CLAN){
-  
+
   if(!is.null(Z_CLAN)){
-    
+
     if(!(is.matrix(Z_CLAN) | is.data.frame(Z_CLAN) )){
       stop("Z_CLAN must be either a data frame or matrix", call. = FALSE)
     }
   }
-  
+
 } # FUN
 
 
@@ -75,213 +75,213 @@ InputChecks_Z_CLAN <- function(Z_CLAN){
 
 # helper that throws error in case of illegal input in 'X1.variables'
 InputChecks_X1 <- function(X1.variables, num.obs){
-  
+
   if(!all(c("functions_of_Z", "custom_covariates", "fixed_effects") %in% names(X1.variables))){
       stop(paste0("The list ", deparse(substitute(X1.variables)), "must consist of three elements called ",
                   "'functions_of_Z', 'custom_covariates', and 'fixed_effects"), call. = FALSE)
     } # IF
-  
-  
+
+
   if(!(is.matrix(X1.variables$custom_covariates) | is.vector(X1.variables$custom_covariates) | is.null(X1.variables$custom_covariates))){
     stop(paste0(deparse(substitute(X1.variables)), "$custom_covariates must be either NULL, a vector, or a matrix"), call. = FALSE)
   } # IF
-  
-  
+
+
   if(!is.null(X1.variables$custom_covariates)){
     if(!is.numeric(X1.variables$custom_covariates)) stop(paste0(deparse(substitute(X1.variables)), "$custom_covariates must be numeric or NULL"), call. = FALSE)
-    
+
     if(is.vector(X1.variables$custom_covariates)){
-      
+
       if(length(X1.variables$custom_covariates) != num.obs){
         stop(paste0(deparse(substitute(X1.variables)), "$custom_covariates must be NULL or of the same length as Y"), call. = FALSE)
       } # IF
-      
+
     } else{
-      
+
       if(nrow(X1.variables$custom_covariates) != num.obs){
         stop(paste0(deparse(substitute(X1.variables)), "$custom_covariates must be NULL or of the same length as Y"), call. = FALSE)
       } # IF
-      
+
     } # IF
-    
+
   } # IF
-  
-  
+
+
   if(!(is.vector(X1.variables$fixed_effects) | is.null(X1.variables$fixed_effects))){
     stop(paste0(deparse(substitute(X1.variables)), "$fixed_effects must be either NULL or a vector"), call. = FALSE)
   } # IF
-  
-  
+
+
   if(is.vector(X1.variables$fixed_effects)){
-    
+
     if(!is.numeric(X1.variables$fixed_effects)){
       stop(paste0(deparse(substitute(X1.variables)), "$fixed_effects must be numeric"), call. = FALSE)
     } else{
-      
+
       if(length(X1.variables$fixed_effects) != num.obs){
         stop(paste0(deparse(substitute(X1.variables)), "$fixed_effects must be NULL or of the same length as Y"),
              call. = FALSE)
       } # IF
-      
+
     }# IF
   } # IF
-    
-  
+
+
   legalinput <- X1.variables$functions_of_Z %in% c("S", "B", "p")
-  
+
   if(!all(legalinput)){
-    
-    stop(paste0("Entries '", 
-                paste(X1.variables$functions_of_Z[!legalinput], collapse = "', '"), 
+
+    stop(paste0("Entries '",
+                paste(X1.variables$functions_of_Z[!legalinput], collapse = "', '"),
                 "' of ", deparse(substitute(X1.variables)),
                 "$functions_of_Z are not contained in c('S', 'B', 'p')!"), call. = FALSE)
-    
+
   } # IF
-  
+
   if(!is.null(X1.variables$fixed_effects) & !is.vector(X1.variables$fixed_effects)){
     stop("The fixed effects need to be a vector", call. = FALSE)
   } # IF
-  
+
 } # FUN
 
 
 
 InputChecks_vcov.control <- function(vcov.control){
-  
+
   if(!is.list(vcov.control)) stop(paste0(deparse(substitute(vcov.control))),
                                   " must be a list", call. = FALSE)
-  
+
   if(length(vcov.control) != 2) stop(paste0("The list ", deparse(substitute(vcov.control))),
                                      " must be of length 2", call. = FALSE)
-  
+
   if(!all(c("estimator", "arguments") %in% names(vcov.control))){
-    
-    stop(paste0("The list ", deparse(substitute(vcov.control))), 
+
+    stop(paste0("The list ", deparse(substitute(vcov.control))),
          " must have two elements called 'estimator' and 'arguments', respectively", call. = FALSE)
-    
+
   } # IF
-  
-  
+
+
   if(!vcov.control$estimator %in% c("vcovBS", "vcovCL", "vcovHAC", "vcovHC")){
     stop(paste0("The element ", deparse(substitute(vcov.control))), "$estimator",
          " needs to be in c('vcovBS', 'vcovCL', 'vcovHAC', 'vcovHC')", call. = FALSE)
   } # IF
-  
+
   if(!is.list(vcov.control$arguments)){
-    
+
     stop(paste0(deparse(substitute(vcov.control))),
          "$arguments must be a list", call. = FALSE)
-    
+
   } else{
-    
+
     if(!"type" %in% names(vcov.control$arguments)) stop(paste0("The list ", deparse(substitute(vcov.control))),
-                                                 "$arguments must contain an element called 'type'", 
+                                                 "$arguments must contain an element called 'type'",
                                                  call. = FALSE)
-    
+
   } # IF
-  
+
 } # FUN
 
 
 InputChecks_differences.control <- function(differences.control, K){
-  
+
   if(!is.list(differences.control)) stop(paste0(deparse(substitute(differences.control))),
                                          " must be a list", call. = FALSE)
-  
+
   if(length(differences.control) != 2) stop(paste0("The list ", deparse(substitute(differences.control))),
                                        " must be of length 2", call. = FALSE)
-  
+
   if(!all(c("group.to.subtract.from", "groups.to.be.subtracted") %in% names(differences.control))){
-    
-    stop(paste0("The list ", deparse(substitute(differences.control))), 
+
+    stop(paste0("The list ", deparse(substitute(differences.control))),
          " must have two elements called 'group.to.subtract.from' and 'groups.to.be.subtracted', respectively", call. = FALSE)
-    
+
   } # IF
-  
-  
+
+
   if(!differences.control$group.to.subtract.from %in% c("most", "least")){
     stop(paste0("The element ", deparse(substitute(differences.control)), "$group.to.subtract.from",
          " must be equal to 'most' or 'least'"), call. = FALSE)
   }
-  
+
   if(!(is.vector(differences.control$groups.to.be.subtracted) | is.numeric(differences.control$groups.to.be.subtracted))){
-    
+
     stop(paste0(deparse(substitute(differences.control)), "$groups.to.be.subtracted",
                 " must be a numeric vector"), call. = FALSE)
-    
+
   }
-  
+
   if(any(differences.control$groups.to.be.subtracted < 1) | any(differences.control$groups.to.be.subtracted > K)){
     stop(paste0("The numeric vector ", deparse(substitute(differences.control)), "$groups.to.be.subtracted",
                 " must be a subset of {1,2,...,K}, where K = ", K, " is the number of groups with the supplied arguments (controlled through the argument 'quantile.cutoffs')"), call. = FALSE)
   }
-  
+
 } # FUN
 
 
 InputChecks_group.membership <- function(group.membership){
-  
-  if(is.null(attr(x, which = "type"))) stop(paste0("The object ",
-                                                   deparse(substitute(group.membership)),
-                                                   " needs to be returned by quantile.group()"))
-  
-  if(attr(x, which = "type") != "quantile_group") stop(paste0("The object ",
-                                                              deparse(substitute(group.membership)),
-                                                              " needs to be returned by quantile.group()"))
-  
+
+  if(is.null(attr(group.membership, which = "type"))) stop(paste0("The object ",
+                                                       deparse(substitute(group.membership)),
+                                                       " needs to be returned by quantile.group()"))
+
+  if(attr(group.membership, which = "type") != "quantile_group") stop(paste0("The object ",
+                                                                  deparse(substitute(group.membership)),
+                                                                  " needs to be returned by quantile.group()"))
+
 
 } # FUN
 
 
 InputChecks_proxy.estimators <- function(proxy.estimators, baseline = TRUE){
-  
+
   if(baseline){
-    
-    if(!inherits(group.membership, what = "proxy_baseline")){
-      
+
+    if(!inherits(proxy.estimators, what = "proxy_baseline")){
+
       stop(paste0("The object ",
-                  deparse(substitute(group.membership)),
+                  deparse(substitute(proxy.estimators)),
                   " needs to be an instance of baseline.proxy.estimator()"))
     }
-    
+
   } else{
-    
-    if(!inherits(group.membership, what = "proxy_CATE")){
-      
+
+    if(!inherits(proxy.estimators, what = "proxy_CATE")){
+
       stop(paste0("The object ",
-                  deparse(substitute(group.membership)),
+                  deparse(substitute(proxy.estimators)),
                   " needs to be an instance of CATE.proxy.estimator()"))
     }
-    
+
   }
-  
+
 } # FUN
 
 
 # checks if learner is correctly specified. If yes, that learner is returned
 get.learner_regr <- function(learner){
-  
+
   # specify the machine learner
   if(is.environment(learner)){
     learner <- learner
   } else if(learner == "elastic.net"){
-    
+
     learner <- mlr3::lrn("regr.cv_glmnet", s = "lambda.min")
-    
+
   } else if(learner == "random.forest"){
-    
+
     learner <- mlr3::lrn("regr.ranger", num.trees = 500)
-    
+
   } else if(learner == "tree"){
-    
+
     learner <- mlr3::lrn("regr.rpart")
-    
+
   } else{
-    
+
     stop("Invalid argument for 'learner'. Needs to be either 'elastic.net', 'random.forest', 'tree', or an mlr3 object")
-    
+
   } # END IF
-  
+
   return(learner)
-  
+
 } # FUN

@@ -1,7 +1,9 @@
-#' Performs generic ML 
-#' 
+#' Generic Machine Learning Inference
+#'
+#' Performs generic machine learning inference as in Chernozhukov, Demirer, Duflo and Fernández-Val (2020). Link to working paper: \url{https://arxiv.org/abs/1712.04802}.
+#'
 #' @param Z A matrix or data frame of the covariates.
-#' @param D A binary vector of treatment assignment. 
+#' @param D A binary vector of treatment assignment.
 #' @param Y The response vector.
 #' @param learner.propensity.score the estimator to be used. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to 'constant' (estimates the propensity scores by mean(D)), 'elastic.net', 'random.forest', 'tree', or mlr3 syntax. Example for the latter: mlr3::lrn("classif.ranger", num.trees = 500) for a classification forest.
 #' @param learners.genericML A vector of strings specifying the machine learners to be used for estimating the BCA and CATE. Either `'elastic.net'`, `'random.forest'`, or `'tree'`. Can alternatively be specified by using `mlr3` syntax, for example `'mlr3::lrn("ranger", num.trees = 500)'`. See https://mlr3learners.mlr-org.com for a list of `mlr3` learners.
@@ -20,14 +22,14 @@
 #' @param significance.level significance level for VEIN. Default is 0.05.
 #' @param minimum.variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
 #' @param parallel logical. If TRUE, parallel computing will be used. Currently only supported on Unix systems.
-#' @param num.cores number of cores to be used in parallelization (if applicable). 
+#' @param num.cores number of cores to be used in parallelization (if applicable).
 #' @param seed random seed.
 #' @param store.learners Logical. If TRUE, all intermediate results of the learners will be stored. Default is FALSE.
 #' @param store.splits Logical. If `TRUE`, information on the sample splits will be stored. Default is `FALSE`.
-#' 
+#'
 #' @export
-GenericML <- function(Z, D, Y, 
-                      learner.propensity.score = "constant", 
+GenericML <- function(Z, D, Y,
+                      learner.propensity.score = "constant",
                       learners.genericML,
                       num.splits = 100,
                       Z_CLAN = NULL,
@@ -48,15 +50,15 @@ GenericML <- function(Z, D, Y,
                       vcov.control_GATES         = list(estimator = "vcovHC",
                                                         arguments = list(type = "const")),
                       equal.group.variances_CLAN = FALSE,
-                      proportion.in.main.set = 0.5, 
+                      proportion.in.main.set = 0.5,
                       significance.level = 0.05,
                       minimum.variation = 1e-05,
                       parallel = .Platform$OS.type == "unix",
-                      num.cores = parallel::detectCores(), 
+                      num.cores = parallel::detectCores(),
                       seed = NULL,
                       store.learners = FALSE,
                       store.splits = FALSE){
-  
+
   ### step 0: input checks ----
   InputChecks_D(D)
   InputChecks_Y(Y)
@@ -69,40 +71,40 @@ GenericML <- function(Z, D, Y,
   InputChecks_vcov.control(vcov.control_GATES)
   InputChecks_differences.control(differences.control_GATES, K = length(quantile.cutoffs) + 1)
   InputChecks_differences.control(differences.control_CLAN, K = length(quantile.cutoffs) + 1)
-  
+
   if(parallel & .Platform$OS.type != "unix"){
     warning("Parallelization is currently only supported on Unix systems (you are using Windows). Therefore, no parallelization will be employed", call. = FALSE)
     parallel <- FALSE
-    
+
   } # IF
-  
+
   # render the learners mlr3 environments
-  learners <- lapply(1:length(learners.genericML), 
+  learners <- lapply(1:length(learners.genericML),
                      function(x) get.learner_regr(make.mlr3.string(learners.genericML[x])))
-  
-  
+
+
   ### step 1: compute propensity scores ----
   propensity.scores.obj <- propensity.score_NoChecks(
     Z = Z, D = D, estimator = learner.propensity.score)
   propensity.scores     <- propensity.scores.obj$propensity.scores
-  
-  
+
+
   ### step 2: for each ML method, do the generic ML analysis ----
-  
-  gen.ml.different.learners <- 
-    generic.ml.across.learners(Z = Z, D = D, Y = Y, 
-                               propensity.scores          = propensity.scores, 
-                               learners                   = learners, 
+
+  gen.ml.different.learners <-
+    generic.ml.across.learners(Z = Z, D = D, Y = Y,
+                               propensity.scores          = propensity.scores,
+                               learners                   = learners,
                                learners.names             = learners.genericML,
                                num.splits                 = num.splits,
-                               Z_CLAN                     = Z_CLAN, 
+                               Z_CLAN                     = Z_CLAN,
                                X1.variables_BLP           = X1.variables_BLP,
                                X1.variables_GATES         = X1.variables_GATES,
                                HT.transformation          = HT.transformation,
                                vcov.control_BLP           = vcov.control_BLP,
                                vcov.control_GATES         = vcov.control_GATES,
                                equal.group.variances_CLAN = equal.group.variances_CLAN,
-                               proportion.in.main.set     = proportion.in.main.set, 
+                               proportion.in.main.set     = proportion.in.main.set,
                                quantile.cutoffs           = quantile.cutoffs,
                                differences.control_GATES  = differences.control_GATES,
                                differences.control_CLAN   = differences.control_CLAN,
@@ -113,14 +115,14 @@ GenericML <- function(Z, D, Y,
                                seed                       = seed,
                                store.learners             = store.learners,
                                store.splits               = store.splits)
-  
+
   # extract the best learners
   best.learners <- get.best.learners(gen.ml.different.learners$generic.targets)
-  
-  
-  ### step 3: perform VEIN analysis ---- 
+
+
+  ### step 3: perform VEIN analysis ----
   vein <- VEIN(gen.ml.different.learners$generic.targets, best.learners)
-  
+
   # return instance of S3 class 'GenericML'
   return(
     structure(
@@ -129,9 +131,9 @@ GenericML <- function(Z, D, Y,
               propensity.scores = list(estimates = propensity.scores,
                                        mlr3.objects = propensity.scores.obj$mlr3.objects),
               genericML.by.split = gen.ml.different.learners$genericML.by.split,
-              splits = gen.ml.different.learners$splits, 
+              splits = gen.ml.different.learners$splits,
               arguments = list(quantile.cutoffs = c(0.25, 0.5, 0.75),
-                               proportion.in.main.set = 0.5, 
+                               proportion.in.main.set = 0.5,
                                significance.level = 0.05,
                                learners.genericML = learners.genericML,
                                learner.propensity.score = learner.propensity.score,
