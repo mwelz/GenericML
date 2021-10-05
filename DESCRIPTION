@@ -22,15 +22,15 @@ Authors@R:
              email = "vchern@mit.edu")) 
 Author: Max Welz [aut, cre], Andreas Alfons [aut], Mert Demirer [aut], Victor Chernozhukov [aut]
 Maintainer: Max Welz <welz@ese.eur.nl>           
-Description:  R implementation of Generic Machine Learning (Chernozhukov, V., Demirer, M., Duflo, E., &amp; Fernández-Val, I., 2020) using the mlr3 framework.
+Description: R implementation of Generic Machine Learning (Chernozhukov, V., Demirer, M., Duflo, E., &amp; Fernández-Val, I., 2020) using the mlr3 framework.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-Depends: ggplot2
+Depends: 
+    ggplot2, mlr3, mlr3learners
 Imports: 
     lmtest,
-    mlr3,
     splitstackshape,
     stats

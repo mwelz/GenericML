@@ -14,7 +14,7 @@ propensity.score(Z, D, estimator = "constant")
 \item{estimator}{the estimator to be used. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to 'constant' (estimates the propensity scores by mean(D)), 'elastic.net', 'random.forest', 'tree', or mlr3 syntax. Example for the latter: mlr3::lrn("classif.ranger", num.trees = 500) for a classification forest.}
 }
 \value{
-Estimates of \emph{Pr(D = 1 | Z)} and an 'mlr3' object of the employed model (if applicable)
+Estimates of \eqn{Pr(D = 1 | Z)} and an 'mlr3' object of the employed model (if applicable)
 }
 \description{
 Estimates the propensity score

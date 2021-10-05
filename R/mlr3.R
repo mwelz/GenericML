@@ -1,4 +1,7 @@
-# helper function in case the propensity scores are estimated via mlr3
+#' helper function in case the propensity scores are estimated via mlr3
+#'
+#' @import mlr3 mlr3learners
+#' @noRd
 propensity.score_mlr3 <- function(Z, D, learner = "random.forest"){
 
   # specify the task
@@ -49,7 +52,8 @@ propensity.score_mlr3 <- function(Z, D, learner = "random.forest"){
 #' @param Z a matrix or data frame of covariates
 #' @param D a binary vector of treatment status
 #' @param estimator the estimator to be used. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to 'constant' (estimates the propensity scores by mean(D)), 'elastic.net', 'random.forest', 'tree', or mlr3 syntax. Example for the latter: mlr3::lrn("classif.ranger", num.trees = 500) for a classification forest.
-#' @return Estimates of \emph{Pr(D = 1 | Z)} and an 'mlr3' object of the employed model (if applicable)
+#' @return Estimates of \eqn{Pr(D = 1 | Z)} and an 'mlr3' object of the employed model (if applicable)
+#'
 #'
 #' @export
 propensity.score <- function(Z, D, estimator = "constant"){
@@ -66,7 +70,10 @@ propensity.score <- function(Z, D, estimator = "constant"){
 
 
 
-# same as above, but w/o input checks
+#' same as above, but w/o input checks
+#'
+#' @import mlr3 mlr3learners
+#' @noRd
 propensity.score_NoChecks <- function(Z, D, estimator = "constant"){
 
   if(!is.character(estimator)){
@@ -115,6 +122,7 @@ propensity.score_NoChecks <- function(Z, D, estimator = "constant"){
 #' @param minimum.variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
 #' @return Estimates of Y, both for the auxiliary sample and all observations, and an 'mlr3' object of the employed model
 #'
+#'
 #' @export
 baseline.proxy.estimator <- function(Z, D, Y,
                                      auxiliary.sample,
@@ -136,7 +144,10 @@ baseline.proxy.estimator <- function(Z, D, Y,
 } # END FUN
 
 
-# helper that skips the input checks
+#' helper that skips the input checks
+#'
+#' @import mlr3 mlr3learners
+#' @noRd
 baseline.proxy.estimator_NoChecks <- function(Z, D, Y,
                                               auxiliary.sample,
                                               learner, # must be mlr3 object
@@ -218,7 +229,10 @@ CATE.proxy.estimator <- function(Z, D, Y,
 } # END FUN
 
 
-# helper that skips the input checks
+#' helper that skips the input checks
+#'
+#' @import mlr3 mlr3learners
+#' @noRd
 CATE.proxy.estimator_NoChecks <- function(Z, D, Y,
                                           auxiliary.sample,
                                           learner = "random.forest",

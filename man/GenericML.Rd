@@ -42,7 +42,7 @@ GenericML(
 
 \item{Y}{The response vector.}
 
-\item{learner.propensity.score}{the estimator to be used. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to 'constant' (estimates the propensity scores by mean(D)), 'elastic.net', 'random.forest', 'tree', or mlr3 syntax. Example for the latter: mlr3::lrn("classif.ranger", num.trees = 500) for a classification forest.}
+\item{learner.propensity.score}{The estimator for the propensity scores. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to 'constant' (estimates the propensity scores by mean(D)), 'elastic.net', 'random.forest', 'tree', or mlr3 syntax. Example for the latter: mlr3::lrn("classif.ranger", num.trees = 500) for a classification forest.}
 
 \item{learners.genericML}{A vector of strings specifying the machine learners to be used for estimating the BCA and CATE. Either \code{'elastic.net'}, \code{'random.forest'}, or \code{'tree'}. Can alternatively be specified by using \code{mlr3} syntax, for example \code{'mlr3::lrn("ranger", num.trees = 500)'}. See https://mlr3learners.mlr-org.com for a list of \code{mlr3} learners.}
 
