@@ -119,21 +119,21 @@ plot.GenericML <- function(x,
     df <- df[group.nam %in% groups.to.be.plotted_new,,drop = FALSE]
 
     # make the plot
-    p <- ggplot(mapping = aes_string(x = group,
-                                     y = point.estimate), data = df) +
-      geom_hline(aes_string(yintercept = 0),
-                 color = "black", linetype = "dotted") +
-      geom_hline(aes_string(yintercept = data.blp["beta.1", "Estimate"],
+    p <- ggplot(mapping = aes(x = group,
+                              y = point.estimate), data = df) +
+      geom_hline(aes(yintercept = 0),
+                     color = "black", linetype = "dotted") +
+      geom_hline(aes(yintercept = data.blp["beta.1", "Estimate"],
                      color = "ATE"),
-                 linetype = "dashed") +
-      geom_hline(aes_string(yintercept = data.blp["beta.1", "CB lower"],
-                            color = paste0(100*confidence.level, "% CB (ATE)")),
-                 linetype = "dashed")  +
+                     linetype = "dashed") +
+      geom_hline(aes(yintercept = data.blp["beta.1", "CB lower"],
+                     color = paste0(100*confidence.level, "% CB (ATE)")),
+                     linetype = "dashed")  +
       geom_hline(yintercept = data.blp["beta.1", "CB upper"],
                  linetype = "dashed", color = "red") +
-      geom_point(aes_string(color = paste0(type, " with ",  100*confidence.level, "% CB")), size = 3) +
-      geom_errorbar(mapping = aes_string(ymin = ci.lower,
-                                         ymax = ci.upper)) +
+      geom_point(aes(color = paste0(type, " with ",  100*confidence.level, "% CB")), size = 3) +
+      geom_errorbar(mapping = aes(ymin = ci.lower,
+                                  ymax = ci.upper)) +
       theme_light() +
       ylab("Treatment Effect") +
       xlab("Group by HTE Score") +
@@ -155,13 +155,13 @@ plot.GenericML <- function(x,
                      ci.upper = data[, "CB upper"],
                      group = c("beta.1 (ATE)", "beta.2 (HTE)"))
 
-    p <- ggplot(mapping = aes_string(x = group,
-                                     y = point.estimate), data = df) +
-      geom_hline(aes_string(yintercept = 0),
-                            color = "black", linetype = "dotted") +
+    p <- ggplot(mapping = aes(x = group,
+                              y = point.estimate), data = df) +
+      geom_hline(aes(yintercept = 0),
+                     color = "black", linetype = "dotted") +
       geom_point(size = 3) +
-      geom_errorbar(mapping = aes_string(ymin = ci.lower,
-                                         ymax = ci.upper)) +
+      geom_errorbar(mapping = aes(ymin = ci.lower,
+                                  ymax = ci.upper)) +
       theme_light() +
       ylab("Treatment Effect") +
       xlab(paste0(type, " with ",  100*confidence.level, "% CB")) +

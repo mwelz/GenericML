@@ -1,8 +1,7 @@
 #' helper function in case the propensity scores are estimated via mlr3
 #'
 #' @import mlr3 mlr3learners
-#' @keywords internal
-#' @export
+#' @noRd
 propensity.score_mlr3 <- function(Z, D, learner = "random.forest"){
 
   # specify the task
@@ -74,8 +73,7 @@ propensity.score <- function(Z, D, estimator = "constant"){
 #' same as above, but w/o input checks
 #'
 #' @import mlr3 mlr3learners
-#' @keywords internal
-#' @export
+#' @noRd
 propensity.score_NoChecks <- function(Z, D, estimator = "constant"){
 
   if(!is.character(estimator)){
@@ -114,7 +112,7 @@ propensity.score_NoChecks <- function(Z, D, estimator = "constant"){
 
 
 
-#' Estimates the baseline proxy estimator E[Y | D=0, Z] on the auxiliary sample
+#' Estimates the baseline proxy estimator \eqn{E[Y | D=0, Z]} on the auxiliary sample
 #'
 #' @param Z an ( _n_ x _d_) matrix or data frame of covariates
 #' @param D a binary vector of treatment status of length _n_
@@ -149,8 +147,7 @@ baseline.proxy.estimator <- function(Z, D, Y,
 #' helper that skips the input checks
 #'
 #' @import mlr3 mlr3learners
-#' @keywords internal
-#' @export
+#' @noRd
 baseline.proxy.estimator_NoChecks <- function(Z, D, Y,
                                               auxiliary.sample,
                                               learner, # must be mlr3 object
@@ -179,10 +176,10 @@ baseline.proxy.estimator_NoChecks <- function(Z, D, Y,
   predictions     <- predictions.obj$response
 
   # if there is not much variation in the predictions, add Gaussian noise
-  if(var(predictions) < minimum.variation){
+  if(stats::var(predictions) < minimum.variation){
 
     predictions <- predictions +
-      rnorm(length(Y), mean = 0, sd = sqrt(var(Y) / 20))
+      stats::rnorm(length(Y), mean = 0, sd = sqrt(stats::var(Y) / 20))
 
   } # IF
 
@@ -205,7 +202,7 @@ baseline.proxy.estimator_NoChecks <- function(Z, D, Y,
 #' @param Y a vector of responses of length _n_
 #' @param auxiliary.sample a numerical vector of indices of observations in the auxiliary sample. Length is shorter than _n_
 #' @param learner the regression machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default.
-#' @param proxy.baseline.estimates A vector of length _n_ of proxy estimates of the baseline estimator E[Y | D=0, Z]. If NULL, these will be estimated separately.
+#' @param proxy.baseline.estimates A vector of length _n_ of proxy estimates of the baseline estimator \eqn{E[Y | D=0, Z]}. If NULL, these will be estimated separately.
 #' @param minimum.variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
 #' @return Estimates of the CATE, both for the auxiliary sample and all observations, and an 'mlr3' object of each employed model
 #'
@@ -235,8 +232,7 @@ CATE.proxy.estimator <- function(Z, D, Y,
 #' helper that skips the input checks
 #'
 #' @import mlr3 mlr3learners
-#' @keywords internal
-#' @export
+#' @noRd
 CATE.proxy.estimator_NoChecks <- function(Z, D, Y,
                                           auxiliary.sample,
                                           learner = "random.forest",
@@ -320,10 +316,10 @@ CATE.proxy.estimator_NoChecks <- function(Z, D, Y,
   cate.predictions <- predictions.treated - predictions.controls
 
   # if there is not much variation in the predictions, add Gaussian noise
-  if(var(cate.predictions) < minimum.variation){
+  if(stats::var(cate.predictions) < minimum.variation){
 
     cate.predictions <- cate.predictions +
-      rnorm(length(Y), mean = 0, sd = sqrt(var(Y) / 20))
+      stats::rnorm(length(Y), mean = 0, sd = sqrt(stats::var(Y) / 20))
 
   } # IF
 
