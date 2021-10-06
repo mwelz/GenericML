@@ -42,45 +42,45 @@ GenericML(
 
 \item{Y}{The response vector.}
 
-\item{learner.propensity.score}{The estimator for the propensity scores. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to 'constant' (estimates the propensity scores by mean(D)), 'elastic.net', 'random.forest', 'tree', or mlr3 syntax. Example for the latter: mlr3::lrn("classif.ranger", num.trees = 500) for a classification forest.}
+\item{learner.propensity.score}{The estimator for the propensity scores. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to \code{'constant'} (estimates the propensity scores by \code{mean(D)}), \code{'elastic.net'}, \code{'random.forest'}, \code{'tree'}, or \code{mlr3} syntax. Note that in case of \code{mlr3} syntax, do \emph{not} specify if the learner is a regression learner or classification learner; Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keyords.}
 
-\item{learners.genericML}{A vector of strings specifying the machine learners to be used for estimating the BCA and CATE. Either \code{'elastic.net'}, \code{'random.forest'}, or \code{'tree'}. Can alternatively be specified by using \code{mlr3} syntax, for example \code{'mlr3::lrn("ranger", num.trees = 500)'}. See https://mlr3learners.mlr-org.com for a list of \code{mlr3} learners.}
+\item{learners.genericML}{A vector of strings specifying the machine learners to be used for estimating the BCA and CATE. Either \code{'elastic.net'}, \code{'random.forest'}, or \code{'tree'}. Can alternatively be specified by using \code{mlr3} syntax \emph{without} specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keyords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.}
 
-\item{num.splits}{number of sample splits. Default is 100.}
+\item{num.splits}{Number of sample splits. Default is 100.}
 
 \item{Z_CLAN}{A matrix of variables that shall be considered for the CLAN. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.}
 
-\item{HT.transformation}{logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.}
+\item{HT.transformation}{Logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.}
 
-\item{X1.variables_BLP}{a list controlling the variables that shall be used in the matrix X1 for the BLP regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The second element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.}
+\item{X1.variables_BLP}{A list with three elements controlling the variables that shall be used in the matrix \eqn{X_1} for the BLP regression. The first element of the list, \code{functions_of_Z}, needs to be a subset of \code{c("S", "B", "p")}, where \code{"p"} corresponds to the propensity scores, \code{"B"} to the proxy baseline estimates, and \code{"S"} to the proxy CATE estimates. Default is \code{"B"}. The second element, \code{custom_covariates}, is an optional matrix/data frame of custom covariates that shall be included in \eqn{X_1} (default is \code{NULL}). The third element, \code{fixed_effects}, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is \code{NULL} for no fixed effects). Note that in the final matrix \eqn{X1}, a constant 1 will be silently included so that the regression model has an intercept.}
 
-\item{X1.variables_GATES}{a list controlling the variables that shall be used in the matrix X1 for the GATES regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The second element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included if no HT transformation is applied so that the regression model has an intercept.}
+\item{X1.variables_GATES}{Same as \code{X1.variables_BLP}, just for the matrix \eqn{X_1} in the GATES regression. Just as in \code{X1.variables_BLP}, a constant 1 will be silently included if no HT transformation is applied so that the GATES regression model has an intercept.}
 
-\item{quantile.cutoffs}{The cutoff points of quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the quartiles.}
+\item{quantile.cutoffs}{The cutoff points of quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.}
 
-\item{differences.control_GATES}{a list with two elements called 'group.to.subtract.from' and 'groups.to.be.subtracted'. The first element ('group.to.subtract.from') denotes what shall be the base group to subtract from in GATES; either "most" or "least". The second element ('groups.to.be.subtracted') are the groups to be subtracted from 'group.to.subtract.from', which is a subset of {1,...,K}, where K equals the number of groups.}
+\item{differences.control_GATES}{A list with two elements called \code{group.to.subtract.from} and \code{groups.to.be.subtracted}. The first element (\code{group.to.subtract.from}) denotes what shall be the base group to subtract from in the GATES generic targets; either \code{"most"} or \code{"least"}. The second element (\code{groups.to.be.subtracted}) are the groups to be subtracted from \code{group.to.subtract.from}, which is a subset of \eqn{{1,2,...,K}}, where \eqn{K} equals the number of groups. The number of groups should be consistent with the number of groups induced by the argument \code{quantile.cutoffs}.}
 
-\item{differences.control_CLAN}{same as differences.control_GATES, just for CLAN.}
+\item{differences.control_CLAN}{Same as \code{differences.control_GATES}, just for the CLAN generic targets.}
 
-\item{vcov.control_BLP}{a list with two elements called 'estimator' and 'arguments'. The argument 'estimator' is a string specifying the covariance matrix estimator to be used in the BLP regression; specifies a covariance estimator function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are "vcovBS", "vcovCL", "vcovHAC", and "vcovHC". Default is 'vcovHC'. The element 'arguments' is a list of arguments that shall be passed to the function specified in the element 'estimator'. Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).}
+\item{vcov.control_BLP}{A list with two elements called \code{estimator} and \code{arguments}. The element \code{estimator} is a string specifying the covariance matrix estimator to be used in the BLP regression and needs to be a covariance estimator function in the sandwich package (\url{https://cran.r-project.org/web/packages/sandwich/sandwich.pdf}). Recommended estimators are \code{"vcovBS"}, \code{"vcovCL"}, \code{"vcovHAC"}, and \code{"vcovHC"}. Default is \code{"vcovHC"}. The second element \code{arguments} is a list of arguments that shall be passed to the function specified in the first element \code{estimator}. Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (\url{https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf}).}
 
-\item{vcov.control_GATES}{same as vcov.control_BLP, just for GATES regression}
+\item{vcov.control_GATES}{Same as \code{vcov.control_BLP}, just for GATES regression.}
 
-\item{equal.group.variances_CLAN}{logical. If TRUE, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is FALSE.}
+\item{equal.group.variances_CLAN}{Logical. If \code{TRUE}, the the two within-group variances of the differences between the CLAN generic targets are assumed to be equal. Default is \code{FALSE}.}
 
-\item{proportion.in.main.set}{proportion of samples that shall be in main set. Default is 0.5.}
+\item{proportion.in.main.set}{Proportion of samples that shall be in main set. Default is 0.5.}
 
-\item{significance.level}{significance level for VEIN. Default is 0.05.}
+\item{significance.level}{Significance level for VEIN. Default is 0.05.}
 
-\item{minimum.variation}{minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.}
+\item{minimum.variation}{Minimum variation of the predictions before random noise with distribution \eqn{N(0, var(Y)/20)} is added. Default is \code{1e-05}.}
 
-\item{parallel}{logical. If TRUE, parallel computing will be used. Currently only supported on Unix systems.}
+\item{parallel}{Logical. If \code{TRUE}, parallel computing will be used. Currently only supported on Unix systems.}
 
-\item{num.cores}{number of cores to be used in parallelization (if applicable).}
+\item{num.cores}{Number of cores to be used in parallelization (if applicable). Deafult is the number of cores on your machine.}
 
-\item{seed}{random seed.}
+\item{seed}{Random seed. Default is \code{NULL} for no random seeding.}
 
-\item{store.learners}{Logical. If TRUE, all intermediate results of the learners will be stored. Default is FALSE.}
+\item{store.learners}{Logical. If \code{TRUE}, all intermediate results of the learners will be stored. Default is \code{FALSE}. \strong{Warning:} For large data sets and/or many splits in \code{num.splits}, having \code{store.learners = TRUE} might cause memory issues.}
 
 \item{store.splits}{Logical. If \code{TRUE}, information on the sample splits will be stored. Default is \code{FALSE}.}
 }
