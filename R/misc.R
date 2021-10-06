@@ -143,7 +143,7 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
   InputChecks_differences.control(differences.control_CLAN, K = length(quantile.cutoffs) + 1)
 
   if(is.null(Z_CLAN)) Z_CLAN <- Z # if no input provided, set it equal to Z
-  learner <- get.learner_regr(make.mlr3.string(learner, regr = TRUE))
+  learner <- get.learner_regr(make.mlr3.environment(learner, regr = TRUE))
 
 
   # call the main function

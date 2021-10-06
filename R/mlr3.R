@@ -99,7 +99,7 @@ propensity.score_NoChecks <- function(Z, D, estimator = "constant"){
     if(estimator %in% c("elastic.net", "random.forest", "tree") |
        substr(estimator, start = 1, stop = 6) == "mlr3::"){
 
-      out <- propensity.score_mlr3(Z = Z, D = D, learner = make.mlr3.string(estimator, regr = FALSE))
+      out <- propensity.score_mlr3(Z = Z, D = D, learner = make.mlr3.environment(estimator, regr = FALSE))
 
     } else stop("The argument 'estimator' must be equal to either 'constant', 'elastic.net', random.forest', 'tree', an mlr3 string, or a numeric vector of the same length as Z and D!")
 

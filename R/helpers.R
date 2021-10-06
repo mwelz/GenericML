@@ -1,4 +1,4 @@
-make.mlr3.string <- function(learner.str, regr = TRUE){
+make.mlr3.environment <- function(learner.str, regr = TRUE){
   # helper function. Requires input of type 'mlr3::lrn("cv_glmnet", s = "lambda.min")' (note the absence of classif and regr)
 
   if(substr(learner.str, start = 1, stop = 6) != "mlr3::"){

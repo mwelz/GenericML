@@ -31,6 +31,8 @@ RoxygenNote: 7.1.1
 Depends: 
     ggplot2, mlr3, mlr3learners
 Imports: 
+    sandwich,
     lmtest,
     splitstackshape,
-    stats
+    stats,
+    parallel
