@@ -1,10 +1,10 @@
 # helper functions
-generic.ml.across.learners <- function(Z, D, Y, 
-                                       propensity.scores, 
+generic.ml.across.learners <- function(Z, D, Y,
+                                       propensity.scores,
                                        learners, # need to be mlr3 objects!
                                        learners.names,
                                        num.splits = 50,
-                                       Z_CLAN = NULL, 
+                                       Z_CLAN = NULL,
                                        X1.variables_BLP           = list(functions_of_Z = c("B"),
                                                                          custom_covariates = NULL,
                                                                          fixed_effects = NULL),
@@ -17,57 +17,57 @@ generic.ml.across.learners <- function(Z, D, Y,
                                        vcov.control_GATES         = list(estimator = "vcovHC",
                                                                          arguments = list(type = "const")),
                                        equal.group.variances_CLAN = FALSE,
-                                       proportion.in.main.set     = 0.5, 
+                                       proportion.in.main.set     = 0.5,
                                        quantile.cutoffs           = c(0.25, 0.5, 0.75),
                                        differences.control_GATES  = list(group.to.subtract.from = "most",
                                                                          groups.to.be.subtracted = 1),
                                        differences.control_CLAN   = list(group.to.subtract.from = "most",
                                                                          groups.to.be.subtracted = 1),
-                                       significance.level = 0.05, 
+                                       significance.level = 0.05,
                                        minimum.variation = 1e-05,
                                        parallel = .Platform$OS.type == "unix",
-                                       num.cores = parallel::detectCores(), 
+                                       num.cores = parallel::detectCores(),
                                        seed = NULL,
                                        store.learners = FALSE,
                                        store.splits = FALSE){
-  
+
   # call correct main function
-  do.call(what = get(ifelse(parallel, 
-                            "generic.ml.across.learners_parallel", 
+  do.call(what = get(ifelse(parallel,
+                            "generic.ml.across.learners_parallel",
                             "generic.ml.across.learners_serial")),
-          args = list(Z = Z, D = D, Y = Y, 
-                      propensity.scores          = propensity.scores, 
-                      learners                   = learners, 
+          args = list(Z = Z, D = D, Y = Y,
+                      propensity.scores          = propensity.scores,
+                      learners                   = learners,
                       learners.names             = learners.names,
                       num.splits                 = num.splits,
-                      Z_CLAN                     = Z_CLAN, 
+                      Z_CLAN                     = Z_CLAN,
                       X1.variables_BLP           = X1.variables_BLP,
                       X1.variables_GATES         = X1.variables_GATES,
                       HT.transformation          = HT.transformation,
                       vcov.control_BLP           = vcov.control_BLP,
                       vcov.control_GATES         = vcov.control_GATES,
                       equal.group.variances_CLAN = equal.group.variances_CLAN,
-                      proportion.in.main.set     = proportion.in.main.set, 
+                      proportion.in.main.set     = proportion.in.main.set,
                       quantile.cutoffs           = quantile.cutoffs,
                       differences.control_GATES  = differences.control_GATES,
                       differences.control_CLAN   = differences.control_CLAN,
-                      significance.level         = significance.level, 
+                      significance.level         = significance.level,
                       minimum.variation          = minimum.variation,
-                      num.cores                  = num.cores, 
+                      num.cores                  = num.cores,
                       seed                       = seed,
                       store.learners             = store.learners,
                       store.splits               = store.splits))
-  
+
 } # FUN
 
 
 
-generic.ml.across.learners_serial <- function(Z, D, Y, 
-                                              propensity.scores, 
+generic.ml.across.learners_serial <- function(Z, D, Y,
+                                              propensity.scores,
                                               learners, # need to be mlr3 objects!
                                               learners.names,
                                               num.splits = 50,
-                                              Z_CLAN = NULL, 
+                                              Z_CLAN = NULL,
                                               X1.variables_BLP           = list(functions_of_Z = c("B"),
                                                                                 custom_covariates = NULL,
                                                                                 fixed_effects = NULL),
@@ -80,43 +80,49 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
                                               vcov.control_GATES         = list(estimator = "vcovHC",
                                                                                 arguments = list(type = "const")),
                                               equal.group.variances_CLAN = FALSE,
-                                              proportion.in.main.set     = 0.5, 
+                                              proportion.in.main.set     = 0.5,
                                               quantile.cutoffs           = c(0.25, 0.5, 0.75),
                                               differences.control_GATES  = list(group.to.subtract.from = "most",
                                                                                 groups.to.be.subtracted = 1),
                                               differences.control_CLAN   = list(group.to.subtract.from = "most",
                                                                                 groups.to.be.subtracted = 1),
-                                              significance.level = 0.05, 
+                                              significance.level = 0.05,
                                               minimum.variation = 1e-05,
                                               num.cores = parallel::detectCores(), # dead argument here
                                               seed = NULL,
                                               store.learners = FALSE,
                                               store.splits = FALSE){
-  
+
 
   # if no input provided, set Z_CLAN it equal to Z
-  if(is.null(Z_CLAN)) Z_CLAN <- Z 
-  
+  if(is.null(Z_CLAN)) Z_CLAN <- Z
+
   # set seed
   if(is.null(seed)){
-    
+
+    # ensure reproducibility
+    rng <- RNGkind()
     RNGkind("L'Ecuyer-CMRG")
-    
+    on.exit(RNGkind(kind = rng[1], normal.kind = rng[2], sample.kind = rng[3]))
+
   } else{
-    
+
+    # ensure reproducibility
+    rng <- RNGkind()
     set.seed(seed, "L'Ecuyer")
-    
+    on.exit(RNGkind(kind = rng[1], normal.kind = rng[2], sample.kind = rng[3]))
+
   } # IF
-  
+
   num.vars.in.Z_CLAN <- ncol(Z_CLAN)
   genericML.by.split <- list()
   N     <- length(Y)
   N.set <- 1:N
-  prop <- proportion.in.main.set * N 
-  
+  prop <- proportion.in.main.set * N
+
   # set variable names fo CLAN
   if(is.null(colnames(Z_CLAN))) colnames(Z_CLAN) <- paste0("V", 1:num.vars.in.Z_CLAN)
-  
+
   # make the custom covariates a matrix to prevent bug later
   if(!is.null(X1.variables_BLP$custom_covariates)){
     X1.variables_BLP$custom_covariates <- as.matrix(X1.variables_BLP$custom_covariates)
@@ -124,43 +130,43 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
   if(!is.null(X1.variables_GATES$custom_covariates)){
     X1.variables_GATES$custom_covariates <- as.matrix(X1.variables_GATES$custom_covariates)
   } # IF
-  
+
   # initialize
-  if(store.splits) splits.mat <- matrix(NA_character_, N, num.splits, 
+  if(store.splits) splits.mat <- matrix(NA_character_, N, num.splits,
                                         dimnames = c(NULL, paste0("split_", 1:num.splits)))
-  
+
   # initialize
-  generic.targets <- initializer.for.splits(Z = Z, Z_CLAN = Z_CLAN, 
-                                            learners = learners.names, num.splits = num.splits, 
-                                            quantile.cutoffs = quantile.cutoffs, 
+  generic.targets <- initializer.for.splits(Z = Z, Z_CLAN = Z_CLAN,
+                                            learners = learners.names, num.splits = num.splits,
+                                            quantile.cutoffs = quantile.cutoffs,
                                             differences.control_GATES = differences.control_GATES,
                                             differences.control_CLAN = differences.control_CLAN)
-  
+
   # loop over the sample splits
   for(s in 1:num.splits){
-    
+
     # perform sample splitting into main set and auxiliary set
     M.set <- sort(sample(x = N.set, size = floor(prop), replace = FALSE),
                   decreasing = FALSE)
     A.set <- setdiff(N.set, M.set)
-    
+
     if(store.splits){
-      
+
       splits.mat[M.set, s] <- "M"
       splits.mat[A.set, s] <- "A"
-      
+
     } # IF
-    
-    
+
+
     # loop over the learners
     for(i in 1:length(learners)){
-      
-      generic.ml.obj <- 
-        get.generic.ml.for.given.learner_NoChecks(Z = Z, D = D, Y = Y, 
+
+      generic.ml.obj <-
+        get.generic.ml.for.given.learner_NoChecks(Z = Z, D = D, Y = Y,
                                                   propensity.scores = propensity.scores,
                                                   learner = learners[[i]],
                                                   M.set = M.set, A.set = A.set,
-                                                  Z_CLAN                       = Z_CLAN, 
+                                                  Z_CLAN                       = Z_CLAN,
                                                   X1.variables_BLP             = X1.variables_BLP,
                                                   X1.variables_GATES           = X1.variables_GATES,
                                                   HT.transformation            = HT.transformation,
@@ -172,31 +178,31 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
                                                   differences.control_CLAN     = differences.control_CLAN,
                                                   significance.level           = significance.level,
                                                   minimum.variation            = minimum.variation)
-      
+
       generic.targets[[i]]$BLP[,,s]   <- generic.ml.obj$BLP$generic.targets
       generic.targets[[i]]$GATES[,,s] <- generic.ml.obj$GATES$generic.targets
       generic.targets[[i]]$best[,,s]  <- c(generic.ml.obj$best$lambda, generic.ml.obj$best$lambda.bar)
-      
+
       if(store.learners){
-        
-        genericML.by.split[[learners.names[i]]][[s]] <- generic.ml.obj 
-        
+
+        genericML.by.split[[learners.names[i]]][[s]] <- generic.ml.obj
+
       }
-      
+
       for(j in 1:num.vars.in.Z_CLAN){
         generic.targets[[i]]$CLAN[[j]][,,s] <- generic.ml.obj$CLAN$generic.targets[[j]]
       }
-      
+
     } # FOR learners
   } # FOR num.splits
-  
+
   if(!store.learners) genericML.by.split <- NULL
   if(!store.splits)   splits.mat <- NULL
-  
-  return(list(generic.targets = generic.targets, 
+
+  return(list(generic.targets = generic.targets,
               genericML.by.split = genericML.by.split,
               splits = splits.mat))
-  
+
 } # END FUN
 
 
@@ -239,11 +245,17 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
   # set seed
   if(is.null(seed)){
 
+    # ensure reproducibility
+    rng <- RNGkind()
     RNGkind("L'Ecuyer-CMRG")
+    on.exit(RNGkind(kind = rng[1], normal.kind = rng[2], sample.kind = rng[3]))
 
   } else{
 
+    # ensure reproducibility
+    rng <- RNGkind()
     set.seed(seed, "L'Ecuyer")
+    on.exit(RNGkind(kind = rng[1], normal.kind = rng[2], sample.kind = rng[3]))
 
   } # IF
 
