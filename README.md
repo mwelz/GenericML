@@ -40,92 +40,92 @@ Y  <- ifelse(D == 1, Y1, Y0)
 ### 2. Prepare the arguments for GenericML() ----
 
 # quantile cutoffs for the GATES grouping of the estimated CATEs
-quantile.cutoffs         <- c(0.2, 0.4, 0.6, 0.8) # 20%, 40%, 60%, 80% quantiles
+quantile_cutoffs         <- c(0.2, 0.4, 0.6, 0.8) # 20%, 40%, 60%, 80% quantiles
 
 # specify the learner of the propensity score (non-penalized logistic regression here). Propensity scores can also directly be supplied.
-learner.propensity.score <- "mlr3::lrn('glmnet', lambda = 0, alpha = 1)"
+learner_propensity_score <- "mlr3::lrn('glmnet', lambda = 0, alpha = 1)"
 
 # specify the considered learners of the BCA and the CATE (here: elastic net, random forest, and SVM)
-learners.genericML       <- c("elastic.net", "mlr3::lrn('ranger', num.trees = 100)", "mlr3::lrn('svm')")
+learners_GenericML       <- c("elastic.net", "mlr3::lrn('ranger', num.trees = 100)", "mlr3::lrn('svm')")
 
 # specify the data that shall be used for the CLAN
 # here, we use all variables of Z and uniformly distributed random noise
 Z_CLAN <- cbind(Z, random = runif(num.obs))
 
 # specify the number of splits
-num.splits               <- 100
+num_splits               <- 100
 
 # specify if a HT transformation shall be used when estimating BLP and GATES
-HT.transformation <- FALSE
+HT <- FALSE
 
 # A list controlling the variables that shall be used in the matrix X1 for the BLP and GATES regressions. 
-X1.variables_BLP    <- list(functions_of_Z = c("B"),
+X1_BLP    <- list(functions_of_Z = c("B"),
                             custom_covariates = NULL,
                             fixed_effects = NULL)
-X1.variables_GATES  <- list(functions_of_Z = c("B"),
+X1_GATES  <- list(functions_of_Z = c("B"),
                             custom_covariates = NULL,
                             fixed_effects = NULL)
 
 # consider differences between group K (most affected) with groups 1 and 2, respectively.
-differences.control_GATES  <- list(group.to.subtract.from = "most",
+diff_GATES  <- list(group.to.subtract.from = "most",
                                    groups.to.be.subtracted = c(1,2))
-differences.control_CLAN  <- list(group.to.subtract.from = "most",
+diff_CLAN  <- list(group.to.subtract.from = "most",
                                   groups.to.be.subtracted = c(1,2))
 
 # specify the significance level
-significance.level       <- 0.05
+significance_level       <- 0.05
 
 # specify minimum variation of predictions before Gaussian noise with variance var(Y)/20 is added.
-minimum.variation <- 1e-05
+min_variation <- 1e-05
 
 # specify which estimator of the error covariance matrix shall be used in BLP and GATES (standard OLS covariance matrix estimator here)
-vcov.control_BLP   <- list(estimator = "vcovHC",
+vcov_BLP   <- list(estimator = "vcovHC",
                            arguments = list(type = "const"))
-vcov.control_GATES <- list(estimator = "vcovHC",
+vcov_GATES <- list(estimator = "vcovHC",
                            arguments = list(type = "const"))
 
 # specify whether of not it should be assumed that the group variances of the most and least affected groups are equal in CLAN.
-equal.group.variances_CLAN <- FALSE
+equal_variances_CLAN <- FALSE
 
 # specify the proportion of samples that shall be selected in the main set
-proportion.in.main.set   <- 0.5
+prop_main   <- 0.5
 
 # specify whether or not the splits and auxiliary results of the learners shall be stored
-store.splits             <- FALSE
-store.learners           <- FALSE
+store_splits             <- FALSE
+store_learners           <- FALSE
 
 # parallelization options (currently only supported on Unix systems)
 parallel  <- TRUE
-num.cores <- parallel::detectCores() # maximum number
+num_cores <- parallel::detectCores() # maximum number
 seed      <- 12345
-# Note that the number of cores influences the random number stream. Thus, different choices of `num.cores` may lead to different results.
+# Note that the number of cores influences the random number stream. Thus, different choices of `num_cores` may lead to different results.
 
 
 
 ### 3. Run the GenericML() functions with these arguments ----
 # runtime: ~30 seconds with R version 4.1.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 21.04. Returns a GenericML object.
 genML <- GenericML(Z = Z, D = D, Y = Y,
-                   learner.propensity.score = learner.propensity.score,
-                   learners.genericML = learners.genericML,
-                   num.splits = num.splits,
+                   learner_propensity_score = learner_propensity_score,
+                   learners_GenericML = learners_GenericML,
+                   num_splits = num_splits,
                    Z_CLAN = Z_CLAN,
-                   HT.transformation = HT.transformation,
-                   X1.variables_BLP = X1.variables_BLP,
-                   X1.variables_GATES = X1.variables_GATES,
-                   vcov.control_BLP = vcov.control_BLP,
-                   vcov.control_GATES = vcov.control_GATES,
-                   quantile.cutoffs = quantile.cutoffs,
-                   differences.control_GATES = differences.control_GATES,
-                   differences.control_CLAN = differences.control_CLAN,
-                   equal.group.variances_CLAN = equal.group.variances_CLAN,
-                   proportion.in.main.set = proportion.in.main.set,
-                   significance.level = significance.level,
-                   minimum.variation = minimum.variation,
+                   HT = HT,
+                   X1_BLP = X1_BLP,
+                   X1_GATES = X1_GATES,
+                   vcov_BLP = vcov_BLP,
+                   vcov_GATES = vcov_GATES,
+                   quantile_cutoffs = quantile_cutoffs,
+                   diff_GATES = diff_GATES,
+                   diff_CLAN = diff_CLAN,
+                   equal_variances_CLAN = equal_variances_CLAN,
+                   prop_main = prop_main,
+                   significance_level = significance_level,
+                   min_variation = min_variation,
                    parallel = parallel,
-                   num.cores = num.cores,
+                   num_cores = num_cores,
                    seed = seed,
-                   store.splits = store.splits,
-                   store.learners = store.learners)
+                   store_splits = store_splits,
+                   store_learners = store_learners)
 
 ### 4. Analyze the output ----
 # the line below returns the medians of the estimated  \Lambda and \bar{\Lambda}

@@ -6,11 +6,11 @@
 print.GenericML <- function(x, ...){
 
   cat("GenericML object with the following specifications:\n")
-  cat("\t* Propensity Score learner:", x$arguments$learner.propensity.score, "\n")
-  cat("\t* Generic ML learners:", paste(x$arguments$learners.genericML, collapse = ", "), "\n")
-  cat("\t* S =", x$arguments$num.splits, "splits are used\n")
-  cat("\t*", ifelse(x$arguments$HT.transformation, "A", "No"), "HT transformation is used\n")
-  cat("\nThe", 100 * (1-2*x$arguments$significance.level), "% confidence bounds of the best BLP estimates are given by\n")
+  cat("\t* Propensity Score learner:", x$arguments$learner_propensity_score, "\n")
+  cat("\t* Generic ML learners:", paste(x$arguments$learners_GenericML, collapse = ", "), "\n")
+  cat("\t* S =", x$arguments$num_splits, "splits are used\n")
+  cat("\t*", ifelse(x$arguments$HT, "A", "No"), "HT transformation is used\n")
+  cat("\nThe", 100 * (1-2*x$arguments$significance_level), "% confidence bounds of the best BLP estimates are given by\n")
   cat("\t beta.1: (",
       round(x$VEIN$best.learners$BLP["beta.1", "CB lower"], 3), ",",
       round(x$VEIN$best.learners$BLP["beta.1", "CB upper"], 3), ")")

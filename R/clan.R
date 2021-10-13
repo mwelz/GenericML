@@ -5,7 +5,7 @@
 #' the group memberships (such a matrix is returned by the function quantile.group())
 #' @param equal.group.variances logical. If TRUE, the the two within-group variances of the most and least affected group are assumed to be equal. Default is FALSE.
 #' @param differences.control a list with two elements called 'group.to.subtract.from' and 'groups.to.be.subtracted'. The first element ('group.to.subtract.from') denotes what shall be the base group to subtract from in CLAN; either "most" or "least". The second element ('groups.to.be.subtracted') are the groups to be subtracted from 'group.to.subtract.from', which is a subset of {1,...,K}, where K equals the number of groups.
-#' @param significance.level Significance level. Default is 0.05.
+#' @param significance_level Significance level. Default is 0.05.
 #' @return The two CLAN parameters ("most" affected and "least" affected) for each variable in Z_CLAN.main.sample
 #'
 #' @export
@@ -14,7 +14,7 @@ CLAN <- function(Z_CLAN.main.sample,
                  equal.group.variances = FALSE,
                  differences.control = list(group.to.subtract.from = "most",
                                             groups.to.be.subtracted = 1),
-                 significance.level = 0.05){
+                 significance_level = 0.05){
 
   # input checks
   InputChecks_group.membership(group.membership.main.sample)
@@ -26,7 +26,7 @@ CLAN <- function(Z_CLAN.main.sample,
                 group.membership.main.sample = group.membership.main.sample,
                 equal.group.variances = equal.group.variances,
                 differences.control = differences.control,
-                significance.level = significance.level)
+                significance_level = significance_level)
 
 } # END FUN
 
@@ -38,7 +38,7 @@ CLAN_NoChecks <- function(Z_CLAN.main.sample,
                           equal.group.variances = FALSE,
                           differences.control = list(group.to.subtract.from = "most",
                                                      groups.to.be.subtracted = 1),
-                          significance.level = 0.05){
+                          significance_level = 0.05){
 
   # extract controls
   group.to.subtract.from  <- differences.control$group.to.subtract.from
@@ -52,7 +52,7 @@ CLAN_NoChecks <- function(Z_CLAN.main.sample,
   clan.coefficients <- matrix(NA_real_,
                               nrow =  K + length(groups.to.be.subtracted),
                               ncol = ncol(Z_CLAN.main.sample))
-  z                 <- stats::qnorm(1-significance.level/2) # the quantile
+  z                 <- stats::qnorm(1-significance_level/2) # the quantile
 
   # loop over the CLAN variables
   for(j in 1:ncol(Z_CLAN.main.sample)){

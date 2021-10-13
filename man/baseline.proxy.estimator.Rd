@@ -10,7 +10,7 @@ baseline.proxy.estimator(
   Y,
   auxiliary.sample,
   learner = "random.forest",
-  minimum.variation = 1e-05
+  min_variation = 1e-05
 )
 }
 \arguments{
@@ -24,7 +24,7 @@ baseline.proxy.estimator(
 
 \item{learner}{the classification machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default.}
 
-\item{minimum.variation}{minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.}
+\item{min_variation}{minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.}
 }
 \value{
 Estimates of Y, both for the auxiliary sample and all observations, and an 'mlr3' object of the employed model

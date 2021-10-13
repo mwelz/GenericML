@@ -89,17 +89,17 @@ quantile.group <- function(x,
 #' @param M.set main set
 #' @param A.set auxiliary set
 #' @param Z_CLAN A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z_CLAN = Z`, i.e. CLAN is performed for all variables in `Z`.
-#' @param X1.variables_BLP a list controlling the variables that shall be used in the matrix X1 for the BLP regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The second element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.
-#' @param X1.variables_GATES a list controlling the variables that shall be used in the matrix X1 for the GATES regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The second element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included if no HT transformation is applied so that the regression model has an intercept.
-#' @param HT.transformation logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.
-#' @param vcov.control_BLP a list with two elements called 'estimator' and 'arguments'. The argument 'estimator' is a string specifying the covariance matrix estimator to be used in the BLP regression; specifies a covariance estimator function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are "vcovBS", "vcovCL", "vcovHAC", and "vcovHC". Default is 'vcovHC'. The element 'arguments' is a list of arguments that shall be passed to the function specified in the element 'estimator'. Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
-#' @param vcov.control_GATES same as vcov.control_BLP, just for GATES regression
-#' @param equal.group.variances_CLAN logical. If TRUE, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is FALSE.
-#' @param quantile.cutoffs Cutoff points of quantiles that shall be used for GATES grouping
-#' @param differences.control_GATES a list with two elements called 'group.to.subtract.from' and 'groups.to.be.subtracted'. The first element ('group.to.subtract.from') denotes what shall be the base group to subtract from in GATES; either "most" or "least". The second element ('groups.to.be.subtracted') are the groups to be subtracted from 'group.to.subtract.from', which is a subset of {1,...,K}, where K equals the number of groups.
-#' @param differences.control_CLAN same as differences.control_GATES, just for CLAN.
-#' @param significance.level Significance level. Default is 0.05
-#' @param minimum.variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
+#' @param X1_BLP a list controlling the variables that shall be used in the matrix X1 for the BLP regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The second element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.
+#' @param X1_GATES a list controlling the variables that shall be used in the matrix X1 for the GATES regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The second element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included if no HT transformation is applied so that the regression model has an intercept.
+#' @param HT logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.
+#' @param vcov_BLP a list with two elements called 'estimator' and 'arguments'. The argument 'estimator' is a string specifying the covariance matrix estimator to be used in the BLP regression; specifies a covariance estimator function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are "vcovBS", "vcovCL", "vcovHAC", and "vcovHC". Default is 'vcovHC'. The element 'arguments' is a list of arguments that shall be passed to the function specified in the element 'estimator'. Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
+#' @param vcov_GATES same as vcov_BLP, just for GATES regression
+#' @param equal_variances_CLAN logical. If TRUE, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is FALSE.
+#' @param quantile_cutoffs Cutoff points of quantiles that shall be used for GATES grouping
+#' @param diff_GATES a list with two elements called 'group.to.subtract.from' and 'groups.to.be.subtracted'. The first element ('group.to.subtract.from') denotes what shall be the base group to subtract from in GATES; either "most" or "least". The second element ('groups.to.be.subtracted') are the groups to be subtracted from 'group.to.subtract.from', which is a subset of {1,...,K}, where K equals the number of groups.
+#' @param diff_CLAN same as diff_GATES, just for CLAN.
+#' @param significance_level Significance level. Default is 0.05
+#' @param min_variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
 #'
 #' TODO: instructions on how mlr3 input is supposed to work (needs to be a string!)
 #' TODO: comments on CLAN: If there are categorical variables, apply one-hot-encoding to Z_CLAN. The interpretation then becomes: Is there a factor that is overproportionally present in the least or most affected group?
@@ -110,37 +110,37 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                                              learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',
                                              M.set, A.set,
                                              Z_CLAN                     = NULL,
-                                             X1.variables_BLP           = list(functions_of_Z = c("B"),
+                                             X1_BLP                     = list(functions_of_Z = c("B"),
                                                                                custom_covariates = NULL,
                                                                                fixed_effects = NULL),
-                                             X1.variables_GATES         = list(functions_of_Z = c("B"),
+                                             X1_GATES                   = list(functions_of_Z = c("B"),
                                                                                custom_covariates = NULL,
                                                                                fixed_effects = NULL),
-                                             HT.transformation          = FALSE,
-                                             vcov.control_BLP           = list(estimator = "vcovHC",
+                                             HT                         = FALSE,
+                                             vcov_BLP                   = list(estimator = "vcovHC",
                                                                             arguments = list(type = "const")),
-                                             vcov.control_GATES         = list(estimator = "vcovHC",
+                                             vcov_GATES                 = list(estimator = "vcovHC",
                                                                             arguments = list(type = "const")),
-                                             equal.group.variances_CLAN = FALSE,
-                                             quantile.cutoffs           = c(0.25, 0.5, 0.75),
-                                             differences.control_GATES  = list(group.to.subtract.from = "most",
+                                             equal_variances_CLAN       = FALSE,
+                                             quantile_cutoffs           = c(0.25, 0.5, 0.75),
+                                             diff_GATES                 = list(group.to.subtract.from = "most",
                                                                                 groups.to.be.subtracted = 1),
-                                             differences.control_CLAN   = list(group.to.subtract.from = "most",
+                                             diff_CLAN                  = list(group.to.subtract.from = "most",
                                                                                 groups.to.be.subtracted = 1),
-                                             significance.level         = 0.05,
-                                             minimum.variation          = 1e-05){
+                                             significance_level         = 0.05,
+                                             min_variation              = 1e-05){
 
   # input checks
   InputChecks_D(D)
   InputChecks_Y(Y)
   InputChecks_Z(Z)
   InputChecks_equal.length3(D, Y, Z)
-  InputChecks_X1(X1.variables_BLP)
-  InputChecks_X1(X1.variables_GATES)
-  InputChecks_vcov.control(vcov.control_BLP)
-  InputChecks_vcov.control(vcov.control_GATES)
-  InputChecks_differences.control(differences.control_GATES, K = length(quantile.cutoffs) + 1)
-  InputChecks_differences.control(differences.control_CLAN, K = length(quantile.cutoffs) + 1)
+  InputChecks_X1(X1_BLP)
+  InputChecks_X1(X1_GATES)
+  InputChecks_vcov.control(vcov_BLP)
+  InputChecks_vcov.control(vcov_GATES)
+  InputChecks_differences.control(diff_GATES, K = length(quantile_cutoffs) + 1)
+  InputChecks_differences.control(diff_CLAN, K = length(quantile_cutoffs) + 1)
 
   if(is.null(Z_CLAN)) Z_CLAN <- Z # if no input provided, set it equal to Z
   learner <- get.learner_regr(make.mlr3.environment(learner, regr = TRUE))
@@ -152,17 +152,17 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                                             learner = learner,
                                             M.set = M.set, A.set = A.set,
                                             Z_CLAN                     = Z_CLAN,
-                                            X1.variables_BLP           = X1.variables_BLP,
-                                            X1.variables_GATES         = X1.variables_GATES,
-                                            HT.transformation          = HT.transformation,
-                                            vcov.control_BLP           = vcov.control_BLP,
-                                            vcov.control_GATES         = vcov.control_GATES,
-                                            equal.group.variances_CLAN = equal.group.variances_CLAN,
-                                            quantile.cutoffs           = quantile.cutoffs,
-                                            differences.control_GATES  = differences.control_GATES,
-                                            differences.control_CLAN   = differences.control_CLAN,
-                                            significance.level         = significance.level,
-                                            minimum.variation          = minimum.variation)
+                                            X1_BLP                     = X1_BLP,
+                                            X1_GATES                   = X1_GATES,
+                                            HT                         = HT,
+                                            vcov_BLP                   = vcov_BLP,
+                                            vcov_GATES                 = vcov_GATES,
+                                            equal_variances_CLAN       = equal_variances_CLAN,
+                                            quantile_cutoffs           = quantile_cutoffs,
+                                            diff_GATES                 = diff_GATES,
+                                            diff_CLAN                  = diff_CLAN,
+                                            significance_level         = significance_level,
+                                            min_variation              = min_variation)
 
 } # END FUN
 
@@ -174,25 +174,25 @@ get.generic.ml.for.given.learner_NoChecks <-
            learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',
            M.set, A.set,
            Z_CLAN                     = NULL,
-           X1.variables_BLP           = list(functions_of_Z = c("B"),
+           X1_BLP                     = list(functions_of_Z = c("B"),
                                              custom_covariates = NULL,
                                              fixed_effects = NULL),
-           X1.variables_GATES         = list(functions_of_Z = c("B"),
+           X1_GATES                   = list(functions_of_Z = c("B"),
                                              custom_covariates = NULL,
                                              fixed_effects = NULL),
-           HT.transformation          = FALSE,
-           vcov.control_BLP           = list(estimator = "vcovHC",
+           HT                         = FALSE,
+           vcov_BLP                   = list(estimator = "vcovHC",
                                              arguments = list(type = "const")),
-           vcov.control_GATES         = list(estimator = "vcovHC",
+           vcov_GATES                 = list(estimator = "vcovHC",
                                              arguments = list(type = "const")),
-           equal.group.variances_CLAN = FALSE,
-           quantile.cutoffs           = c(0.25, 0.5, 0.75),
-           differences.control_GATES  = list(group.to.subtract.from = "most",
+           equal_variances_CLAN       = FALSE,
+           quantile_cutoffs           = c(0.25, 0.5, 0.75),
+           diff_GATES                 = list(group.to.subtract.from = "most",
                                              groups.to.be.subtracted = 1),
-           differences.control_CLAN   = list(group.to.subtract.from = "most",
+           diff_CLAN   = list(group.to.subtract.from = "most",
                                              groups.to.be.subtracted = 1),
-           significance.level         = 0.05,
-           minimum.variation          = 1e-05){
+           significance_level         = 0.05,
+           min_variation              = 1e-05){
 
 
     ### step 1a: learn proxy predictors by using the auxiliary set ----
@@ -202,7 +202,7 @@ get.generic.ml.for.given.learner_NoChecks <-
       Z = Z, D = D, Y = Y,
       auxiliary.sample = A.set,
       learner = learner,
-      minimum.variation = minimum.variation)
+      min_variation = min_variation)
     proxy.baseline     <- proxy.baseline.obj$baseline.predictions.main.sample
 
     # get the proxy estimator of the CATE for the main sample
@@ -211,7 +211,7 @@ get.generic.ml.for.given.learner_NoChecks <-
       auxiliary.sample = A.set,
       learner = learner,
       proxy.baseline.estimates = proxy.baseline.obj$baseline.predictions.full.sample,
-      minimum.variation = minimum.variation)
+      min_variation = min_variation)
     proxy.cate <- proxy.cate.obj$CATE.predictions.main.sample
 
 
@@ -222,19 +222,19 @@ get.generic.ml.for.given.learner_NoChecks <-
       propensity.scores  = propensity.scores[M.set],
       proxy.baseline     = proxy.baseline,
       proxy.cate         = proxy.cate,
-      HT.transformation  = HT.transformation,
-      X1.variables       = list(functions_of_Z = X1.variables_BLP$functions_of_Z,
-                                custom_covariates = X1.variables_BLP$custom_covariates[M.set,],
-                                fixed_effects = X1.variables_BLP$fixed_effects[M.set]),
-      vcov.control       = vcov.control_BLP,
-      significance.level = significance.level)
+      HT                 = HT,
+      X1.variables       = list(functions_of_Z = X1_BLP$functions_of_Z,
+                                custom_covariates = X1_BLP$custom_covariates[M.set,],
+                                fixed_effects = X1_BLP$fixed_effects[M.set]),
+      vcov.control       = vcov_BLP,
+      significance_level = significance_level)
 
 
 
     ### step 1c: estimate GATES parameters by OLS ----
     # group the proxy estimators for the CATE in the main sample by quantiles
     group.membership.main.sample <- quantile.group(proxy.cate,
-                                                   cutoffs = quantile.cutoffs,
+                                                   cutoffs = quantile_cutoffs,
                                                    quantile.nam = TRUE)
 
     gates.obj <- GATES_NoChecks(
@@ -244,22 +244,22 @@ get.generic.ml.for.given.learner_NoChecks <-
       proxy.baseline      = proxy.baseline,
       proxy.cate          = proxy.cate,
       group.membership.main.sample = group.membership.main.sample,
-      HT.transformation   = HT.transformation,
-      X1.variables        = list(functions_of_Z = X1.variables_GATES$functions_of_Z,
-                                 custom_covariates = X1.variables_GATES$custom_covariates[M.set,],
-                                 fixed_effects = X1.variables_GATES$fixed_effects[M.set]),
-      vcov.control        = vcov.control_GATES,
-      differences.control = differences.control_GATES,
-      significance.level  = significance.level)
+      HT                  = HT,
+      X1.variables        = list(functions_of_Z = X1_GATES$functions_of_Z,
+                                 custom_covariates = X1_GATES$custom_covariates[M.set,],
+                                 fixed_effects = X1_GATES$fixed_effects[M.set]),
+      vcov.control        = vcov_GATES,
+      differences.control = diff_GATES,
+      significance_level  = significance_level)
 
 
     ### step 1d: estimate CLAN parameters in the main sample ----
     clan.obj <- CLAN_NoChecks(
       Z_CLAN.main.sample = Z_CLAN[M.set,,drop = FALSE],
       group.membership.main.sample = group.membership.main.sample,
-      equal.group.variances   = equal.group.variances_CLAN,
-      differences.control     = differences.control_CLAN,
-      significance.level      = significance.level)
+      equal.group.variances   = equal_variances_CLAN,
+      differences.control     = diff_CLAN,
+      significance_level      = significance_level)
 
 
     ### step 1e: get parameters over which we maximize to find the "best" ML method ----
@@ -330,7 +330,7 @@ best.ml.method.parameters <- function(BLP.obj,
 # 2. statistical concern: this is nonrandom sample selection, hence it might induce a sampling bias.
 # 3. What shall the role of the strata be? Shall it be the A set or the M set? Suppose it is the A set, is the A set then [n]\A or pool\A? The second option implies that we effectively only work on the pool.
 #'
-#' @export
+#' @noRd
 stratified <- function(group, relative.size, select = NULL){
 
   # perform stratified sampling

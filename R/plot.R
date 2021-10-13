@@ -4,7 +4,7 @@
 #' @param learner the learner whose results are to be returned. Default is 'best'
 #' @param type the analysis to be plotted. Either 'GATES', 'BLP', or 'CLAN'. Default is 'GATES'.
 #' @param CLAN.variable CLAN variable to be plotted. Only applicable if type = 'CLAN'.
-#' @param groups.to.be.plotted The groups to be plotted for GATES and CLAN. Default is 'all'. If there are K groups, this variable can be set to a subset of {"G1", "G2",...,"GK", "GK-G1", "GK-G2",...}, but this set depends on the choices of the arguments 'differences.control_GATES' and 'differences.control_CLAN' of the GenericML() function that generated GenericML.obj.
+#' @param groups.to.be.plotted The groups to be plotted for GATES and CLAN. Default is 'all'. If there are K groups, this variable can be set to a subset of {"G1", "G2",...,"GK", "GK-G1", "GK-G2",...}, but this set depends on the choices of the arguments 'diff_GATES' and 'diff_CLAN' of the GenericML() function that generated GenericML.obj.
 #' @param limits the limits of the y-axis of the plot.
 #' @param title the title of the plot.
 #' @param ... Additional arguments
@@ -43,7 +43,7 @@ plot.GenericML <- function(x,
 
     data <- GenericML.obj$VEIN$best.learners[[type]][[CLAN.variable]]
 
-  } else if(!(learner %in% GenericML.obj$arguments$learners.genericML)){
+  } else if(!(learner %in% GenericML.obj$arguments$learners_GenericML)){
 
     stop("This learner is not used in the generic ML procedure.")
 
@@ -78,7 +78,7 @@ plot.GenericML <- function(x,
   } # IF
 
   # adjusted confidence level
-  confidence.level <- 1 - 2 * GenericML.obj$arguments$significance.level
+  confidence.level <- 1 - 2 * GenericML.obj$arguments$significance_level
 
 
   ## 1.1 make plot for GATES or CLAN ----

@@ -213,7 +213,7 @@ InputChecks_differences.control <- function(differences.control, K){
 
   if(any(differences.control$groups.to.be.subtracted < 1) | any(differences.control$groups.to.be.subtracted > K)){
     stop(paste0("The numeric vector ", deparse(substitute(differences.control)), "$groups.to.be.subtracted",
-                " must be a subset of {1,2,...,K}, where K = ", K, " is the number of groups with the supplied arguments (controlled through the argument 'quantile.cutoffs')"), call. = FALSE)
+                " must be a subset of {1,2,...,K}, where K = ", K, " is the number of groups with the supplied arguments (controlled through the argument 'quantile_cutoffs')"), call. = FALSE)
   }
 
 } # FUN

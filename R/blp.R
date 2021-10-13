@@ -5,10 +5,10 @@
 #' @param propensity.scores a vector of propensity scores of length _|M|_
 #' @param proxy.baseline a vector of proxy baseline estimates of length _M_
 #' @param proxy.cate a vector of proxy CATE estimates of length _M_
-#' @param HT.transformation logical. If TRUE, a HT transformation is applied (BLP2 in the paper). Default is FALSE.
+#' @param HT logical. If TRUE, a HT transformation is applied (BLP2 in the paper). Default is FALSE.
 #' @param X1.variables a list controlling the variables that shall be used in the matrix X1. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.
 #' @param vcov.control a list with two elements called 'estimator' and 'arguments'. The argument 'estimator' is a string specifying the covariance matrix estimator to be used; specifies a covariance estimator function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are "vcovBS", "vcovCL", "vcovHAC", and "vcovHC". Default is 'vcovHC'. The element 'arguments' is a list of arguments that shall be passed to the function specified in the element 'estimator'. Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
-#' @param significance.level significance level for construction of confidence intervals
+#' @param significance_level significance level for construction of confidence intervals
 #' @return BLP coefficients with inference statements
 #'
 #' @export
@@ -16,13 +16,13 @@ BLP <- function(D, Y,
                 propensity.scores,
                 proxy.baseline,
                 proxy.cate,
-                HT.transformation  = FALSE,
+                HT  = FALSE,
                 X1.variables       = list(functions_of_Z = c("B"),
                                           custom_covariates = NULL,
                                           fixed_effects = NULL),
                 vcov.control       = list(estimator = "vcovHC",
                                           arguments = list(type = "const")),
-                significance.level = 0.05){
+                significance_level = 0.05){
 
 
 
@@ -42,7 +42,7 @@ BLP <- function(D, Y,
                proxy.cate         = proxy.cate,
                X1.variables       = X1.variables,
                vcov.control       = vcov.control,
-               significance.level = significance.level)
+               significance_level = significance_level)
 
 } # FUN
 
@@ -52,23 +52,23 @@ BLP_NoChecks <- function(D, Y,
                          propensity.scores,
                          proxy.baseline,
                          proxy.cate,
-                         HT.transformation  = FALSE,
+                         HT  = FALSE,
                          X1.variables       = list(functions_of_Z = c("B"),
                                                    custom_covariates = NULL,
                                                    fixed_effects = NULL),
                          vcov.control       = list(estimator = "vcovHC",
                                                    arguments = list(type = "const")),
-                         significance.level = 0.05){
+                         significance_level = 0.05){
 
   # fit model according to strategy 1 or 2 in the paper
-  do.call(what = get(ifelse(HT.transformation, "BLP.HT", "BLP.classic")),
+  do.call(what = get(ifelse(HT, "BLP.HT", "BLP.classic")),
           args = list(D = D, Y = Y,
                       propensity.scores  = propensity.scores,
                       proxy.baseline     = proxy.baseline,
                       proxy.cate         = proxy.cate,
                       X1.variables       = X1.variables,
                       vcov.control       = vcov.control,
-                      significance.level = significance.level))
+                      significance_level = significance_level))
 
 } # FUN
 
@@ -81,7 +81,7 @@ BLP.classic <- function(D, Y, propensity.scores,
                                             fixed_effects = NULL),
                         vcov.control       = list(estimator = "vcovHC",
                                                   arguments = list(type = "const")),
-                        significance.level = 0.05){
+                        significance_level = 0.05){
 
   # prepare weights
   weights <- 1 / (propensity.scores * (1 - propensity.scores))
@@ -108,7 +108,7 @@ BLP.classic <- function(D, Y, propensity.scores,
   return(structure(
     list(lm.obj = blp.obj,
               blp.coefficients = blp.obj$coefficients[c("beta.1", "beta.2")],
-              generic.targets = generic.targets_BLP(coefficients, significance.level = significance.level),
+              generic.targets = generic.targets_BLP(coefficients, significance_level = significance_level),
               coefficients = coefficients), class = "BLP"))
 
 } # END FUN
@@ -123,7 +123,7 @@ BLP.HT <- function(D, Y, propensity.scores,
                                        fixed_effects = NULL),
                    vcov.control       = list(estimator = "vcovHC",
                                              arguments = list(type = "const")),
-                   significance.level = 0.05){
+                   significance_level = 0.05){
 
   # HT transformation
   H <- (D - propensity.scores) / (propensity.scores * (1 - propensity.scores))
@@ -171,22 +171,22 @@ BLP.HT <- function(D, Y, propensity.scores,
   return(structure(
     list(lm.obj = blp.obj,
               blp.coefficients = blp.obj$coefficients[c("beta.1", "beta.2")],
-              generic.targets = generic.targets_BLP(coefficients, significance.level = significance.level),
+              generic.targets = generic.targets_BLP(coefficients, significance_level = significance_level),
               coefficients = coefficients), class = "BLP"))
 
 } # END FUN
 
 
 # helper function to calculate the generic targets of BLP
-generic.targets_BLP <- function(coeftest.object, significance.level = 0.05){
+generic.targets_BLP <- function(coeftest.object, significance_level = 0.05){
 
   # helper that computes generic targets beta.1, beta.2 in BLP
   coefficients.temp <- coeftest.object[c("beta.1", "beta.2"), 1:3]
   colnames(coefficients.temp) <- c("Estimate", "Std. Error", "z value")
   p.right <- stats::pnorm(coefficients.temp[,"z value"], lower.tail = FALSE) # right p-value: Pr(Z>z)
   p.left  <- stats::pnorm(coefficients.temp[,"z value"], lower.tail = TRUE)  # left p-value: Pr(Z<z)
-  ci.lo   <- coefficients.temp[,"Estimate"] - stats::qnorm(1-significance.level/2) * coefficients.temp[,"Std. Error"]
-  ci.up   <- coefficients.temp[,"Estimate"] + stats::qnorm(1-significance.level/2) * coefficients.temp[,"Std. Error"]
+  ci.lo   <- coefficients.temp[,"Estimate"] - stats::qnorm(1-significance_level/2) * coefficients.temp[,"Std. Error"]
+  ci.up   <- coefficients.temp[,"Estimate"] + stats::qnorm(1-significance_level/2) * coefficients.temp[,"Std. Error"]
   generic.targets <- cbind(coefficients.temp, ci.lo, ci.up, p.left, p.right)
   colnames(generic.targets) <- c("Estimate", "Std. Error", "z value",
                                  "CB lower", "CB upper", "Pr(<z)", "Pr(>z)")

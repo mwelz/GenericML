@@ -119,7 +119,7 @@ propensity.score_NoChecks <- function(Z, D, estimator = "constant"){
 #' @param Y a vector of responses of length _n_
 #' @param auxiliary.sample a numerical vector of indices of observations in the auxiliary sample. Length is shorter than _n_
 #' @param learner the classification machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default.
-#' @param minimum.variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
+#' @param min_variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
 #' @return Estimates of Y, both for the auxiliary sample and all observations, and an 'mlr3' object of the employed model
 #'
 #'
@@ -127,7 +127,7 @@ propensity.score_NoChecks <- function(Z, D, estimator = "constant"){
 baseline.proxy.estimator <- function(Z, D, Y,
                                      auxiliary.sample,
                                      learner = "random.forest",
-                                     minimum.variation = 1e-05){
+                                     min_variation = 1e-05){
 
   # input checks
   InputChecks_D(D)
@@ -139,7 +139,7 @@ baseline.proxy.estimator <- function(Z, D, Y,
   baseline.proxy.estimator_NoChecks(Z = Z, D = D, Y = Y,
                                     auxiliary.sample = auxiliary.sample,
                                     learner = get.learner_regr(learner),
-                                    minimum.variation = minimum.variation)
+                                    min_variation = min_variation)
 
 } # END FUN
 
@@ -151,7 +151,7 @@ baseline.proxy.estimator <- function(Z, D, Y,
 baseline.proxy.estimator_NoChecks <- function(Z, D, Y,
                                               auxiliary.sample,
                                               learner, # must be mlr3 object
-                                              minimum.variation = 1e-05){
+                                              min_variation = 1e-05){
 
   # specify the task
   task.proxy.baseline.estimator <- mlr3::TaskRegr$new(id = "proxy.baseline",
@@ -176,7 +176,7 @@ baseline.proxy.estimator_NoChecks <- function(Z, D, Y,
   predictions     <- predictions.obj$response
 
   # if there is not much variation in the predictions, add Gaussian noise
-  if(stats::var(predictions) < minimum.variation){
+  if(stats::var(predictions) < min_variation){
 
     predictions <- predictions +
       stats::rnorm(length(Y), mean = 0, sd = sqrt(stats::var(Y) / 20))
@@ -203,7 +203,7 @@ baseline.proxy.estimator_NoChecks <- function(Z, D, Y,
 #' @param auxiliary.sample a numerical vector of indices of observations in the auxiliary sample. Length is shorter than _n_
 #' @param learner the regression machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default.
 #' @param proxy.baseline.estimates A vector of length _n_ of proxy estimates of the baseline estimator \eqn{E[Y | D=0, Z]}. If NULL, these will be estimated separately.
-#' @param minimum.variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
+#' @param min_variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
 #' @return Estimates of the CATE, both for the auxiliary sample and all observations, and an 'mlr3' object of each employed model
 #'
 #' @export
@@ -211,7 +211,7 @@ CATE.proxy.estimator <- function(Z, D, Y,
                                  auxiliary.sample,
                                  learner = "random.forest",
                                  proxy.baseline.estimates = NULL,
-                                 minimum.variation = 1e-05){
+                                 min_variation = 1e-05){
 
   # input checks
   InputChecks_D(D)
@@ -224,7 +224,7 @@ CATE.proxy.estimator <- function(Z, D, Y,
                                 auxiliary.sample = auxiliary.sample,
                                 learner = get.learner_regr(learner), # must be mlr3 object
                                 proxy.baseline.estimates = proxy.baseline.estimates,
-                                minimum.variation = minimum.variation)
+                                min_variation = min_variation)
 
 } # END FUN
 
@@ -237,7 +237,7 @@ CATE.proxy.estimator_NoChecks <- function(Z, D, Y,
                                           auxiliary.sample,
                                           learner = "random.forest",
                                           proxy.baseline.estimates = NULL,
-                                          minimum.variation = 1e-05){
+                                          min_variation = 1e-05){
 
   # indices of the treated units in the auxiliary sample
   auxiliary.sample.logical <- 1:length(Y) %in% auxiliary.sample
@@ -316,7 +316,7 @@ CATE.proxy.estimator_NoChecks <- function(Z, D, Y,
   cate.predictions <- predictions.treated - predictions.controls
 
   # if there is not much variation in the predictions, add Gaussian noise
-  if(stats::var(cate.predictions) < minimum.variation){
+  if(stats::var(cate.predictions) < min_variation){
 
     cate.predictions <- cate.predictions +
       stats::rnorm(length(Y), mean = 0, sd = sqrt(stats::var(Y) / 20))

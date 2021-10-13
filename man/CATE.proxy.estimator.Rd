@@ -11,7 +11,7 @@ CATE.proxy.estimator(
   auxiliary.sample,
   learner = "random.forest",
   proxy.baseline.estimates = NULL,
-  minimum.variation = 1e-05
+  min_variation = 1e-05
 )
 }
 \arguments{
@@ -27,7 +27,7 @@ CATE.proxy.estimator(
 
 \item{proxy.baseline.estimates}{A vector of length \emph{n} of proxy estimates of the baseline estimator \eqn{E[Y | D=0, Z]}. If NULL, these will be estimated separately.}
 
-\item{minimum.variation}{minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.}
+\item{min_variation}{minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.}
 }
 \value{
 Estimates of the CATE, both for the auxiliary sample and all observations, and an 'mlr3' object of each employed model
