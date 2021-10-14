@@ -183,36 +183,36 @@ InputChecks_vcov.control <- function(vcov.control){
 } # FUN
 
 
-InputChecks_differences.control <- function(differences.control, K){
+InputChecks_diff <- function(diff, K){
 
-  if(!is.list(differences.control)) stop(paste0(deparse(substitute(differences.control))),
+  if(!is.list(diff)) stop(paste0(deparse(substitute(diff))),
                                          " must be a list", call. = FALSE)
 
-  if(length(differences.control) != 2) stop(paste0("The list ", deparse(substitute(differences.control))),
+  if(length(diff) != 2) stop(paste0("The list ", deparse(substitute(diff))),
                                        " must be of length 2", call. = FALSE)
 
-  if(!all(c("group.to.subtract.from", "groups.to.be.subtracted") %in% names(differences.control))){
+  if(!all(c("subtract_from", "subtracted") %in% names(diff))){
 
-    stop(paste0("The list ", deparse(substitute(differences.control))),
-         " must have two elements called 'group.to.subtract.from' and 'groups.to.be.subtracted', respectively", call. = FALSE)
+    stop(paste0("The list ", deparse(substitute(diff))),
+         " must have two elements called 'subtract_from' and 'subtracted', respectively", call. = FALSE)
 
   } # IF
 
 
-  if(!differences.control$group.to.subtract.from %in% c("most", "least")){
-    stop(paste0("The element ", deparse(substitute(differences.control)), "$group.to.subtract.from",
+  if(!diff$subtract_from %in% c("most", "least")){
+    stop(paste0("The element ", deparse(substitute(diff)), "$subtract_from",
          " must be equal to 'most' or 'least'"), call. = FALSE)
   }
 
-  if(!(is.vector(differences.control$groups.to.be.subtracted) | is.numeric(differences.control$groups.to.be.subtracted))){
+  if(!(is.vector(diff$subtracted) | is.numeric(diff$subtracted))){
 
-    stop(paste0(deparse(substitute(differences.control)), "$groups.to.be.subtracted",
+    stop(paste0(deparse(substitute(diff)), "$subtracted",
                 " must be a numeric vector"), call. = FALSE)
 
   }
 
-  if(any(differences.control$groups.to.be.subtracted < 1) | any(differences.control$groups.to.be.subtracted > K)){
-    stop(paste0("The numeric vector ", deparse(substitute(differences.control)), "$groups.to.be.subtracted",
+  if(any(diff$subtracted < 1) | any(diff$subtracted > K)){
+    stop(paste0("The numeric vector ", deparse(substitute(diff)), "$subtracted",
                 " must be a subset of {1,2,...,K}, where K = ", K, " is the number of groups with the supplied arguments (controlled through the argument 'quantile_cutoffs')"), call. = FALSE)
   }
 

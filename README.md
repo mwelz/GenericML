@@ -67,10 +67,10 @@ X1_GATES  <- list(functions_of_Z = c("B"),
                             fixed_effects = NULL)
 
 # consider differences between group K (most affected) with groups 1 and 2, respectively.
-diff_GATES  <- list(group.to.subtract.from = "most",
-                                   groups.to.be.subtracted = c(1,2))
-diff_CLAN  <- list(group.to.subtract.from = "most",
-                                  groups.to.be.subtracted = c(1,2))
+diff_GATES  <- initialize_diff(subtract_from = "most",
+                               subtracted = c(1,2))
+diff_CLAN  <- initialize_diff(subtract_from = "most",
+                               subtracted = c(1,2))
 
 # specify the significance level
 significance_level       <- 0.05

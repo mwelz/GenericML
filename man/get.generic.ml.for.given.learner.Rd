@@ -22,8 +22,8 @@ get.generic.ml.for.given.learner(
   vcov_GATES = list(estimator = "vcovHC", arguments = list(type = "const")),
   equal_variances_CLAN = FALSE,
   quantile_cutoffs = c(0.25, 0.5, 0.75),
-  diff_GATES = list(group.to.subtract.from = "most", groups.to.be.subtracted = 1),
-  diff_CLAN = list(group.to.subtract.from = "most", groups.to.be.subtracted = 1),
+  diff_GATES = initialize_diff(),
+  diff_CLAN = initialize_diff(),
   significance_level = 0.05,
   min_variation = 1e-05
 )
@@ -59,9 +59,9 @@ get.generic.ml.for.given.learner(
 
 \item{quantile_cutoffs}{Cutoff points of quantiles that shall be used for GATES grouping}
 
-\item{diff_GATES}{a list with two elements called 'group.to.subtract.from' and 'groups.to.be.subtracted'. The first element ('group.to.subtract.from') denotes what shall be the base group to subtract from in GATES; either "most" or "least". The second element ('groups.to.be.subtracted') are the groups to be subtracted from 'group.to.subtract.from', which is a subset of {1,...,K}, where K equals the number of groups.}
+\item{diff_GATES}{Controls the generic targets of GATES. See the documentation of \code{\link{initialize_diff}}.}
 
-\item{diff_CLAN}{same as diff_GATES, just for CLAN.}
+\item{diff_CLAN}{Same as \code{diff_GATES}, just for the CLAN generic targets.}
 
 \item{significance_level}{Significance level. Default is 0.05}
 

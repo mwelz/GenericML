@@ -15,8 +15,7 @@ GATES(
   X1.variables = list(functions_of_Z = c("B"), custom_covariates = NULL, fixed_effects
     = NULL),
   vcov.control = list(estimator = "vcovHC", arguments = list(type = "const")),
-  differences.control = list(group.to.subtract.from = "most", groups.to.be.subtracted =
-    1),
+  diff = initialize_diff(),
   significance_level = 0.05
 )
 }
@@ -40,7 +39,7 @@ the group memberships (such a matrix is returned by the function quantile.group(
 
 \item{vcov.control}{a list with two elements called 'estimator' and 'arguments'. The argument 'estimator' is a string specifying the covariance matrix estimator to be used; specifies a covariance estimator function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are "vcovBS", "vcovCL", "vcovHAC", and "vcovHC". Default is 'vcovHC'. The element 'arguments' is a list of arguments that shall be passed to the function specified in the element 'estimator'. Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).}
 
-\item{differences.control}{a list with two elements called 'group.to.subtract.from' and 'groups.to.be.subtracted'. The first element ('group.to.subtract.from') denotes what shall be the base group to subtract from in GATES; either "most" or "least". The second element ('groups.to.be.subtracted') are the groups to be subtracted from 'group.to.subtract.from', which is a subset of {1,...,K}, where K equals the number of groups.}
+\item{diff}{Controls the generic targets of GATES See the documentation of \code{\link{initialize_diff}}.}
 
 \item{significance_level}{significance level for construction of confidence intervals}
 }

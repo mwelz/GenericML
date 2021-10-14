@@ -10,7 +10,7 @@
 #' @param HT logical. If TRUE, a HT transformation is applied (GATES2 in the paper). Default is FALSE.
 #' @param X1.variables a list controlling the variables that shall be used in the matrix X1. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.
 #' @param vcov.control a list with two elements called 'estimator' and 'arguments'. The argument 'estimator' is a string specifying the covariance matrix estimator to be used; specifies a covariance estimator function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are "vcovBS", "vcovCL", "vcovHAC", and "vcovHC". Default is 'vcovHC'. The element 'arguments' is a list of arguments that shall be passed to the function specified in the element 'estimator'. Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
-#' @param differences.control a list with two elements called 'group.to.subtract.from' and 'groups.to.be.subtracted'. The first element ('group.to.subtract.from') denotes what shall be the base group to subtract from in GATES; either "most" or "least". The second element ('groups.to.be.subtracted') are the groups to be subtracted from 'group.to.subtract.from', which is a subset of {1,...,K}, where K equals the number of groups.
+#' @param diff Controls the generic targets of GATES See the documentation of \code{\link{initialize_diff}}.
 #' @param significance_level significance level for construction of confidence intervals
 #' @return GATES coefficients
 #'
@@ -26,8 +26,7 @@ GATES <- function(D, Y,
                                             fixed_effects = NULL),
                   vcov.control        = list(estimator = "vcovHC",
                                             arguments = list(type = "const")),
-                  differences.control = list(group.to.subtract.from = "most",
-                                              groups.to.be.subtracted = 1),
+                  diff = initialize_diff(),
                   significance_level  = 0.05){
 
   # input check
@@ -38,7 +37,7 @@ GATES <- function(D, Y,
   InputChecks_equal.length2(Y, propensity.scores)
   InputChecks_X1(X1.variables)
   InputChecks_vcov.control(vcov.control)
-  InputChecks_differences.control(differences.control, K = ncol(group.membership.main.sample))
+  InputChecks_diff(diff, K = ncol(group.membership.main.sample))
   InputChecks_group.membership(group.membership.main.sample)
 
   # fit model according to strategy 1 or 2 in the paper
@@ -49,7 +48,7 @@ GATES <- function(D, Y,
                  group.membership.main.sample = group.membership.main.sample,
                  X1.variables        = X1.variables,
                  vcov.control        = vcov.control,
-                 differences.control = differences.control,
+                 diff = diff,
                  significance_level  = significance_level)
 
 } # FUN
@@ -67,8 +66,7 @@ GATES_NoChecks <- function(D, Y,
                                                       fixed_effects = NULL),
                            vcov.control        = list(estimator = "vcovHC",
                                                       arguments = list(type = "const")),
-                           differences.control = list(group.to.subtract.from = "most",
-                                                      groups.to.be.subtracted = 1),
+                           diff                = initialize_diff(),
                            significance_level  = 0.05){
 
   # fit model according to strategy 1 or 2 in the paper
@@ -80,7 +78,7 @@ GATES_NoChecks <- function(D, Y,
                       group.membership.main.sample = group.membership.main.sample,
                       X1.variables        = X1.variables,
                       vcov.control        = vcov.control,
-                      differences.control = differences.control,
+                      diff                = diff,
                       significance_level  = significance_level))
 
 } # FUN
@@ -96,8 +94,7 @@ GATES.classic <- function(D, Y,
                                               fixed_effects = NULL),
                           vcov.control       = list(estimator = "vcovHC",
                                                     arguments = list(type = "const")),
-                          differences.control = list(group.to.subtract.from = "most",
-                                                     groups.to.be.subtracted = 1),
+                          diff               = initialize_diff(),
                           significance_level = 0.05){
 
   # make the group membership a binary matrix
@@ -142,7 +139,7 @@ GATES.classic <- function(D, Y,
                                                       K = K,
                                                       vcov = vcov,
                                                       significance_level = significance_level,
-                                                      differences.control = differences.control),
+                                                      diff = diff),
               coefficients = coefficients), class = "GATES"))
 
 } # END FUN
@@ -158,8 +155,7 @@ GATES.HT <- function(D, Y,
                                          fixed_effects = NULL),
                      vcov.control       = list(estimator = "vcovHC",
                                                arguments = list(type = "const")),
-                     differences.control = list(group.to.subtract.from = "most",
-                                                groups.to.be.subtracted = 1),
+                     diff               = initialize_diff(),
                      significance_level = 0.05){
 
   # make the group membership a binary matrix
@@ -225,7 +221,7 @@ GATES.HT <- function(D, Y,
                                                       K = K,
                                                       vcov = vcov,
                                                       significance_level = significance_level,
-                                                      differences.control = differences.control),
+                                                      diff = diff),
               coefficients = coefficients), class = "GATES"))
 
 } # END FUN
@@ -234,11 +230,11 @@ GATES.HT <- function(D, Y,
 # helper function to calculate the generic targets of BLP
 generic.targets_GATES <- function(coeftest.object, K, vcov,
                                   significance_level = 0.05,
-                                  differences.control = differences.control){
+                                  diff = diff){
 
   # extract controls
-  group.to.subtract.from  <- differences.control$group.to.subtract.from
-  groups.to.be.subtracted <- differences.control$groups.to.be.subtracted
+  subtract_from  <- diff$subtract_from
+  subtracted <- diff$subtracted
 
   # extract coefficients
   coefficients.temp <- coeftest.object[paste0("gamma.", 1:K), 1:3]
@@ -261,41 +257,41 @@ generic.targets_GATES <- function(coeftest.object, K, vcov,
                                         "Std. Error", "z value", "Pr(<z)", "Pr(>z)")]
 
   # GATES differences: estimate mean and variance of a difference
-  if(group.to.subtract.from == "least"){
+  if(subtract_from == "least"){
 
-    diff <- coeftest.object["gamma.1", "Estimate"] -
-      coeftest.object[paste0("gamma.", groups.to.be.subtracted), "Estimate"]
+    diff. <- coeftest.object["gamma.1", "Estimate"] -
+      coeftest.object[paste0("gamma.", subtracted), "Estimate"]
 
     diff.se <- as.numeric(
       sqrt(vcov["gamma.1", "gamma.1"] +
-                      diag(vcov[paste0("gamma.", groups.to.be.subtracted),
-                                paste0("gamma.", groups.to.be.subtracted), drop = FALSE]) -
-                      2 * vcov["gamma.1", paste0("gamma.", groups.to.be.subtracted)]))
+                      diag(vcov[paste0("gamma.", subtracted),
+                                paste0("gamma.", subtracted), drop = FALSE]) -
+                      2 * vcov["gamma.1", paste0("gamma.", subtracted)]))
 
-    nam <- paste0("gamma.1-gamma.", groups.to.be.subtracted)
+    nam <- paste0("gamma.1-gamma.", subtracted)
 
   } else{
 
-    diff <- coeftest.object[paste0("gamma.", K), "Estimate"] -
-      coeftest.object[paste0("gamma.", groups.to.be.subtracted), "Estimate"]
+    diff. <- coeftest.object[paste0("gamma.", K), "Estimate"] -
+      coeftest.object[paste0("gamma.", subtracted), "Estimate"]
 
     diff.se <- as.numeric(
       sqrt(vcov[paste0("gamma.", K), paste0("gamma.", K)] +
-                      diag(vcov[paste0("gamma.", groups.to.be.subtracted),
-                                paste0("gamma.", groups.to.be.subtracted), drop = FALSE]) -
-                      2 * vcov[paste0("gamma.", K), paste0("gamma.", groups.to.be.subtracted)]))
+                      diag(vcov[paste0("gamma.", subtracted),
+                                paste0("gamma.", subtracted), drop = FALSE]) -
+                      2 * vcov[paste0("gamma.", K), paste0("gamma.", subtracted)]))
 
-    nam <- paste0("gamma.", K, "-gamma.", groups.to.be.subtracted)
+    nam <- paste0("gamma.", K, "-gamma.", subtracted)
 
   } # IF
 
-  ci.lo   <- diff - z * diff.se
-  ci.up   <- diff + z * diff.se
-  zstat   <- diff / diff.se
+  ci.lo   <- diff. - z * diff.se
+  ci.up   <- diff. + z * diff.se
+  zstat   <- diff. / diff.se
   p.right <- stats::pnorm(zstat, lower.tail = FALSE) # right p-value: Pr(Z>z)
   p.left  <- stats::pnorm(zstat, lower.tail = TRUE)  # left p-value: Pr(Z<z)
 
-  diff.mat <- cbind(diff, ci.lo, ci.up, diff.se, zstat, p.left, p.right)
+  diff.mat <- cbind(diff., ci.lo, ci.up, diff.se, zstat, p.left, p.right)
   rownames(diff.mat) <- nam
 
   # return final matrix

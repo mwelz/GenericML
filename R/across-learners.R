@@ -19,10 +19,8 @@ generic.ml.across.learners <- function(Z, D, Y,
                                        equal_variances_CLAN       = FALSE,
                                        prop_main     = 0.5,
                                        quantile_cutoffs           = c(0.25, 0.5, 0.75),
-                                       diff_GATES                 = list(group.to.subtract.from = "most",
-                                                                         groups.to.be.subtracted = 1),
-                                       diff_CLAN                  = list(group.to.subtract.from = "most",
-                                                                         groups.to.be.subtracted = 1),
+                                       diff_GATES                 = initialize_diff(),
+                                       diff_CLAN                  = initialize_diff(),
                                        significance_level = 0.05,
                                        min_variation = 1e-05,
                                        parallel = .Platform$OS.type == "unix",
@@ -82,10 +80,8 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
                                               equal_variances_CLAN       = FALSE,
                                               prop_main     = 0.5,
                                               quantile_cutoffs           = c(0.25, 0.5, 0.75),
-                                              diff_GATES                 = list(group.to.subtract.from = "most",
-                                                                                groups.to.be.subtracted = 1),
-                                              diff_CLAN                  = list(group.to.subtract.from = "most",
-                                                                                groups.to.be.subtracted = 1),
+                                              diff_GATES                 = initialize_diff(),
+                                              diff_CLAN                  = initialize_diff(),
                                               significance_level = 0.05,
                                               min_variation = 1e-05,
                                               num_cores = parallel::detectCores(), # dead argument here
@@ -228,10 +224,8 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
                                               equal_variances_CLAN       = FALSE,
                                               prop_main     = 0.5,
                                               quantile_cutoffs           = c(0.25, 0.5, 0.75),
-                                              diff_GATES                 = list(group.to.subtract.from = "most",
-                                                                                groups.to.be.subtracted = 1),
-                                              diff_CLAN                  = list(group.to.subtract.from = "most",
-                                                                                groups.to.be.subtracted = 1),
+                                              diff_GATES                 = initialize_diff(),
+                                              diff_CLAN                  = initialize_diff(),
                                               significance_level = 0.05,
                                               min_variation = 1e-05,
                                               num_cores = parallel::detectCores(),
@@ -261,8 +255,8 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
 
   num.vars.in.Z_CLAN <- ncol(Z_CLAN)
   K <- length(quantile_cutoffs) + 1
-  num.generic.targets.gates <- K + length(diff_GATES$groups.to.be.subtracted)
-  num.generic.targets.clan <- K + length(diff_CLAN$groups.to.be.subtracted)
+  num.generic.targets.gates <- K + length(diff_GATES$subtracted)
+  num.generic.targets.clan <- K + length(diff_CLAN$subtracted)
   N     <- length(Y)
   N.set <- 1:N
   num.learners <- length(learners)

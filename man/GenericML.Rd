@@ -18,8 +18,8 @@ GenericML(
   X1_GATES = list(functions_of_Z = c("B"), custom_covariates = NULL, fixed_effects =
     NULL),
   quantile_cutoffs = c(0.25, 0.5, 0.75),
-  diff_GATES = list(group.to.subtract.from = "most", groups.to.be.subtracted = 1),
-  diff_CLAN = list(group.to.subtract.from = "most", groups.to.be.subtracted = 1),
+  diff_GATES = initialize_diff(),
+  diff_CLAN = initialize_diff(),
   vcov_BLP = list(estimator = "vcovHC", arguments = list(type = "const")),
   vcov_GATES = list(estimator = "vcovHC", arguments = list(type = "const")),
   equal_variances_CLAN = FALSE,
@@ -56,7 +56,7 @@ GenericML(
 
 \item{quantile_cutoffs}{The cutoff points of quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.}
 
-\item{diff_GATES}{A list with two elements called \code{group.to.subtract.from} and \code{groups.to.be.subtracted}. The first element (\code{group.to.subtract.from}) denotes what shall be the base group to subtract from in the GATES generic targets; either \code{"most"} or \code{"least"}. The second element (\code{groups.to.be.subtracted}) are the groups to be subtracted from \code{group.to.subtract.from}, which is a subset of \eqn{{1,2,...,K}}, where \eqn{K} equals the number of groups. The number of groups should be consistent with the number of groups induced by the argument \code{quantile_cutoffs}.}
+\item{diff_GATES}{Controls the generic targets of GATES. See the documentation of \code{\link{initialize_diff}}.}
 
 \item{diff_CLAN}{Same as \code{diff_GATES}, just for the CLAN generic targets.}
 

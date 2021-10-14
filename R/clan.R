@@ -4,7 +4,7 @@
 #' @param group.membership.main.sample a logical matrix with _M_ rows that indicate
 #' the group memberships (such a matrix is returned by the function quantile.group())
 #' @param equal.group.variances logical. If TRUE, the the two within-group variances of the most and least affected group are assumed to be equal. Default is FALSE.
-#' @param differences.control a list with two elements called 'group.to.subtract.from' and 'groups.to.be.subtracted'. The first element ('group.to.subtract.from') denotes what shall be the base group to subtract from in CLAN; either "most" or "least". The second element ('groups.to.be.subtracted') are the groups to be subtracted from 'group.to.subtract.from', which is a subset of {1,...,K}, where K equals the number of groups.
+#' @param diff Controls the generic targets of CLAN. See the documentation of \code{\link{initialize_diff}}.
 #' @param significance_level Significance level. Default is 0.05.
 #' @return The two CLAN parameters ("most" affected and "least" affected) for each variable in Z_CLAN.main.sample
 #'
@@ -12,20 +12,19 @@
 CLAN <- function(Z_CLAN.main.sample,
                  group.membership.main.sample,
                  equal.group.variances = FALSE,
-                 differences.control = list(group.to.subtract.from = "most",
-                                            groups.to.be.subtracted = 1),
+                 diff = initialize_diff(),
                  significance_level = 0.05){
 
   # input checks
   InputChecks_group.membership(group.membership.main.sample)
   InputChecks_equal.length2(Z_CLAN.main.sample, group.membership.main.sample)
-  InputChecks_differences.control(differences.control, K = ncol(group.membership.main.sample))
+  InputChecks_diff(diff, K = ncol(group.membership.main.sample))
 
   # run main function
   CLAN_NoChecks(Z_CLAN.main.sample = Z_CLAN.main.sample,
                 group.membership.main.sample = group.membership.main.sample,
                 equal.group.variances = equal.group.variances,
-                differences.control = differences.control,
+                diff = diff,
                 significance_level = significance_level)
 
 } # END FUN
@@ -36,21 +35,20 @@ CLAN <- function(Z_CLAN.main.sample,
 CLAN_NoChecks <- function(Z_CLAN.main.sample,
                           group.membership.main.sample,
                           equal.group.variances = FALSE,
-                          differences.control = list(group.to.subtract.from = "most",
-                                                     groups.to.be.subtracted = 1),
+                          diff = initialize_diff(),
                           significance_level = 0.05){
 
   # extract controls
-  group.to.subtract.from  <- differences.control$group.to.subtract.from
-  groups.to.be.subtracted <- differences.control$groups.to.be.subtracted
+  subtract_from  <- diff$subtract_from
+  subtracted <- diff$subtracted
 
   K <- ncol(group.membership.main.sample)
-  group.base <- ifelse(group.to.subtract.from == "least", 1, K)
+  group.base <- ifelse(subtract_from == "least", 1, K)
 
   # initialize
   generic.targets   <- rep(list(NULL), ncol(Z_CLAN.main.sample))
   clan.coefficients <- matrix(NA_real_,
-                              nrow =  K + length(groups.to.be.subtracted),
+                              nrow =  K + length(subtracted),
                               ncol = ncol(Z_CLAN.main.sample))
   z                 <- stats::qnorm(1-significance_level/2) # the quantile
 
@@ -59,7 +57,7 @@ CLAN_NoChecks <- function(Z_CLAN.main.sample,
 
     # initialize matrix
     out.mat <- matrix(NA_real_,
-                      nrow = K + length(groups.to.be.subtracted),
+                      nrow = K + length(subtracted),
                       ncol = 7)
     ct <- 1 # initialize counter
 
@@ -94,7 +92,7 @@ CLAN_NoChecks <- function(Z_CLAN.main.sample,
 
     ### 2. get summary statistics for differences ----
 
-    for(k in groups.to.be.subtracted){
+    for(k in subtracted){
 
       x <- Z_CLAN.main.sample[group.membership.main.sample[, group.base], j]
       y <- Z_CLAN.main.sample[group.membership.main.sample[, k], j]
@@ -102,7 +100,7 @@ CLAN_NoChecks <- function(Z_CLAN.main.sample,
       if((stats::var(x) == stats::var(y)) & (stats::var(x) == 0)){
 
         # in case of zero variation, t.test() will throw an error. In this case, return uninformative out.mat[ct,]. NB: this bug has been spotted and fixed by Lucas Kitzmueller. All credits for this fix go to him!
-        diff <- ci.lo <- ci.up <- mean(x) - mean(y)
+        diff. <- ci.lo <- ci.up <- mean(x) - mean(y)
         diff.se <- z.diff      <- 0.0
         p.left <- p.right      <- 0.5
 
@@ -110,19 +108,19 @@ CLAN_NoChecks <- function(Z_CLAN.main.sample,
 
         ttest.diff   <- stats::t.test(x = x, y = y,
                                       var.equal = equal.group.variances) # 2-sample t-test
-        diff         <- ifelse(group.base == 1,
+        diff.        <- ifelse(group.base == 1,
                                out.mat[1,1] - out.mat[k,1],
                                out.mat[K,1] - out.mat[k,1])
         diff.se      <- ttest.diff$stderr
-        ci.lo        <- diff - z * diff.se
-        ci.up        <- diff + z * diff.se
+        ci.lo        <- diff. - z * diff.se
+        ci.up        <- diff. + z * diff.se
         z.diff       <- ttest.diff$statistic
         p.right      <- stats::pnorm(z.diff, lower.tail = FALSE) # right p-value: Pr(Z>z)
         p.left       <- stats::pnorm(z.diff, lower.tail = TRUE)  # left p-value: Pr(Z<z)
 
       } # IF
 
-      out.mat[ct,] <- c(diff, ci.lo, ci.up, diff.se, z.diff, p.left, p.right)
+      out.mat[ct,] <- c(diff., ci.lo, ci.up, diff.se, z.diff, p.left, p.right)
       ct           <- ct + 1 # update counter
 
     } # FOR
@@ -132,7 +130,7 @@ CLAN_NoChecks <- function(Z_CLAN.main.sample,
     rownames(out.mat)     <- c(paste0("delta.", 1:K),
                                paste0(
                                  "delta.", group.base, "-",
-                                 "delta.", groups.to.be.subtracted))
+                                 "delta.", subtracted))
     # "delta.K-delta.1")
     generic.targets[[j]]  <- out.mat
     clan.coefficients[,j] <- out.mat[,1]

@@ -8,8 +8,7 @@ CLAN(
   Z_CLAN.main.sample,
   group.membership.main.sample,
   equal.group.variances = FALSE,
-  differences.control = list(group.to.subtract.from = "most", groups.to.be.subtracted =
-    1),
+  diff = initialize_diff(),
   significance_level = 0.05
 )
 }
@@ -21,7 +20,7 @@ the group memberships (such a matrix is returned by the function quantile.group(
 
 \item{equal.group.variances}{logical. If TRUE, the the two within-group variances of the most and least affected group are assumed to be equal. Default is FALSE.}
 
-\item{differences.control}{a list with two elements called 'group.to.subtract.from' and 'groups.to.be.subtracted'. The first element ('group.to.subtract.from') denotes what shall be the base group to subtract from in CLAN; either "most" or "least". The second element ('groups.to.be.subtracted') are the groups to be subtracted from 'group.to.subtract.from', which is a subset of {1,...,K}, where K equals the number of groups.}
+\item{diff}{Controls the generic targets of CLAN. See the documentation of \code{\link{initialize_diff}}.}
 
 \item{significance_level}{Significance level. Default is 0.05.}
 }

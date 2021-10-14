@@ -6,25 +6,25 @@ initializer.for.splits <- function(Z, Z_CLAN, learners,
   # helper function that initializes object in the generic ML splitting procedure
 
   K <- length(quantile_cutoffs) + 1
-  CLAN_group.base  <- ifelse(diff_CLAN$group.to.subtract.from == "least", 1, K)
-  GATES_group.base <- ifelse(diff_GATES$group.to.subtract.from == "least", 1, K)
-  CLAN_groups.to.be.subtracted  <- diff_CLAN$groups.to.be.subtracted
-  GATES_groups.to.be.subtracted <- diff_GATES$groups.to.be.subtracted
+  CLAN_group.base  <- ifelse(diff_CLAN$subtract_from == "least", 1, K)
+  GATES_group.base <- ifelse(diff_GATES$subtract_from == "least", 1, K)
+  CLAN_subtracted  <- diff_CLAN$subtracted
+  GATES_subtracted <- diff_GATES$subtracted
 
-  clan <- array(NA_real_, dim = c(K + length(CLAN_groups.to.be.subtracted), 7, num_splits),
+  clan <- array(NA_real_, dim = c(K + length(CLAN_subtracted), 7, num_splits),
                 dimnames = list(c(paste0("delta.", 1:K),
                                   paste0(
                                     "delta.", CLAN_group.base, "-",
-                                    "delta.", CLAN_groups.to.be.subtracted)),
+                                    "delta.", CLAN_subtracted)),
                                 c("Estimate", "CB lower", "CB upper", "Std. Error",
                                   "z value", "Pr(<z)", "Pr(>z)"),
                                 NULL))
 
-  gates <- array(NA_real_, dim = c(K + length(GATES_groups.to.be.subtracted), 7, num_splits),
+  gates <- array(NA_real_, dim = c(K + length(GATES_subtracted), 7, num_splits),
                  dimnames = list(c(paste0("gamma.", 1:K),
                                    paste0(
                                      "gamma.", GATES_group.base, "-",
-                                     "gamma.", GATES_groups.to.be.subtracted)),
+                                     "gamma.", GATES_subtracted)),
                                  c("Estimate", "CB lower", "CB upper", "Std. Error",
                                    "z value", "Pr(<z)", "Pr(>z)"),
                                  NULL))
@@ -129,4 +129,20 @@ get_clan.3d.ls <- function(num.learners, learners.names, num.generic.targets.cla
 
 } # FUN
 
+
+#' Initializer for the arguments \code{diff_GATES} and \code{diff_CLAN} for the \code{GenericML()} function.
+#'
+#' Returns a list with two elements called \code{subtract_from} and \code{subtracted}. The first element (\code{subtract_from}) denotes what shall be the base group to subtract from in the generic targets of interest (GATES or CLAN); either \code{"most"} or \code{"least"}. The second element (\code{subtracted}) are the groups to be subtracted from \code{subtract_from}, which is a subset of \eqn{{1,2,...,K}}, where \eqn{K} equals the number of groups. The number of groups should be consistent with the number of groups induced by the argument \code{quantile_cutoffs}.
+#'
+#' @param subtract_from String indicating the base group to subtract from, either \code{"most"} (default) or \code{"least"}. The most affected group corresponds to the \eqn{K}-th group in the paper (there are \eqn{K} groups). The least affected group corresponds to the first group.
+#' @param subtracted Vector indicating the groups to be subtracted from the group specified in \code{subtract_from}. If there are \eqn{K} group, \code{subtracted} should be a subset of \eqn{{1,2,...,K}}.
+#'
+#' @export
+initialize_diff <- function(subtract_from = "most",
+                            subtracted = 1){
+
+  list(subtract_from = subtract_from,
+       subtracted = subtracted)
+
+} # FUN
 
