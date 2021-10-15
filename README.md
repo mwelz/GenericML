@@ -79,7 +79,7 @@ significance_level       <- 0.05
 min_variation <- 1e-05
 
 # specify which estimator of the error covariance matrix shall be used in BLP and GATES (standard OLS covariance matrix estimator here)
-vcov_BLP   <- setup_vcov(),
+vcov_BLP   <- setup_vcov()
 vcov_GATES <- setup_vcov()
 
 # specify whether of not it should be assumed that the group variances of the most and least affected groups are equal in CLAN.
