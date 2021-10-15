@@ -92,11 +92,11 @@ quantile.group <- function(x,
 #' @param X1_BLP a list controlling the variables that shall be used in the matrix X1 for the BLP regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The second element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.
 #' @param X1_GATES a list controlling the variables that shall be used in the matrix X1 for the GATES regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The second element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included if no HT transformation is applied so that the regression model has an intercept.
 #' @param HT logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.
-#' @param vcov_BLP a list with two elements called 'estimator' and 'arguments'. The argument 'estimator' is a string specifying the covariance matrix estimator to be used in the BLP regression; specifies a covariance estimator function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are "vcovBS", "vcovCL", "vcovHAC", and "vcovHC". Default is 'vcovHC'. The element 'arguments' is a list of arguments that shall be passed to the function specified in the element 'estimator'. Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
-#' @param vcov_GATES same as vcov_BLP, just for GATES regression
+#' @param vcov_BLP Specifies the covariance matrix estimator in the BLP regression. See the documentation of \code{\link{setup_vcov}} for details.
+#' @param vcov_GATES Same as \code{vcov_BLP}, just for the GATES regression.
 #' @param equal_variances_CLAN logical. If TRUE, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is FALSE.
 #' @param quantile_cutoffs Cutoff points of quantiles that shall be used for GATES grouping
-#' @param diff_GATES Controls the generic targets of GATES. See the documentation of \code{\link{setup_diff}}.
+#' @param diff_GATES Specifies the generic targets of GATES. See the documentation of \code{\link{setup_diff}}.
 #' @param diff_CLAN Same as \code{diff_GATES}, just for the CLAN generic targets.
 #' @param significance_level Significance level. Default is 0.05
 #' @param min_variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
@@ -117,10 +117,8 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                                                                                custom_covariates = NULL,
                                                                                fixed_effects = NULL),
                                              HT                         = FALSE,
-                                             vcov_BLP                   = list(estimator = "vcovHC",
-                                                                            arguments = list(type = "const")),
-                                             vcov_GATES                 = list(estimator = "vcovHC",
-                                                                            arguments = list(type = "const")),
+                                             vcov_BLP                   = setup_vcov(),
+                                             vcov_GATES                 = setup_vcov(),
                                              equal_variances_CLAN       = FALSE,
                                              quantile_cutoffs           = c(0.25, 0.5, 0.75),
                                              diff_GATES                 = setup_diff(),
@@ -179,10 +177,8 @@ get.generic.ml.for.given.learner_NoChecks <-
                                              custom_covariates = NULL,
                                              fixed_effects = NULL),
            HT                         = FALSE,
-           vcov_BLP                   = list(estimator = "vcovHC",
-                                             arguments = list(type = "const")),
-           vcov_GATES                 = list(estimator = "vcovHC",
-                                             arguments = list(type = "const")),
+           vcov_BLP                   = setup_vcov(),
+           vcov_GATES                 = setup_vcov(),
            equal_variances_CLAN       = FALSE,
            quantile_cutoffs           = c(0.25, 0.5, 0.75),
            diff_GATES                 = setup_diff(),

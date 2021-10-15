@@ -18,12 +18,12 @@ get.generic.ml.for.given.learner(
   X1_GATES = list(functions_of_Z = c("B"), custom_covariates = NULL, fixed_effects =
     NULL),
   HT = FALSE,
-  vcov_BLP = list(estimator = "vcovHC", arguments = list(type = "const")),
-  vcov_GATES = list(estimator = "vcovHC", arguments = list(type = "const")),
+  vcov_BLP = setup_vcov(),
+  vcov_GATES = setup_vcov(),
   equal_variances_CLAN = FALSE,
   quantile_cutoffs = c(0.25, 0.5, 0.75),
-  diff_GATES = initialize_diff(),
-  diff_CLAN = initialize_diff(),
+  diff_GATES = setup_diff(),
+  diff_CLAN = setup_diff(),
   significance_level = 0.05,
   min_variation = 1e-05
 )
@@ -51,15 +51,15 @@ get.generic.ml.for.given.learner(
 
 \item{HT}{logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.}
 
-\item{vcov_BLP}{a list with two elements called 'estimator' and 'arguments'. The argument 'estimator' is a string specifying the covariance matrix estimator to be used in the BLP regression; specifies a covariance estimator function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are "vcovBS", "vcovCL", "vcovHAC", and "vcovHC". Default is 'vcovHC'. The element 'arguments' is a list of arguments that shall be passed to the function specified in the element 'estimator'. Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).}
+\item{vcov_BLP}{Specifies the covariance matrix estimator in the BLP regression. See the documentation of \code{\link{setup_vcov}} for details.}
 
-\item{vcov_GATES}{same as vcov_BLP, just for GATES regression}
+\item{vcov_GATES}{Same as \code{vcov_BLP}, just for the GATES regression.}
 
 \item{equal_variances_CLAN}{logical. If TRUE, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is FALSE.}
 
 \item{quantile_cutoffs}{Cutoff points of quantiles that shall be used for GATES grouping}
 
-\item{diff_GATES}{Controls the generic targets of GATES. See the documentation of \code{\link{initialize_diff}}.}
+\item{diff_GATES}{Specifies the generic targets of GATES. See the documentation of \code{\link{setup_diff}}.}
 
 \item{diff_CLAN}{Same as \code{diff_GATES}, just for the CLAN generic targets.}
 

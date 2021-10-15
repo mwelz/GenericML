@@ -130,7 +130,7 @@ get_clan.3d.ls <- function(num.learners, learners.names, num.generic.targets.cla
 } # FUN
 
 
-#' Initializer for the arguments \code{diff_GATES} and \code{diff_CLAN} for the \code{GenericML()} function.
+#' Setup function for the arguments \code{diff_GATES} and \code{diff_CLAN} in the \code{\link{GenericML}} function.
 #'
 #' Returns a list with two elements called \code{subtract_from} and \code{subtracted}. The first element (\code{subtract_from}) denotes what shall be the base group to subtract from in the generic targets of interest (GATES or CLAN); either \code{"most"} or \code{"least"}. The second element (\code{subtracted}) are the groups to be subtracted from \code{subtract_from}, which is a subset of \eqn{{1,2,...,K}}, where \eqn{K} equals the number of groups. The number of groups should be consistent with the number of groups induced by the argument \code{quantile_cutoffs}.
 #'
@@ -146,3 +146,19 @@ setup_diff <- function(subtract_from = "most",
 
 } # FUN
 
+
+#' Setup function for the arguments \code{vcov_BLP} and \code{vcov_GATES} in the \code{\link{GenericML}} function.
+#'
+#' Returns a list with two elements called \code{estimator} and \code{arguments}. The element \code{estimator} is a string specifying the covariance matrix estimator to be used in the linear regression regression of interest and needs to be a covariance estimator function in the \href{https://cran.r-project.org/web/packages/sandwich/}{sandwich} package. The second element, \code{arguments}, is a list of arguments that shall be passed to the function specified in the first element, \code{estimator}.
+#'
+#' @param estimator String specifying a covariance matrix estimator in the \href{https://cran.r-project.org/web/packages/sandwich/}{sandwich}. Default is \code{"vcovHC"}. Recommended estimators are \code{"vcovBS"}, \code{"vcovCL"}, \code{"vcovHAC"}, and \code{"vcovHC"}.
+#' @param arguments A list of arguments that are to be passed to the function in the sandwich package that is specified in \code{estimator}. Default is \code{list(type = "const")}, which specifies the homoskedastic ordinary least squares covariance matrix estimate.
+#'
+#' @export
+setup_vcov <- function(estimator = "vcovHC",
+                       arguments = list(type = "const")){
+
+  list(estimator = estimator,
+       arguments = arguments)
+
+} # FUN

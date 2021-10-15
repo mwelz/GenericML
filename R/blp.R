@@ -7,7 +7,7 @@
 #' @param proxy.cate a vector of proxy CATE estimates of length _M_
 #' @param HT logical. If TRUE, a HT transformation is applied (BLP2 in the paper). Default is FALSE.
 #' @param X1.variables a list controlling the variables that shall be used in the matrix X1. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.
-#' @param vcov_control a list with two elements called 'estimator' and 'arguments'. The argument 'estimator' is a string specifying the covariance matrix estimator to be used; specifies a covariance estimator function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are "vcovBS", "vcovCL", "vcovHAC", and "vcovHC". Default is 'vcovHC'. The element 'arguments' is a list of arguments that shall be passed to the function specified in the element 'estimator'. Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
+#' @param vcov_control Specifies the covariance matrix estimator. See the documentation of \code{\link{setup_vcov}} for details.
 #' @param significance_level significance level for construction of confidence intervals
 #' @return BLP coefficients with inference statements
 #'
@@ -20,8 +20,7 @@ BLP <- function(D, Y,
                 X1.variables       = list(functions_of_Z = c("B"),
                                           custom_covariates = NULL,
                                           fixed_effects = NULL),
-                vcov_control       = list(estimator = "vcovHC",
-                                          arguments = list(type = "const")),
+                vcov_control       = setup_vcov(),
                 significance_level = 0.05){
 
 
@@ -55,8 +54,7 @@ BLP_NoChecks <- function(D, Y,
                          X1.variables       = list(functions_of_Z = c("B"),
                                                    custom_covariates = NULL,
                                                    fixed_effects = NULL),
-                         vcov_control       = list(estimator = "vcovHC",
-                                                   arguments = list(type = "const")),
+                         vcov_control       = setup_vcov(),
                          significance_level = 0.05){
 
   # fit model according to strategy 1 or 2 in the paper
@@ -78,8 +76,7 @@ BLP.classic <- function(D, Y, propensity.scores,
                         X1.variables = list(functions_of_Z = c("B"),
                                             custom_covariates = NULL,
                                             fixed_effects = NULL),
-                        vcov_control       = list(estimator = "vcovHC",
-                                                  arguments = list(type = "const")),
+                        vcov_control       = setup_vcov(),
                         significance_level = 0.05){
 
   # prepare weights
@@ -120,8 +117,7 @@ BLP.HT <- function(D, Y, propensity.scores,
                    X1.variables = list(functions_of_Z = c("B"),
                                        custom_covariates = NULL,
                                        fixed_effects = NULL),
-                   vcov_control       = list(estimator = "vcovHC",
-                                             arguments = list(type = "const")),
+                   vcov_control       = setup_vcov(),
                    significance_level = 0.05){
 
   # HT transformation

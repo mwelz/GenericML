@@ -8,7 +8,7 @@ CLAN(
   Z_CLAN.main.sample,
   group.membership.main.sample,
   equal.group.variances = FALSE,
-  diff = initialize_diff(),
+  diff = setup_diff(),
   significance_level = 0.05
 )
 }
@@ -20,7 +20,7 @@ the group memberships (such a matrix is returned by the function quantile.group(
 
 \item{equal.group.variances}{logical. If TRUE, the the two within-group variances of the most and least affected group are assumed to be equal. Default is FALSE.}
 
-\item{diff}{Controls the generic targets of CLAN. See the documentation of \code{\link{initialize_diff}}.}
+\item{diff}{Controls the generic targets of CLAN. See the documentation of \code{\link{setup_diff}}.}
 
 \item{significance_level}{Significance level. Default is 0.05.}
 }

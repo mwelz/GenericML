@@ -18,10 +18,10 @@ GenericML(
   X1_GATES = list(functions_of_Z = c("B"), custom_covariates = NULL, fixed_effects =
     NULL),
   quantile_cutoffs = c(0.25, 0.5, 0.75),
-  diff_GATES = initialize_diff(),
-  diff_CLAN = initialize_diff(),
-  vcov_BLP = list(estimator = "vcovHC", arguments = list(type = "const")),
-  vcov_GATES = list(estimator = "vcovHC", arguments = list(type = "const")),
+  diff_GATES = setup_diff(),
+  diff_CLAN = setup_diff(),
+  vcov_BLP = setup_vcov(),
+  vcov_GATES = setup_vcov(),
   equal_variances_CLAN = FALSE,
   prop_main = 0.5,
   significance_level = 0.05,
@@ -56,13 +56,13 @@ GenericML(
 
 \item{quantile_cutoffs}{The cutoff points of quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.}
 
-\item{diff_GATES}{Controls the generic targets of GATES. See the documentation of \code{\link{initialize_diff}}.}
+\item{diff_GATES}{Specifies the generic targets of GATES. See the documentation of \code{\link{setup_diff}} for details.}
 
 \item{diff_CLAN}{Same as \code{diff_GATES}, just for the CLAN generic targets.}
 
-\item{vcov_BLP}{A list with two elements called \code{estimator} and \code{arguments}. The element \code{estimator} is a string specifying the covariance matrix estimator to be used in the BLP regression and needs to be a covariance estimator function in the sandwich package (\url{https://cran.r-project.org/web/packages/sandwich/sandwich.pdf}). Recommended estimators are \code{"vcovBS"}, \code{"vcovCL"}, \code{"vcovHAC"}, and \code{"vcovHC"}. Default is \code{"vcovHC"}. The second element \code{arguments} is a list of arguments that shall be passed to the function specified in the first element \code{estimator}. Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (\url{https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf}).}
+\item{vcov_BLP}{Specifies the covariance matrix estimator in the BLP regression. See the documentation of \code{\link{setup_vcov}} for details.}
 
-\item{vcov_GATES}{Same as \code{vcov_BLP}, just for GATES regression.}
+\item{vcov_GATES}{Same as \code{vcov_BLP}, just for the GATES regression.}
 
 \item{equal_variances_CLAN}{Logical. If \code{TRUE}, the the two within-group variances of the differences between the CLAN generic targets are assumed to be equal. Default is \code{FALSE}.}
 
