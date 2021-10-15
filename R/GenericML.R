@@ -13,7 +13,7 @@
 #' @param X1_BLP A list with three elements controlling the variables that shall be used in the matrix \eqn{X_1} for the BLP regression. The first element of the list, \code{functions_of_Z}, needs to be a subset of \code{c("S", "B", "p")}, where \code{"p"} corresponds to the propensity scores, \code{"B"} to the proxy baseline estimates, and \code{"S"} to the proxy CATE estimates. Default is \code{"B"}. The second element, \code{custom_covariates}, is an optional matrix/data frame of custom covariates that shall be included in \eqn{X_1} (default is \code{NULL}). The third element, \code{fixed_effects}, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is \code{NULL} for no fixed effects). Note that in the final matrix \eqn{X1}, a constant 1 will be silently included so that the regression model has an intercept.
 #' @param X1_GATES Same as \code{X1_BLP}, just for the matrix \eqn{X_1} in the GATES regression. Just as in \code{X1_BLP}, a constant 1 will be silently included if no HT transformation is applied so that the GATES regression model has an intercept.
 #' @param quantile_cutoffs The cutoff points of quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.
-#' @param diff_GATES Controls the generic targets of GATES. See the documentation of \code{\link{initialize_diff}}.
+#' @param diff_GATES Controls the generic targets of GATES. See the documentation of \code{\link{setup_diff}}.
 #' @param diff_CLAN Same as \code{diff_GATES}, just for the CLAN generic targets.
 #' @param vcov_BLP A list with two elements called \code{estimator} and \code{arguments}. The element \code{estimator} is a string specifying the covariance matrix estimator to be used in the BLP regression and needs to be a covariance estimator function in the sandwich package (\url{https://cran.r-project.org/web/packages/sandwich/sandwich.pdf}). Recommended estimators are \code{"vcovBS"}, \code{"vcovCL"}, \code{"vcovHAC"}, and \code{"vcovHC"}. Default is \code{"vcovHC"}. The second element \code{arguments} is a list of arguments that shall be passed to the function specified in the first element \code{estimator}. Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (\url{https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf}).
 #' @param vcov_GATES Same as \code{vcov_BLP}, just for GATES regression.
@@ -41,8 +41,8 @@ GenericML <- function(Z, D, Y,
                                                         custom_covariates = NULL,
                                                         fixed_effects = NULL),
                       quantile_cutoffs           = c(0.25, 0.5, 0.75),
-                      diff_GATES                 = initialize_diff(),
-                      diff_CLAN                  = initialize_diff(),
+                      diff_GATES                 = setup_diff(),
+                      diff_CLAN                  = setup_diff(),
                       vcov_BLP                   = list(estimator = "vcovHC",
                                                         arguments = list(type = "const")),
                       vcov_GATES                 = list(estimator = "vcovHC",

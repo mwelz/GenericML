@@ -96,7 +96,7 @@ quantile.group <- function(x,
 #' @param vcov_GATES same as vcov_BLP, just for GATES regression
 #' @param equal_variances_CLAN logical. If TRUE, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is FALSE.
 #' @param quantile_cutoffs Cutoff points of quantiles that shall be used for GATES grouping
-#' @param diff_GATES Controls the generic targets of GATES. See the documentation of \code{\link{initialize_diff}}.
+#' @param diff_GATES Controls the generic targets of GATES. See the documentation of \code{\link{setup_diff}}.
 #' @param diff_CLAN Same as \code{diff_GATES}, just for the CLAN generic targets.
 #' @param significance_level Significance level. Default is 0.05
 #' @param min_variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
@@ -123,8 +123,8 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                                                                             arguments = list(type = "const")),
                                              equal_variances_CLAN       = FALSE,
                                              quantile_cutoffs           = c(0.25, 0.5, 0.75),
-                                             diff_GATES                 = initialize_diff(),
-                                             diff_CLAN                  = initialize_diff(),
+                                             diff_GATES                 = setup_diff(),
+                                             diff_CLAN                  = setup_diff(),
                                              significance_level         = 0.05,
                                              min_variation              = 1e-05){
 
@@ -185,8 +185,8 @@ get.generic.ml.for.given.learner_NoChecks <-
                                              arguments = list(type = "const")),
            equal_variances_CLAN       = FALSE,
            quantile_cutoffs           = c(0.25, 0.5, 0.75),
-           diff_GATES                 = initialize_diff(),
-           diff_CLAN                  = initialize_diff(),
+           diff_GATES                 = setup_diff(),
+           diff_CLAN                  = setup_diff(),
            significance_level         = 0.05,
            min_variation              = 1e-05){
 
@@ -222,7 +222,7 @@ get.generic.ml.for.given.learner_NoChecks <-
       X1.variables       = list(functions_of_Z = X1_BLP$functions_of_Z,
                                 custom_covariates = X1_BLP$custom_covariates[M.set,],
                                 fixed_effects = X1_BLP$fixed_effects[M.set]),
-      vcov.control       = vcov_BLP,
+      vcov_control       = vcov_BLP,
       significance_level = significance_level)
 
 
@@ -244,7 +244,7 @@ get.generic.ml.for.given.learner_NoChecks <-
       X1.variables        = list(functions_of_Z = X1_GATES$functions_of_Z,
                                  custom_covariates = X1_GATES$custom_covariates[M.set,],
                                  fixed_effects = X1_GATES$fixed_effects[M.set]),
-      vcov.control        = vcov_GATES,
+      vcov_control        = vcov_GATES,
       diff                = diff_GATES,
       significance_level  = significance_level)
 

@@ -146,35 +146,35 @@ InputChecks_X1 <- function(X1.variables, num.obs){
 
 
 
-InputChecks_vcov.control <- function(vcov.control){
+InputChecks_vcov.control <- function(vcov_control){
 
-  if(!is.list(vcov.control)) stop(paste0(deparse(substitute(vcov.control))),
+  if(!is.list(vcov_control)) stop(paste0(deparse(substitute(vcov_control))),
                                   " must be a list", call. = FALSE)
 
-  if(length(vcov.control) != 2) stop(paste0("The list ", deparse(substitute(vcov.control))),
+  if(length(vcov_control) != 2) stop(paste0("The list ", deparse(substitute(vcov_control))),
                                      " must be of length 2", call. = FALSE)
 
-  if(!all(c("estimator", "arguments") %in% names(vcov.control))){
+  if(!all(c("estimator", "arguments") %in% names(vcov_control))){
 
-    stop(paste0("The list ", deparse(substitute(vcov.control))),
+    stop(paste0("The list ", deparse(substitute(vcov_control))),
          " must have two elements called 'estimator' and 'arguments', respectively", call. = FALSE)
 
   } # IF
 
 
-  if(!vcov.control$estimator %in% c("vcovBS", "vcovCL", "vcovHAC", "vcovHC")){
-    stop(paste0("The element ", deparse(substitute(vcov.control))), "$estimator",
+  if(!vcov_control$estimator %in% c("vcovBS", "vcovCL", "vcovHAC", "vcovHC")){
+    stop(paste0("The element ", deparse(substitute(vcov_control))), "$estimator",
          " needs to be in c('vcovBS', 'vcovCL', 'vcovHAC', 'vcovHC')", call. = FALSE)
   } # IF
 
-  if(!is.list(vcov.control$arguments)){
+  if(!is.list(vcov_control$arguments)){
 
-    stop(paste0(deparse(substitute(vcov.control))),
+    stop(paste0(deparse(substitute(vcov_control))),
          "$arguments must be a list", call. = FALSE)
 
   } else{
 
-    if(!"type" %in% names(vcov.control$arguments)) stop(paste0("The list ", deparse(substitute(vcov.control))),
+    if(!"type" %in% names(vcov_control$arguments)) stop(paste0("The list ", deparse(substitute(vcov_control))),
                                                  "$arguments must contain an element called 'type'",
                                                  call. = FALSE)
 

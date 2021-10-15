@@ -138,7 +138,7 @@ get_clan.3d.ls <- function(num.learners, learners.names, num.generic.targets.cla
 #' @param subtracted Vector indicating the groups to be subtracted from the group specified in \code{subtract_from}. If there are \eqn{K} group, \code{subtracted} should be a subset of \eqn{{1,2,...,K}}.
 #'
 #' @export
-initialize_diff <- function(subtract_from = "most",
+setup_diff <- function(subtract_from = "most",
                             subtracted = 1){
 
   list(subtract_from = subtract_from,

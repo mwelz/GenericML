@@ -4,7 +4,7 @@
 #' @param group.membership.main.sample a logical matrix with _M_ rows that indicate
 #' the group memberships (such a matrix is returned by the function quantile.group())
 #' @param equal.group.variances logical. If TRUE, the the two within-group variances of the most and least affected group are assumed to be equal. Default is FALSE.
-#' @param diff Controls the generic targets of CLAN. See the documentation of \code{\link{initialize_diff}}.
+#' @param diff Controls the generic targets of CLAN. See the documentation of \code{\link{setup_diff}}.
 #' @param significance_level Significance level. Default is 0.05.
 #' @return The two CLAN parameters ("most" affected and "least" affected) for each variable in Z_CLAN.main.sample
 #'
@@ -12,7 +12,7 @@
 CLAN <- function(Z_CLAN.main.sample,
                  group.membership.main.sample,
                  equal.group.variances = FALSE,
-                 diff = initialize_diff(),
+                 diff = setup_diff(),
                  significance_level = 0.05){
 
   # input checks
@@ -35,7 +35,7 @@ CLAN <- function(Z_CLAN.main.sample,
 CLAN_NoChecks <- function(Z_CLAN.main.sample,
                           group.membership.main.sample,
                           equal.group.variances = FALSE,
-                          diff = initialize_diff(),
+                          diff = setup_diff(),
                           significance_level = 0.05){
 
   # extract controls
