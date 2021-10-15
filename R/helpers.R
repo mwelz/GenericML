@@ -122,13 +122,13 @@ get.vcov <- function(x,
 
 
 # helper function to prepare the custom part of the regressor matrix in BLP and GATES
-get.df.from.X1.variables <- function(functions.of.Z_mat,
-                                     X1.variables){
+get.df.from.X1_control <- function(functions.of.Z_mat,
+                                     X1_control){
 
-  custom        <- X1.variables$custom_covariates
-  fixed.eff     <- X1.variables$fixed_effects
-  out           <- data.frame(functions.of.Z_mat[, X1.variables$functions_of_Z, drop = FALSE])
-  colnames(out) <- X1.variables$functions_of_Z
+  custom        <- X1_control$custom_covariates
+  fixed.eff     <- X1_control$fixed_effects
+  out           <- data.frame(functions.of.Z_mat[, X1_control$functions_of_Z, drop = FALSE])
+  colnames(out) <- X1_control$functions_of_Z
 
   if(!is.null(fixed.eff)) out$fixed.effects <- factor(fixed.eff)
   if(!is.null(custom))    out <- data.frame(out, custom)

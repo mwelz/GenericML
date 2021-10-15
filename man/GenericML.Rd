@@ -8,15 +8,13 @@ GenericML(
   Z,
   D,
   Y,
-  learner_propensity_score = "constant",
   learners_GenericML,
+  learner_propensity_score = "constant",
   num_splits = 100,
   Z_CLAN = NULL,
   HT = FALSE,
-  X1_BLP = list(functions_of_Z = c("B"), custom_covariates = NULL, fixed_effects =
-    NULL),
-  X1_GATES = list(functions_of_Z = c("B"), custom_covariates = NULL, fixed_effects =
-    NULL),
+  X1_BLP = setup_X1(),
+  X1_GATES = setup_X1(),
   quantile_cutoffs = c(0.25, 0.5, 0.75),
   diff_GATES = setup_diff(),
   diff_CLAN = setup_diff(),
@@ -40,9 +38,9 @@ GenericML(
 
 \item{Y}{The response vector.}
 
-\item{learner_propensity_score}{The estimator for the propensity scores. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to \code{'constant'} (estimates the propensity scores by \code{mean(D)}), \code{'elastic.net'}, \code{'random.forest'}, \code{'tree'}, or \code{mlr3} syntax. Note that in case of \code{mlr3} syntax, do \emph{not} specify if the learner is a regression learner or classification learner; Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keyords.}
-
 \item{learners_GenericML}{A vector of strings specifying the machine learners to be used for estimating the BCA and CATE. Either \code{'elastic.net'}, \code{'random.forest'}, or \code{'tree'}. Can alternatively be specified by using \code{mlr3} syntax \emph{without} specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keyords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.}
+
+\item{learner_propensity_score}{The estimator for the propensity scores. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to \code{'constant'} (estimates the propensity scores by \code{mean(D)}), \code{'elastic.net'}, \code{'random.forest'}, \code{'tree'}, or \code{mlr3} syntax. Note that in case of \code{mlr3} syntax, do \emph{not} specify if the learner is a regression learner or classification learner; Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keyords.}
 
 \item{num_splits}{Number of sample splits. Default is 100.}
 
@@ -50,9 +48,9 @@ GenericML(
 
 \item{HT}{Logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.}
 
-\item{X1_BLP}{A list with three elements controlling the variables that shall be used in the matrix \eqn{X_1} for the BLP regression. The first element of the list, \code{functions_of_Z}, needs to be a subset of \code{c("S", "B", "p")}, where \code{"p"} corresponds to the propensity scores, \code{"B"} to the proxy baseline estimates, and \code{"S"} to the proxy CATE estimates. Default is \code{"B"}. The second element, \code{custom_covariates}, is an optional matrix/data frame of custom covariates that shall be included in \eqn{X_1} (default is \code{NULL}). The third element, \code{fixed_effects}, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is \code{NULL} for no fixed effects). Note that in the final matrix \eqn{X1}, a constant 1 will be silently included so that the regression model has an intercept.}
+\item{X1_BLP}{Specifies the design matrix \eqn{X_1} in the BLP regression. See the documentation of \code{\link{setup_X1}} for details.}
 
-\item{X1_GATES}{Same as \code{X1_BLP}, just for the matrix \eqn{X_1} in the GATES regression. Just as in \code{X1_BLP}, a constant 1 will be silently included if no HT transformation is applied so that the GATES regression model has an intercept.}
+\item{X1_GATES}{Same as \code{X1_BLP}, just for the the GATES regression.}
 
 \item{quantile_cutoffs}{The cutoff points of quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.}
 

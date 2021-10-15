@@ -13,10 +13,8 @@ get.generic.ml.for.given.learner(
   M.set,
   A.set,
   Z_CLAN = NULL,
-  X1_BLP = list(functions_of_Z = c("B"), custom_covariates = NULL, fixed_effects =
-    NULL),
-  X1_GATES = list(functions_of_Z = c("B"), custom_covariates = NULL, fixed_effects =
-    NULL),
+  X1_BLP = setup_X1(),
+  X1_GATES = setup_X1(),
   HT = FALSE,
   vcov_BLP = setup_vcov(),
   vcov_GATES = setup_vcov(),
@@ -45,9 +43,9 @@ get.generic.ml.for.given.learner(
 
 \item{Z_CLAN}{A matrix of variables that shall be considered for the CLAN. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.}
 
-\item{X1_BLP}{a list controlling the variables that shall be used in the matrix X1 for the BLP regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The second element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.}
+\item{X1_BLP}{Specifies the design matrix \eqn{X_1} in the BLP regression. See the documentation of \code{\link{setup_X1}} for details.}
 
-\item{X1_GATES}{a list controlling the variables that shall be used in the matrix X1 for the GATES regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The second element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included if no HT transformation is applied so that the regression model has an intercept.}
+\item{X1_GATES}{Same as \code{X1_BLP}, just for the the GATES regression.}
 
 \item{HT}{logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.}
 

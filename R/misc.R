@@ -89,8 +89,8 @@ quantile.group <- function(x,
 #' @param M.set main set
 #' @param A.set auxiliary set
 #' @param Z_CLAN A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z_CLAN = Z`, i.e. CLAN is performed for all variables in `Z`.
-#' @param X1_BLP a list controlling the variables that shall be used in the matrix X1 for the BLP regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The second element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.
-#' @param X1_GATES a list controlling the variables that shall be used in the matrix X1 for the GATES regression. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The second element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included if no HT transformation is applied so that the regression model has an intercept.
+#' @param X1_BLP Specifies the design matrix \eqn{X_1} in the BLP regression. See the documentation of \code{\link{setup_X1}} for details.
+#' @param X1_GATES Same as \code{X1_BLP}, just for the the GATES regression.
 #' @param HT logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.
 #' @param vcov_BLP Specifies the covariance matrix estimator in the BLP regression. See the documentation of \code{\link{setup_vcov}} for details.
 #' @param vcov_GATES Same as \code{vcov_BLP}, just for the GATES regression.
@@ -110,12 +110,8 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
                                              learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',
                                              M.set, A.set,
                                              Z_CLAN                     = NULL,
-                                             X1_BLP                     = list(functions_of_Z = c("B"),
-                                                                               custom_covariates = NULL,
-                                                                               fixed_effects = NULL),
-                                             X1_GATES                   = list(functions_of_Z = c("B"),
-                                                                               custom_covariates = NULL,
-                                                                               fixed_effects = NULL),
+                                             X1_BLP                     = setup_X1(),
+                                             X1_GATES                   = setup_X1(),
                                              HT                         = FALSE,
                                              vcov_BLP                   = setup_vcov(),
                                              vcov_GATES                 = setup_vcov(),
@@ -170,12 +166,8 @@ get.generic.ml.for.given.learner_NoChecks <-
            learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',
            M.set, A.set,
            Z_CLAN                     = NULL,
-           X1_BLP                     = list(functions_of_Z = c("B"),
-                                             custom_covariates = NULL,
-                                             fixed_effects = NULL),
-           X1_GATES                   = list(functions_of_Z = c("B"),
-                                             custom_covariates = NULL,
-                                             fixed_effects = NULL),
+           X1_BLP                     = setup_X1(),
+           X1_GATES                   = setup_X1(),
            HT                         = FALSE,
            vcov_BLP                   = setup_vcov(),
            vcov_GATES                 = setup_vcov(),
@@ -215,9 +207,7 @@ get.generic.ml.for.given.learner_NoChecks <-
       proxy.baseline     = proxy.baseline,
       proxy.cate         = proxy.cate,
       HT                 = HT,
-      X1.variables       = list(functions_of_Z = X1_BLP$functions_of_Z,
-                                custom_covariates = X1_BLP$custom_covariates[M.set,],
-                                fixed_effects = X1_BLP$fixed_effects[M.set]),
+      X1_control       = setup_X1(),
       vcov_control       = vcov_BLP,
       significance_level = significance_level)
 
@@ -237,9 +227,7 @@ get.generic.ml.for.given.learner_NoChecks <-
       proxy.cate          = proxy.cate,
       group.membership.main.sample = group.membership.main.sample,
       HT                  = HT,
-      X1.variables        = list(functions_of_Z = X1_GATES$functions_of_Z,
-                                 custom_covariates = X1_GATES$custom_covariates[M.set,],
-                                 fixed_effects = X1_GATES$fixed_effects[M.set]),
+      X1_control        = setup_X1(),
       vcov_control        = vcov_GATES,
       diff                = diff_GATES,
       significance_level  = significance_level)

@@ -162,3 +162,24 @@ setup_vcov <- function(estimator = "vcovHC",
        arguments = arguments)
 
 } # FUN
+
+
+
+#' Setup function controlling the variables that shall be used in the matrix \eqn{X_1} in the BLP or GATES regression.
+#'
+#' Returns a list with three elements. The first element of the list, \code{functions_of_Z}, controls which functions of matrix \code{Z} are used as regressors. The second element, \code{custom_covariates}, is an optional matrix of custom covariates that shall be included in \eqn{X_1}. The third element, \code{fixed_effects}, controls the inclusion of fixed effects.
+#'
+#' @param functions_of_Z Character string controlling the functions of \code{Z} to be included in \eqn{X_1}. Subset of \code{c("S", "B", "p")}, where \code{"p"} corresponds to the propensity scores, \code{"B"} to the proxy baseline estimates, and \code{"S"} to the proxy CATE estimates. Default is \code{"B"}.
+#' @param custom_covariates Optional matrix containing additional covariates to be included in \eqn{X_1}. Default is \code{NULL}.
+#' @param fixed_effects vector of integers that indicates cluster membership of the observations: For each cluster, a fixed effect will be added. Default is \code{NULL} for no fixed effects.
+#'
+#' @export
+setup_X1 <- function(functions_of_Z = c("B"),
+                     custom_covariates = NULL,
+                     fixed_effects = NULL){
+
+  list(functions_of_Z = functions_of_Z,
+       custom_covariates = custom_covariates,
+       fixed_effects = fixed_effects)
+
+} # FUN

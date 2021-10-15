@@ -59,12 +59,8 @@ num_splits               <- 100
 HT <- FALSE
 
 # A list controlling the variables that shall be used in the matrix X1 for the BLP and GATES regressions. 
-X1_BLP    <- list(functions_of_Z = c("B"),
-                            custom_covariates = NULL,
-                            fixed_effects = NULL)
-X1_GATES  <- list(functions_of_Z = c("B"),
-                            custom_covariates = NULL,
-                            fixed_effects = NULL)
+X1_BLP    <- setup_X1()
+X1_GATES  <- setup_X1()
 
 # consider differences between group K (most affected) with groups 1 and 2, respectively.
 diff_GATES  <- setup_diff(subtract_from = "most",

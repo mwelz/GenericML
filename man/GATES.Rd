@@ -12,8 +12,7 @@ GATES(
   proxy.cate,
   group.membership.main.sample,
   HT = FALSE,
-  X1.variables = list(functions_of_Z = c("B"), custom_covariates = NULL, fixed_effects
-    = NULL),
+  X1_control = setup_X1(),
   vcov_control = setup_vcov(),
   diff = setup_diff(),
   significance_level = 0.05
@@ -35,7 +34,7 @@ the group memberships (such a matrix is returned by the function quantile.group(
 
 \item{HT}{logical. If TRUE, a HT transformation is applied (GATES2 in the paper). Default is FALSE.}
 
-\item{X1.variables}{a list controlling the variables that shall be used in the matrix X1. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.}
+\item{X1_control}{Specifies the design matrix \eqn{X_1} in the regression. See the documentation of \code{\link{setup_X1}} for details.}
 
 \item{vcov_control}{Specifies the covariance matrix estimator. See the documentation of \code{\link{setup_vcov}} for details.}
 

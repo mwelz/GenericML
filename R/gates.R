@@ -8,7 +8,7 @@
 #' @param group.membership.main.sample a logical matrix with _M_ rows that indicate
 #' the group memberships (such a matrix is returned by the function quantile.group())
 #' @param HT logical. If TRUE, a HT transformation is applied (GATES2 in the paper). Default is FALSE.
-#' @param X1.variables a list controlling the variables that shall be used in the matrix X1. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.
+#' @param X1_control Specifies the design matrix \eqn{X_1} in the regression. See the documentation of \code{\link{setup_X1}} for details.
 #' @param vcov_control Specifies the covariance matrix estimator. See the documentation of \code{\link{setup_vcov}} for details.
 #' @param diff Controls the generic targets of GATES See the documentation of \code{\link{setup_diff}}.
 #' @param significance_level significance level for construction of confidence intervals
@@ -20,9 +20,7 @@ GATES <- function(D, Y,
                   proxy.cate,
                   group.membership.main.sample,
                   HT                  = FALSE,
-                  X1.variables        = list(functions_of_Z = c("B"),
-                                            custom_covariates = NULL,
-                                            fixed_effects = NULL),
+                  X1_control        = setup_X1(),
                   vcov_control        = setup_vcov(),
                   diff = setup_diff(),
                   significance_level  = 0.05){
@@ -33,7 +31,7 @@ GATES <- function(D, Y,
   InputChecks_equal.length2(D, Y)
   InputChecks_equal.length3(propensity.scores, proxy.baseline, proxy.cate)
   InputChecks_equal.length2(Y, propensity.scores)
-  InputChecks_X1(X1.variables)
+  InputChecks_X1(X1_control)
   InputChecks_vcov.control(vcov_control)
   InputChecks_diff(diff, K = ncol(group.membership.main.sample))
   InputChecks_group.membership(group.membership.main.sample)
@@ -44,7 +42,7 @@ GATES <- function(D, Y,
                  proxy.baseline      = proxy.baseline,
                  proxy.cate          = proxy.cate,
                  group.membership.main.sample = group.membership.main.sample,
-                 X1.variables        = X1.variables,
+                 X1_control        = X1_control,
                  vcov_control        = vcov_control,
                  diff = diff,
                  significance_level  = significance_level)
@@ -59,9 +57,7 @@ GATES_NoChecks <- function(D, Y,
                            proxy.cate,
                            group.membership.main.sample,
                            HT                  = FALSE,
-                           X1.variables        = list(functions_of_Z = c("B"),
-                                                      custom_covariates = NULL,
-                                                      fixed_effects = NULL),
+                           X1_control        = setup_X1(),
                            vcov_control        = setup_vcov(),
                            diff                = setup_diff(),
                            significance_level  = 0.05){
@@ -73,7 +69,7 @@ GATES_NoChecks <- function(D, Y,
                       proxy.baseline      = proxy.baseline,
                       proxy.cate          = proxy.cate,
                       group.membership.main.sample = group.membership.main.sample,
-                      X1.variables        = X1.variables,
+                      X1_control        = X1_control,
                       vcov_control        = vcov_control,
                       diff                = diff,
                       significance_level  = significance_level))
@@ -86,9 +82,7 @@ GATES.classic <- function(D, Y,
                           propensity.scores,
                           proxy.baseline, proxy.cate,
                           group.membership.main.sample,
-                          X1.variables = list(functions_of_Z = c("B"),
-                                              custom_covariates = NULL,
-                                              fixed_effects = NULL),
+                          X1_control       = setup_X1(),
                           vcov_control       = setup_vcov(),
                           diff               = setup_diff(),
                           significance_level = 0.05){
@@ -103,10 +97,10 @@ GATES.classic <- function(D, Y,
   weights <- 1 / (propensity.scores * (1 - propensity.scores))
 
   # prepare matrix X1
-  X1     <- get.df.from.X1.variables(functions.of.Z_mat = cbind(S = proxy.cate,
+  X1     <- get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy.cate,
                                                                 B = proxy.baseline,
                                                                 p = propensity.scores),
-                                     X1.variables = X1.variables)
+                                     X1_control = X1_control)
 
   # prepare covariate matrix
   X <- data.frame(X1,
@@ -146,9 +140,7 @@ GATES.HT <- function(D, Y,
                      propensity.scores,
                      proxy.baseline, proxy.cate,
                      group.membership.main.sample,
-                     X1.variables = list(functions_of_Z = c("B"),
-                                         custom_covariates = NULL,
-                                         fixed_effects = NULL),
+                     X1_control       = setup_X1(),
                      vcov_control       = setup_vcov(),
                      diff               = setup_diff(),
                      significance_level = 0.05){
@@ -163,13 +155,13 @@ GATES.HT <- function(D, Y,
   H <- (D - propensity.scores) / (propensity.scores * (1 - propensity.scores))
 
   # prepare matrix X1
-  X1 <- get.df.from.X1.variables(functions.of.Z_mat = cbind(S = proxy.cate,
+  X1 <- get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy.cate,
                                                             B = proxy.baseline,
                                                             p = propensity.scores),
-                                 X1.variables = X1.variables)
+                                 X1_control = X1_control)
 
   # construct the matrix X1H (the fixed effects are not multiplied by H, if applicable)
-  if(is.null(X1.variables$fixed_effects)){
+  if(is.null(X1_control$fixed_effects)){
 
     # matrix X_1 * H
     X1H           <- X1 * H

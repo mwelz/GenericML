@@ -6,7 +6,7 @@
 #' @param proxy.baseline a vector of proxy baseline estimates of length _M_
 #' @param proxy.cate a vector of proxy CATE estimates of length _M_
 #' @param HT logical. If TRUE, a HT transformation is applied (BLP2 in the paper). Default is FALSE.
-#' @param X1.variables a list controlling the variables that shall be used in the matrix X1. The first element of the list, functions_of_Z, needs to be a subset of c("S", "B", "p"), where "p" corresponds to the propensity scores (default is "B"). The seconds element, custom_covariates, is an optional matrix/data frame of custom covariates that shall be included in X1 (default is NULL). The third element, fixed_effects, is a vector of integers that indicates group membership of the observations: For each group, a fixed effect will be added (default is NULL for no fixed effects). Note that in the final matrix X1, a constant 1 will be silently included so that the regression model has an intercept.
+#' @param X1_control Specifies the design matrix \eqn{X_1} in the regression. See the documentation of \code{\link{setup_X1}} for details.
 #' @param vcov_control Specifies the covariance matrix estimator. See the documentation of \code{\link{setup_vcov}} for details.
 #' @param significance_level significance level for construction of confidence intervals
 #' @return BLP coefficients with inference statements
@@ -17,9 +17,7 @@ BLP <- function(D, Y,
                 proxy.baseline,
                 proxy.cate,
                 HT  = FALSE,
-                X1.variables       = list(functions_of_Z = c("B"),
-                                          custom_covariates = NULL,
-                                          fixed_effects = NULL),
+                X1_control       = setup_X1(),
                 vcov_control       = setup_vcov(),
                 significance_level = 0.05){
 
@@ -31,14 +29,14 @@ BLP <- function(D, Y,
   InputChecks_equal.length2(proxy.baseline, proxy.cate)
   InputChecks_equal.length2(proxy.baseline, Y)
   InputChecks_vcov.control(vcov_control)
-  InputChecks_X1(X1.variables)
+  InputChecks_X1(X1_control)
 
   # fit model according to strategy 1 or 2 in the paper
   BLP_NoChecks(D = D, Y = Y,
                propensity.scores  = propensity.scores,
                proxy.baseline     = proxy.baseline,
                proxy.cate         = proxy.cate,
-               X1.variables       = X1.variables,
+               X1_control       = X1_control,
                vcov_control       = vcov_control,
                significance_level = significance_level)
 
@@ -51,9 +49,7 @@ BLP_NoChecks <- function(D, Y,
                          proxy.baseline,
                          proxy.cate,
                          HT  = FALSE,
-                         X1.variables       = list(functions_of_Z = c("B"),
-                                                   custom_covariates = NULL,
-                                                   fixed_effects = NULL),
+                         X1_control       = setup_X1(),
                          vcov_control       = setup_vcov(),
                          significance_level = 0.05){
 
@@ -63,7 +59,7 @@ BLP_NoChecks <- function(D, Y,
                       propensity.scores  = propensity.scores,
                       proxy.baseline     = proxy.baseline,
                       proxy.cate         = proxy.cate,
-                      X1.variables       = X1.variables,
+                      X1_control       = X1_control,
                       vcov_control       = vcov_control,
                       significance_level = significance_level))
 
@@ -73,9 +69,7 @@ BLP_NoChecks <- function(D, Y,
 # helper function for case when there is no HT transformation used. Wrapped by function "BLP"
 BLP.classic <- function(D, Y, propensity.scores,
                         proxy.baseline, proxy.cate,
-                        X1.variables = list(functions_of_Z = c("B"),
-                                            custom_covariates = NULL,
-                                            fixed_effects = NULL),
+                        X1_control       = setup_X1(),
                         vcov_control       = setup_vcov(),
                         significance_level = 0.05){
 
@@ -83,10 +77,10 @@ BLP.classic <- function(D, Y, propensity.scores,
   weights <- 1 / (propensity.scores * (1 - propensity.scores))
 
   # prepare covariate matrix X
-  X <- data.frame(get.df.from.X1.variables(functions.of.Z_mat = cbind(S = proxy.cate,
+  X <- data.frame(get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy.cate,
                                                                       B = proxy.baseline,
                                                                       p = propensity.scores),
-                                           X1.variables = X1.variables),
+                                           X1_control = X1_control),
                   beta.1 = D - propensity.scores,
                   beta.2 = (D - propensity.scores) * (proxy.cate - mean(proxy.cate)))
 
@@ -114,9 +108,7 @@ BLP.classic <- function(D, Y, propensity.scores,
 # helper function for case when there is a HT transformation used. Wrapped by function "BLP"
 BLP.HT <- function(D, Y, propensity.scores,
                    proxy.baseline, proxy.cate,
-                   X1.variables = list(functions_of_Z = c("B"),
-                                       custom_covariates = NULL,
-                                       fixed_effects = NULL),
+                   X1_control       = setup_X1(),
                    vcov_control       = setup_vcov(),
                    significance_level = 0.05){
 
@@ -124,25 +116,25 @@ BLP.HT <- function(D, Y, propensity.scores,
   H <- (D - propensity.scores) / (propensity.scores * (1 - propensity.scores))
 
   # prepare matrix X1
-  X1 <- get.df.from.X1.variables(functions.of.Z_mat = cbind(S = proxy.cate,
-                                                            B = proxy.baseline,
-                                                            p = propensity.scores),
-                                 X1.variables = X1.variables)
+  X1. <- get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy.cate,
+                                                             B = proxy.baseline,
+                                                             p = propensity.scores),
+                                 X1_control = X1_control)
 
 
   # construct the matrix X1H (the fixed effects are not multiplied by H, if applicable)
-  if(is.null(X1.variables$fixed_effects)){
+  if(is.null(X1_control$fixed_effects)){
 
     # matrix X_1 * H
-    X1H           <- X1 * H
-    colnames(X1H) <- paste0(colnames(X1), ".H")
+    X1H           <- X1. * H
+    colnames(X1H) <- paste0(colnames(X1.), ".H")
 
   } else{
 
-    fixed.effects     <- X1$fixed.effects  # retain the fixed effects
-    X1                <- X1[,!colnames(X1) %in% "fixed.effects", drop = FALSE]
-    X1H               <- X1 * H
-    colnames(X1H)     <- paste0(colnames(X1), ".H")
+    fixed.effects     <- X1.$fixed.effects  # retain the fixed effects
+    X1.               <- X1.[,!colnames(X1.) %in% "fixed.effects", drop = FALSE]
+    X1H               <- X1. * H
+    colnames(X1H)     <- paste0(colnames(X1.), ".H")
     X1H$fixed.effects <- fixed.effects # append the fixed effects
 
   } # IF
