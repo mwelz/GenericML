@@ -76,30 +76,30 @@ InputChecks_Z_CLAN <- function(Z_CLAN){
 # helper that throws error in case of illegal input in 'X1_control'
 InputChecks_X1 <- function(X1_control, num.obs){
 
-  if(!all(c("functions_of_Z", "custom_covariates", "fixed_effects") %in% names(X1_control))){
+  if(!all(c("funs_Z", "covariates", "fixed_effects") %in% names(X1_control))){
       stop(paste0("The list ", deparse(substitute(X1_control)), "must consist of three elements called ",
-                  "'functions_of_Z', 'custom_covariates', and 'fixed_effects"), call. = FALSE)
+                  "'funs_Z', 'covariates', and 'fixed_effects"), call. = FALSE)
     } # IF
 
 
-  if(!(is.matrix(X1_control$custom_covariates) | is.vector(X1_control$custom_covariates) | is.null(X1_control$custom_covariates))){
-    stop(paste0(deparse(substitute(X1_control)), "$custom_covariates must be either NULL, a vector, or a matrix"), call. = FALSE)
+  if(!(is.matrix(X1_control$covariates) | is.vector(X1_control$covariates) | is.null(X1_control$covariates))){
+    stop(paste0(deparse(substitute(X1_control)), "$covariates must be either NULL, a vector, or a matrix"), call. = FALSE)
   } # IF
 
 
-  if(!is.null(X1_control$custom_covariates)){
-    if(!is.numeric(X1_control$custom_covariates)) stop(paste0(deparse(substitute(X1_control)), "$custom_covariates must be numeric or NULL"), call. = FALSE)
+  if(!is.null(X1_control$covariates)){
+    if(!is.numeric(X1_control$covariates)) stop(paste0(deparse(substitute(X1_control)), "$covariates must be numeric or NULL"), call. = FALSE)
 
-    if(is.vector(X1_control$custom_covariates)){
+    if(is.vector(X1_control$covariates)){
 
-      if(length(X1_control$custom_covariates) != num.obs){
-        stop(paste0(deparse(substitute(X1_control)), "$custom_covariates must be NULL or of the same length as Y"), call. = FALSE)
+      if(length(X1_control$covariates) != num.obs){
+        stop(paste0(deparse(substitute(X1_control)), "$covariates must be NULL or of the same length as Y"), call. = FALSE)
       } # IF
 
     } else{
 
-      if(nrow(X1_control$custom_covariates) != num.obs){
-        stop(paste0(deparse(substitute(X1_control)), "$custom_covariates must be NULL or of the same length as Y"), call. = FALSE)
+      if(nrow(X1_control$covariates) != num.obs){
+        stop(paste0(deparse(substitute(X1_control)), "$covariates must be NULL or of the same length as Y"), call. = FALSE)
       } # IF
 
     } # IF
@@ -127,14 +127,14 @@ InputChecks_X1 <- function(X1_control, num.obs){
   } # IF
 
 
-  legalinput <- X1_control$functions_of_Z %in% c("S", "B", "p")
+  legalinput <- X1_control$funs_Z %in% c("S", "B", "p")
 
   if(!all(legalinput)){
 
     stop(paste0("Entries '",
-                paste(X1_control$functions_of_Z[!legalinput], collapse = "', '"),
+                paste(X1_control$funs_Z[!legalinput], collapse = "', '"),
                 "' of ", deparse(substitute(X1_control)),
-                "$functions_of_Z are not contained in c('S', 'B', 'p')!"), call. = FALSE)
+                "$funs_Z are not contained in c('S', 'B', 'p')!"), call. = FALSE)
 
   } # IF
 

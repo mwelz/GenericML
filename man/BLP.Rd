@@ -2,14 +2,14 @@
 % Please edit documentation in R/blp.R
 \name{BLP}
 \alias{BLP}
-\title{Estimates the BLP parameters based on the main sample M.}
+\title{Performs BLP regression.}
 \usage{
 BLP(
-  D,
   Y,
+  D,
   propensity_scores,
-  proxy.baseline,
-  proxy.cate,
+  proxy_baseline,
+  proxy_CATE,
   HT = FALSE,
   X1_control = setup_X1(),
   vcov_control = setup_vcov(),
@@ -17,17 +17,17 @@ BLP(
 )
 }
 \arguments{
-\item{D}{a binary vector of treatment status of length \emph{|M|}}
+\item{Y}{a vector of responses.}
 
-\item{Y}{a vector of responses of length \emph{|M|}}
+\item{D}{a binary vector of treatment status.}
 
-\item{propensity_scores}{a vector of propensity scores of length \emph{|M|}}
+\item{propensity_scores}{a vector of propensity scores.}
 
-\item{proxy.baseline}{a vector of proxy baseline estimates of length \emph{M}}
+\item{proxy_baseline}{a vector of proxy baseline estimates.}
 
-\item{proxy.cate}{a vector of proxy CATE estimates of length \emph{M}}
+\item{proxy_CATE}{a vector of proxy CATE estimates.}
 
-\item{HT}{logical. If TRUE, a HT transformation is applied (BLP2 in the paper). Default is FALSE.}
+\item{HT}{logical. If \code{TRUE}, a HT transformation is applied (BLP2 in the paper). Default is \code{FALSE}.}
 
 \item{X1_control}{Specifies the design matrix \eqn{X_1} in the regression. See the documentation of \code{\link{setup_X1}} for details.}
 
@@ -36,8 +36,8 @@ BLP(
 \item{significance_level}{significance level for construction of confidence intervals}
 }
 \value{
-BLP coefficients with inference statements
+An object of the class "BLP".
 }
 \description{
-Estimates the BLP parameters based on the main sample M.
+Performs the linear regression for the "best linear predictor" procedure.
 }

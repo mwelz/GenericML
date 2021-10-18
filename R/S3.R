@@ -12,14 +12,14 @@ print.GenericML <- function(x, ...){
   cat("\t*", ifelse(x$arguments$HT, "A", "No"), "HT transformation is used\n")
   cat("\nThe", 100 * (1-2*x$arguments$significance_level), "% confidence bounds of the best BLP estimates are given by\n")
   cat("\t beta.1: (",
-      round(x$VEIN$best.learners$BLP["beta.1", "CB lower"], 3), ",",
-      round(x$VEIN$best.learners$BLP["beta.1", "CB upper"], 3), ")")
+      round(x$VEIN$best_learners$BLP["beta.1", "CB lower"], 3), ",",
+      round(x$VEIN$best_learners$BLP["beta.1", "CB upper"], 3), ")")
   cat("\t beta.2: (",
-      round(x$VEIN$best.learners$BLP["beta.2", "CB lower"], 3), ",",
-      round(x$VEIN$best.learners$BLP["beta.2", "CB upper"], 3), ")\n")
-  cat("The best learner for the CATE is ", x$best.learners$best.learner.for.CATE,
-      " (lambda of ", round(max(x$best.learners$lambda.overview[,"lambda"]), 3), ")\n",
-      "The best learner for the GATES and CLAN is ", x$best.learners$best.learner.for.GATES,
-      " (lambda.bar of ", round(max(x$best.learners$lambda.overview[,"lambda.bar"]), 3), ")", sep = "")
+      round(x$VEIN$best_learners$BLP["beta.2", "CB lower"], 3), ",",
+      round(x$VEIN$best_learners$BLP["beta.2", "CB upper"], 3), ")\n")
+  cat("The best learner for the CATE is ", x$best_learners$CATE,
+      " (lambda of ", round(max(x$best_learners$lambda[,"lambda"]), 3), ")\n",
+      "The best learner for the GATES and CLAN is ", x$best_learners$GATES,
+      " (lambda.bar of ", round(max(x$best_learners$lambda[,"lambda.bar"]), 3), ")", sep = "")
 
 } # FUN

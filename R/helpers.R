@@ -29,9 +29,9 @@ get.best.learners <- function(generic.ml.across.learners.obj){
                           function(learner) apply(generic.ml.across.learners.obj[[learner]]$best, c(1,2), stats::median))
   rownames(best.analysis) <- c("lambda", "lambda.bar")
 
-  return(list(best.learner.for.CATE  = learners[which.max(best.analysis["lambda", ])],
-              best.learner.for.GATES = learners[which.max(best.analysis["lambda.bar", ])],
-              lambda.overview = t(best.analysis)))
+  return(list(CATE   = learners[which.max(best.analysis["lambda", ])],
+              GATES  = learners[which.max(best.analysis["lambda.bar", ])],
+              lambda = t(best.analysis)))
 
 } # END FUN
 
@@ -95,10 +95,10 @@ VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
   } # FOR learners
 
 
-  return(list(best.learners = list(BLP = gen.ml.ls$BLP[[best.learners.obj$best.learner.for.CATE]],
-                                   GATES = gen.ml.ls$GATES[[best.learners.obj$best.learner.for.GATES]],
-                                   CLAN = gen.ml.ls$CLAN[[best.learners.obj$best.learner.for.GATES]]),
-              all.learners = gen.ml.ls))
+  return(list(best_learners = list(BLP = gen.ml.ls$BLP[[best.learners.obj$CATE]],
+                                   GATES = gen.ml.ls$GATES[[best.learners.obj$GATES]],
+                                   CLAN = gen.ml.ls$CLAN[[best.learners.obj$GATES]]),
+              all_learners = gen.ml.ls))
 
 } # END FUN
 
@@ -125,10 +125,10 @@ get.vcov <- function(x,
 get.df.from.X1_control <- function(functions.of.Z_mat,
                                      X1_control){
 
-  custom        <- X1_control$custom_covariates
+  custom        <- X1_control$covariates
   fixed.eff     <- X1_control$fixed_effects
-  out           <- data.frame(functions.of.Z_mat[, X1_control$functions_of_Z, drop = FALSE])
-  colnames(out) <- X1_control$functions_of_Z
+  out           <- data.frame(functions.of.Z_mat[, X1_control$funs_Z, drop = FALSE])
+  colnames(out) <- X1_control$funs_Z
 
   if(!is.null(fixed.eff)) out$fixed.effects <- factor(fixed.eff)
   if(!is.null(custom))    out <- data.frame(out, custom)

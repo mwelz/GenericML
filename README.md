@@ -123,26 +123,26 @@ genML <- GenericML(Z = Z, D = D, Y = Y,
 
 ### 4. Analyze the output ----
 # the line below returns the medians of the estimated  \Lambda and \bar{\Lambda}
-genML$best.learners$lambda.overview
+genML$best_learners$lambda
 
 # Get best learner for CATE
-genML$best.learners$best.learner.for.CATE
+genML$best_learners$CATE
 
 # Get best learner for GATES
-genML$best.learners$best.learner.for.GATES
+genML$best_learners$GATES
 
 # VEIN of BLP
-genML$VEIN$best.learners$BLP
+genML$VEIN$best_learners$BLP
 plot(genML, type = "BLP", title = "VEIN of BLP") # plot.GenericML() method
 # No indication of treatment effect heterogeneity; see beta.2 coefficient
 
 # VEIN of GATES
-genML$VEIN$best.learners$GATES
+genML$VEIN$best_learners$GATES
 plot(genML, type = "GATES", title = "VEIN of GATES")
 # No indication of heterogeneity
 
 # VEIN of CLAN for variable 'z1'
-genML$VEIN$best.learners$CLAN$z1
+genML$VEIN$best_learners$CLAN$z1
 plot(genML, type = "CLAN", CLAN.variable = "z1", title = "CLAN of 'z1'")
 # No indication of heterogeneity
 

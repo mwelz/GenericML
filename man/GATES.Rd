@@ -5,11 +5,11 @@
 \title{Estimates the GATES parameters based on the main sample M.}
 \usage{
 GATES(
-  D,
   Y,
+  D,
   propensity_scores,
-  proxy.baseline,
-  proxy.cate,
+  proxy_baseline,
+  proxy_CATE,
   group.membership.main.sample,
   HT = FALSE,
   X1_control = setup_X1(),
@@ -19,15 +19,15 @@ GATES(
 )
 }
 \arguments{
-\item{D}{a binary vector of treatment status of length \emph{|M|}}
-
 \item{Y}{a vector of responses of length \emph{|M|}}
+
+\item{D}{a binary vector of treatment status of length \emph{|M|}}
 
 \item{propensity_scores}{a vector of propensity scores of length \emph{|M|}}
 
-\item{proxy.baseline}{a vector of proxy baseline estimates of length \emph{M}}
+\item{proxy_baseline}{a vector of proxy baseline estimates of length \emph{M}}
 
-\item{proxy.cate}{a vector of proxy CATE estimates of length \emph{M}}
+\item{proxy_CATE}{a vector of proxy CATE estimates of length \emph{M}}
 
 \item{group.membership.main.sample}{a logical matrix with \emph{M} rows that indicate
 the group memberships (such a matrix is returned by the function quantile_group())}

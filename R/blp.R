@@ -1,23 +1,25 @@
-#' Estimates the BLP parameters based on the main sample M.
+#' Performs BLP regression.
 #'
-#' @param D a binary vector of treatment status of length _|M|_
-#' @param Y a vector of responses of length _|M|_
-#' @param propensity_scores a vector of propensity scores of length _|M|_
-#' @param proxy.baseline a vector of proxy baseline estimates of length _M_
-#' @param proxy.cate a vector of proxy CATE estimates of length _M_
-#' @param HT logical. If TRUE, a HT transformation is applied (BLP2 in the paper). Default is FALSE.
+#' Performs the linear regression for the "best linear predictor" procedure.
+#'
+#' @param Y a vector of responses.
+#' @param D a binary vector of treatment status.
+#' @param propensity_scores a vector of propensity scores.
+#' @param proxy_baseline a vector of proxy baseline estimates.
+#' @param proxy_CATE a vector of proxy CATE estimates.
+#' @param HT logical. If \code{TRUE}, a HT transformation is applied (BLP2 in the paper). Default is \code{FALSE}.
 #' @param X1_control Specifies the design matrix \eqn{X_1} in the regression. See the documentation of \code{\link{setup_X1}} for details.
 #' @param vcov_control Specifies the covariance matrix estimator. See the documentation of \code{\link{setup_vcov}} for details.
 #' @param significance_level significance level for construction of confidence intervals
-#' @return BLP coefficients with inference statements
+#' @return An object of the class "BLP".
 #'
 #' @export
-BLP <- function(D, Y,
+BLP <- function(Y, D,
                 propensity_scores,
-                proxy.baseline,
-                proxy.cate,
-                HT  = FALSE,
-                X1_control       = setup_X1(),
+                proxy_baseline,
+                proxy_CATE,
+                HT                 = FALSE,
+                X1_control         = setup_X1(),
                 vcov_control       = setup_vcov(),
                 significance_level = 0.05){
 
@@ -26,17 +28,17 @@ BLP <- function(D, Y,
   InputChecks_Y(Y)
   InputChecks_D(D)
   InputChecks_equal.length2(Y, D)
-  InputChecks_equal.length2(proxy.baseline, proxy.cate)
-  InputChecks_equal.length2(proxy.baseline, Y)
+  InputChecks_equal.length2(proxy_baseline, proxy_CATE)
+  InputChecks_equal.length2(proxy_baseline, Y)
   InputChecks_vcov.control(vcov_control)
   InputChecks_X1(X1_control)
 
   # fit model according to strategy 1 or 2 in the paper
   BLP_NoChecks(D = D, Y = Y,
                propensity_scores  = propensity_scores,
-               proxy.baseline     = proxy.baseline,
-               proxy.cate         = proxy.cate,
-               X1_control       = X1_control,
+               proxy_baseline     = proxy_baseline,
+               proxy_CATE         = proxy_CATE,
+               X1_control         = X1_control,
                vcov_control       = vcov_control,
                significance_level = significance_level)
 
@@ -46,8 +48,8 @@ BLP <- function(D, Y,
 # helper function to perform BLP w/o input checks
 BLP_NoChecks <- function(D, Y,
                          propensity_scores,
-                         proxy.baseline,
-                         proxy.cate,
+                         proxy_baseline,
+                         proxy_CATE,
                          HT  = FALSE,
                          X1_control       = setup_X1(),
                          vcov_control       = setup_vcov(),
@@ -57,8 +59,8 @@ BLP_NoChecks <- function(D, Y,
   do.call(what = get(ifelse(HT, "BLP.HT", "BLP.classic")),
           args = list(D = D, Y = Y,
                       propensity_scores  = propensity_scores,
-                      proxy.baseline     = proxy.baseline,
-                      proxy.cate         = proxy.cate,
+                      proxy_baseline     = proxy_baseline,
+                      proxy_CATE         = proxy_CATE,
                       X1_control       = X1_control,
                       vcov_control       = vcov_control,
                       significance_level = significance_level))
@@ -68,8 +70,8 @@ BLP_NoChecks <- function(D, Y,
 
 # helper function for case when there is no HT transformation used. Wrapped by function "BLP"
 BLP.classic <- function(D, Y, propensity_scores,
-                        proxy.baseline, proxy.cate,
-                        X1_control       = setup_X1(),
+                        proxy_baseline, proxy_CATE,
+                        X1_control         = setup_X1(),
                         vcov_control       = setup_vcov(),
                         significance_level = 0.05){
 
@@ -77,12 +79,12 @@ BLP.classic <- function(D, Y, propensity_scores,
   weights <- 1 / (propensity_scores * (1 - propensity_scores))
 
   # prepare covariate matrix X
-  X <- data.frame(get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy.cate,
-                                                                      B = proxy.baseline,
+  X <- data.frame(get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy_CATE,
+                                                                      B = proxy_baseline,
                                                                       p = propensity_scores),
                                            X1_control = X1_control),
                   beta.1 = D - propensity_scores,
-                  beta.2 = (D - propensity_scores) * (proxy.cate - mean(proxy.cate)))
+                  beta.2 = (D - propensity_scores) * (proxy_CATE - mean(proxy_CATE)))
 
   # fit weighted linear regression by OLS
   blp.obj <- stats::lm(Y ~., data = data.frame(Y, X), weights = weights)
@@ -97,9 +99,9 @@ BLP.classic <- function(D, Y, propensity_scores,
   # return
   return(structure(
     list(lm.obj = blp.obj,
-              blp.coefficients = blp.obj$coefficients[c("beta.1", "beta.2")],
-              generic.targets = generic.targets_BLP(coefficients, significance_level = significance_level),
-              coefficients = coefficients), class = "BLP"))
+         blp.coefficients = blp.obj$coefficients[c("beta.1", "beta.2")],
+         generic.targets = generic.targets_BLP(coefficients, significance_level = significance_level),
+         coefficients = coefficients), class = "BLP"))
 
 } # END FUN
 
@@ -107,7 +109,7 @@ BLP.classic <- function(D, Y, propensity_scores,
 
 # helper function for case when there is a HT transformation used. Wrapped by function "BLP"
 BLP.HT <- function(D, Y, propensity_scores,
-                   proxy.baseline, proxy.cate,
+                   proxy_baseline, proxy_CATE,
                    X1_control       = setup_X1(),
                    vcov_control       = setup_vcov(),
                    significance_level = 0.05){
@@ -116,8 +118,8 @@ BLP.HT <- function(D, Y, propensity_scores,
   H <- (D - propensity_scores) / (propensity_scores * (1 - propensity_scores))
 
   # prepare matrix X1
-  X1. <- get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy.cate,
-                                                             B = proxy.baseline,
+  X1. <- get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy_CATE,
+                                                             B = proxy_baseline,
                                                              p = propensity_scores),
                                  X1_control = X1_control)
 
@@ -141,7 +143,7 @@ BLP.HT <- function(D, Y, propensity_scores,
 
   # prepare covariate matrix X
   X <- data.frame(X1H,
-                  beta.2 = proxy.cate - mean(proxy.cate))
+                  beta.2 = proxy_CATE - mean(proxy_CATE))
 
   # fit linear regression by OLS (intercept is beta.1)
   blp.obj <- stats::lm(YH ~., data = data.frame(YH = Y*H, X))

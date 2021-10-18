@@ -28,7 +28,7 @@ plot.GenericML <- function(x,
   if(type == "CLAN"){
 
     if(is.null(CLAN.variable)) stop("No CLAN variable specified")
-    if(!CLAN.variable %in% names(GenericML.obj$VEIN$best.learners$CLAN)) stop("This variable was not used for CLAN.")
+    if(!CLAN.variable %in% names(GenericML.obj$VEIN$best_learners$CLAN)) stop("This variable was not used for CLAN.")
 
   } # IF
 
@@ -36,12 +36,12 @@ plot.GenericML <- function(x,
 
   if(learner == "best" & type != "CLAN"){
 
-    data <- GenericML.obj$VEIN$best.learners[[type]]
+    data <- GenericML.obj$VEIN$best_learners[[type]]
 
 
   } else if(learner == "best" & type == "CLAN"){
 
-    data <- GenericML.obj$VEIN$best.learners[[type]][[CLAN.variable]]
+    data <- GenericML.obj$VEIN$best_learners[[type]][[CLAN.variable]]
 
   } else if(!(learner %in% GenericML.obj$arguments$learners_GenericML)){
 
@@ -49,19 +49,19 @@ plot.GenericML <- function(x,
 
   } else if(learner != "best" & type == "CLAN" ){
 
-    data <- GenericML.obj$VEIN$all.learners[[type]][[learner]][[CLAN.variable]]
+    data <- GenericML.obj$VEIN$all_learners[[type]][[learner]][[CLAN.variable]]
 
   } else{
 
-    data <- GenericML.obj$VEIN$all.learners[[type]][[learner]]
+    data <- GenericML.obj$VEIN$all_learners[[type]][[learner]]
 
   } # IF
 
 
   if(learner == "best"){
-    data.blp <- GenericML.obj$VEIN$best.learners$BLP
+    data.blp <- GenericML.obj$VEIN$best_learners$BLP
   } else{
-    data.blp <- GenericML.obj$VEIN$all.learners$BLP[[learner]]
+    data.blp <- GenericML.obj$VEIN$all_learners$BLP[[learner]]
   } # IF
 
 

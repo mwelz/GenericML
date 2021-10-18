@@ -7,7 +7,7 @@
 lambda_parameters(
   BLP.obj,
   GATES.obj,
-  proxy.cate.main.sample,
+  proxy_CATE.main.sample,
   group.membership.main.sample
 )
 }
@@ -16,7 +16,7 @@ lambda_parameters(
 
 \item{GATES.obj}{an object as returned by get.BLP.parameters()}
 
-\item{proxy.cate.main.sample}{Proxy CATE estimators for the main sample}
+\item{proxy_CATE.main.sample}{Proxy CATE estimators for the main sample}
 
 \item{group.membership.main.sample}{a logical matrix with \emph{M} rows that indicate
 the group memberships (such a matrix is returned by the function quantile_group())}

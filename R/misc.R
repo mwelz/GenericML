@@ -108,7 +108,8 @@ quantile_group <- function(x,
 GenericML_single <- function(Z, D, Y,
                              propensity_scores,
                              learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',
-                             M.set, A.set,
+                             M.set,
+                             A.set                      = setdiff(1:length(Y), M.set),
                              Z_CLAN                     = NULL,
                              X1_BLP                     = setup_X1(),
                              X1_GATES                   = setup_X1(),
@@ -182,21 +183,21 @@ GenericML_single_NoChecks <-
     ### step 1a: learn proxy predictors by using the auxiliary set ----
 
     # get the proxy baseline estimator for the main sample
-    proxy.baseline.obj <- proxy_baseline_NoChecks(
+    proxy_baseline.obj <- proxy_baseline_NoChecks(
       Z = Z, D = D, Y = Y,
       auxiliary.sample = A.set,
       learner = learner,
       min_variation = min_variation)
-    proxy.baseline     <- proxy.baseline.obj$baseline.predictions.main.sample
+    proxy_baseline     <- proxy_baseline.obj$baseline.predictions.main.sample
 
     # get the proxy estimator of the CATE for the main sample
-    proxy.cate.obj <- proxy_CATE_NoChecks(
+    proxy_CATE.obj <- proxy_CATE_NoChecks(
       Z = Z, D = D, Y = Y,
       auxiliary.sample = A.set,
       learner = learner,
-      proxy.baseline.estimates = proxy.baseline.obj$baseline.predictions.full.sample,
+      proxy_baseline.estimates = proxy_baseline.obj$baseline.predictions.full.sample,
       min_variation = min_variation)
-    proxy.cate <- proxy.cate.obj$CATE.predictions.main.sample
+    proxy_CATE <- proxy_CATE.obj$CATE.predictions.main.sample
 
 
     ### step 1b: estimate BLP parameters by OLS ----
@@ -204,8 +205,8 @@ GenericML_single_NoChecks <-
       D = D[M.set],
       Y = Y[M.set],
       propensity_scores  = propensity_scores[M.set],
-      proxy.baseline     = proxy.baseline,
-      proxy.cate         = proxy.cate,
+      proxy_baseline     = proxy_baseline,
+      proxy_CATE         = proxy_CATE,
       HT                 = HT,
       X1_control       = setup_X1(),
       vcov_control       = vcov_BLP,
@@ -215,7 +216,7 @@ GenericML_single_NoChecks <-
 
     ### step 1c: estimate GATES parameters by OLS ----
     # group the proxy estimators for the CATE in the main sample by quantiles
-    group.membership.main.sample <- quantile_group(proxy.cate,
+    group.membership.main.sample <- quantile_group(proxy_CATE,
                                                    cutoffs = quantile_cutoffs,
                                                    quantile.nam = TRUE)
 
@@ -223,8 +224,8 @@ GenericML_single_NoChecks <-
       D = D[M.set],
       Y = Y[M.set],
       propensity_scores   = propensity_scores[M.set],
-      proxy.baseline      = proxy.baseline,
-      proxy.cate          = proxy.cate,
+      proxy_baseline      = proxy_baseline,
+      proxy_CATE          = proxy_CATE,
       group.membership.main.sample = group.membership.main.sample,
       HT                  = HT,
       X1_control        = setup_X1(),
@@ -245,17 +246,17 @@ GenericML_single_NoChecks <-
     ### step 1e: get parameters over which we maximize to find the "best" ML method ----
     best.obj <- lambda_parameters(BLP.obj = blp.obj,
                                   GATES.obj = gates.obj,
-                                  proxy.cate.main.sample = proxy.cate,
+                                  proxy_CATE.main.sample = proxy_CATE,
                                   group.membership.main.sample = group.membership.main.sample)
 
     ### organize output in a list ----
-    return(list(BLP = blp.obj,
-                GATES = gates.obj,
-                CLAN = clan.obj,
-                best = best.obj,
-                CATE.proxy = proxy.cate.obj,
-                baseline.proxy = proxy.baseline,
-                group.membership_M.set = group.membership.main.sample))
+    return(list(BLP            = blp.obj,
+                GATES          = gates.obj,
+                CLAN           = clan.obj,
+                proxy_CATE     = proxy_CATE.obj,
+                proxy_baseline = proxy_baseline,
+                best           = best.obj
+    ))
 
   } # FUN
 
@@ -265,7 +266,7 @@ GenericML_single_NoChecks <-
 #'
 #' @param BLP.obj an object as returned by CLAN()
 #' @param GATES.obj an object as returned by get.BLP.parameters()
-#' @param proxy.cate.main.sample Proxy CATE estimators for the main sample
+#' @param proxy_CATE.main.sample Proxy CATE estimators for the main sample
 #' @param group.membership.main.sample a logical matrix with _M_ rows that indicate
 #' the group memberships (such a matrix is returned by the function quantile_group())
 #' @return lambda and lambda.bar parameters
@@ -273,10 +274,10 @@ GenericML_single_NoChecks <-
 #' @export
 lambda_parameters <- function(BLP.obj,
                               GATES.obj,
-                              proxy.cate.main.sample,
+                              proxy_CATE.main.sample,
                               group.membership.main.sample){
 
-  return(list(lambda = as.numeric(BLP.obj$blp.coefficients["beta.2"]^2 * stats::var(proxy.cate.main.sample)),
+  return(list(lambda = as.numeric(BLP.obj$blp.coefficients["beta.2"]^2 * stats::var(proxy_CATE.main.sample)),
               lambda.bar = as.numeric(colMeans(group.membership.main.sample) %*%  GATES.obj$gates.coefficients^2)))
 
 } # END FUN

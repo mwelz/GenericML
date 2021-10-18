@@ -1,10 +1,10 @@
 #' Estimates the GATES parameters based on the main sample M.
 #'
-#' @param D a binary vector of treatment status of length _|M|_
 #' @param Y a vector of responses of length _|M|_
+#' @param D a binary vector of treatment status of length _|M|_
 #' @param propensity_scores a vector of propensity scores of length _|M|_
-#' @param proxy.baseline a vector of proxy baseline estimates of length _M_
-#' @param proxy.cate a vector of proxy CATE estimates of length _M_
+#' @param proxy_baseline a vector of proxy baseline estimates of length _M_
+#' @param proxy_CATE a vector of proxy CATE estimates of length _M_
 #' @param group.membership.main.sample a logical matrix with _M_ rows that indicate
 #' the group memberships (such a matrix is returned by the function quantile_group())
 #' @param HT logical. If TRUE, a HT transformation is applied (GATES2 in the paper). Default is FALSE.
@@ -14,22 +14,22 @@
 #' @param significance_level significance level for construction of confidence intervals
 #'
 #' @export
-GATES <- function(D, Y,
+GATES <- function(Y, D,
                   propensity_scores,
-                  proxy.baseline,
-                  proxy.cate,
+                  proxy_baseline,
+                  proxy_CATE,
                   group.membership.main.sample,
-                  HT                  = FALSE,
-                  X1_control        = setup_X1(),
-                  vcov_control        = setup_vcov(),
-                  diff = setup_diff(),
-                  significance_level  = 0.05){
+                  HT                 = FALSE,
+                  X1_control         = setup_X1(),
+                  vcov_control       = setup_vcov(),
+                  diff               = setup_diff(),
+                  significance_level = 0.05){
 
   # input check
   InputChecks_D(D)
   InputChecks_Y(Y)
   InputChecks_equal.length2(D, Y)
-  InputChecks_equal.length3(propensity_scores, proxy.baseline, proxy.cate)
+  InputChecks_equal.length3(propensity_scores, proxy_baseline, proxy_CATE)
   InputChecks_equal.length2(Y, propensity_scores)
   InputChecks_X1(X1_control)
   InputChecks_vcov.control(vcov_control)
@@ -39,8 +39,8 @@ GATES <- function(D, Y,
   # fit model according to strategy 1 or 2 in the paper
   GATES_NoChecks(D = D, Y = Y,
                  propensity_scores   = propensity_scores,
-                 proxy.baseline      = proxy.baseline,
-                 proxy.cate          = proxy.cate,
+                 proxy_baseline      = proxy_baseline,
+                 proxy_CATE          = proxy_CATE,
                  group.membership.main.sample = group.membership.main.sample,
                  X1_control        = X1_control,
                  vcov_control        = vcov_control,
@@ -53,8 +53,8 @@ GATES <- function(D, Y,
 # helper function that skips the input checks
 GATES_NoChecks <- function(D, Y,
                            propensity_scores,
-                           proxy.baseline,
-                           proxy.cate,
+                           proxy_baseline,
+                           proxy_CATE,
                            group.membership.main.sample,
                            HT                  = FALSE,
                            X1_control        = setup_X1(),
@@ -66,8 +66,8 @@ GATES_NoChecks <- function(D, Y,
   do.call(what = get(ifelse(HT, "GATES.HT", "GATES.classic")),
           args = list(D = D, Y = Y,
                       propensity_scores   = propensity_scores,
-                      proxy.baseline      = proxy.baseline,
-                      proxy.cate          = proxy.cate,
+                      proxy_baseline      = proxy_baseline,
+                      proxy_CATE          = proxy_CATE,
                       group.membership.main.sample = group.membership.main.sample,
                       X1_control        = X1_control,
                       vcov_control        = vcov_control,
@@ -80,7 +80,7 @@ GATES_NoChecks <- function(D, Y,
 # helper function for case when there is no HT transformation used. Wrapped by function "GATES"
 GATES.classic <- function(D, Y,
                           propensity_scores,
-                          proxy.baseline, proxy.cate,
+                          proxy_baseline, proxy_CATE,
                           group.membership.main.sample,
                           X1_control       = setup_X1(),
                           vcov_control       = setup_vcov(),
@@ -97,8 +97,8 @@ GATES.classic <- function(D, Y,
   weights <- 1 / (propensity_scores * (1 - propensity_scores))
 
   # prepare matrix X1
-  X1     <- get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy.cate,
-                                                                B = proxy.baseline,
+  X1     <- get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy_CATE,
+                                                                B = proxy_baseline,
                                                                 p = propensity_scores),
                                      X1_control = X1_control)
 
@@ -138,7 +138,7 @@ GATES.classic <- function(D, Y,
 # helper function for case when there is a HT transformation used. Wrapped by function "GATES"
 GATES.HT <- function(D, Y,
                      propensity_scores,
-                     proxy.baseline, proxy.cate,
+                     proxy_baseline, proxy_CATE,
                      group.membership.main.sample,
                      X1_control       = setup_X1(),
                      vcov_control       = setup_vcov(),
@@ -155,8 +155,8 @@ GATES.HT <- function(D, Y,
   H <- (D - propensity_scores) / (propensity_scores * (1 - propensity_scores))
 
   # prepare matrix X1
-  X1 <- get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy.cate,
-                                                            B = proxy.baseline,
+  X1 <- get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy_CATE,
+                                                            B = proxy_baseline,
                                                             p = propensity_scores),
                                  X1_control = X1_control)
 

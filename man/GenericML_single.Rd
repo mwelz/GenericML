@@ -11,7 +11,7 @@ GenericML_single(
   propensity_scores,
   learner = "mlr3::lrn(\\"cv_glmnet\\", s = \\"lambda.min\\")",
   M.set,
-  A.set,
+  A.set = setdiff(1:length(Y), M.set),
   Z_CLAN = NULL,
   X1_BLP = setup_X1(),
   X1_GATES = setup_X1(),

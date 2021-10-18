@@ -41,7 +41,7 @@ propensity_score_mlr3 <- function(Z, D, learner = "random.forest"){
 
   # return
   return(list(propensity_scores = probs[, colnames(probs) == "1"],
-              mlr3.objects = list(task = task.propensity_score,
+              mlr3_objects = list(task = task.propensity_score,
                                   learner = learner)))
 
 } # END FUN
@@ -83,13 +83,13 @@ propensity_score_NoChecks <- function(Z, D, estimator = "constant"){
     if(any(estimator <= 0 | estimator >= 1)) stop("User-supplied propensity scores in 'estimator' must be contained in interval (0,1)!")
 
     out <- list(propensity_scores = estimator,
-                mlr3.objects = NULL)
+                mlr3_objects = NULL)
 
   } else if(estimator == "constant"){
 
     ### case 2: propensity scores are estimated by mean of D
     out <- list(propensity_scores = rep(mean(D), length(Z)),
-                mlr3.objects = NULL)
+                mlr3_objects = NULL)
 
   } else{
 
@@ -154,7 +154,7 @@ proxy_baseline_NoChecks <- function(Z, D, Y,
                                     min_variation = 1e-05){
 
   # specify the task
-  task.proxy.baseline.estimator <- mlr3::TaskRegr$new(id = "proxy.baseline",
+  task.proxy_baseline.estimator <- mlr3::TaskRegr$new(id = "proxy_baseline",
                                                       backend = data.frame(Y, Z),
                                                       target = "Y")
 
@@ -169,10 +169,10 @@ proxy_baseline_NoChecks <- function(Z, D, Y,
   main.sample <- setdiff(1:length(Y), auxiliary.sample)
 
   # fit the learner on the control units in the auxiliary sample
-  learner$train(task.proxy.baseline.estimator, row_ids = idx)
+  learner$train(task.proxy_baseline.estimator, row_ids = idx)
 
   # obtain predictions for Y for all observations
-  predictions.obj <- learner$predict(task.proxy.baseline.estimator)
+  predictions.obj <- learner$predict(task.proxy_baseline.estimator)
   predictions     <- predictions.obj$response
 
   # if there is not much variation in the predictions, add Gaussian noise
@@ -189,7 +189,7 @@ proxy_baseline_NoChecks <- function(Z, D, Y,
          baseline.predictions.auxiliary.sample = predictions[auxiliary.sample],
          baseline.predictions.full.sample = predictions,
          auxiliary.sample = auxiliary.sample,
-         mlr3.objects = list(task = task.proxy.baseline.estimator,
+         mlr3_objects = list(task = task.proxy_baseline.estimator,
                              learner = learner)), class = "proxy_baseline"))
 
 } # FUN
@@ -202,7 +202,7 @@ proxy_baseline_NoChecks <- function(Z, D, Y,
 #' @param Y a vector of responses of length _n_
 #' @param auxiliary.sample a numerical vector of indices of observations in the auxiliary sample. Length is shorter than _n_
 #' @param learner the regression machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default.
-#' @param proxy.baseline.estimates A vector of length _n_ of proxy estimates of the baseline estimator \eqn{E[Y | D=0, Z]}. If NULL, these will be estimated separately.
+#' @param proxy_baseline.estimates A vector of length _n_ of proxy estimates of the baseline estimator \eqn{E[Y | D=0, Z]}. If NULL, these will be estimated separately.
 #' @param min_variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
 #' @return Estimates of the CATE, both for the auxiliary sample and all observations, and an 'mlr3' object of each employed model
 #'
@@ -210,7 +210,7 @@ proxy_baseline_NoChecks <- function(Z, D, Y,
 proxy_CATE <- function(Z, D, Y,
                        auxiliary.sample,
                        learner = "random.forest",
-                       proxy.baseline.estimates = NULL,
+                       proxy_baseline.estimates = NULL,
                        min_variation = 1e-05){
 
   # input checks
@@ -223,7 +223,7 @@ proxy_CATE <- function(Z, D, Y,
   proxy_CATE_NoChecks(Z = Z, D = D, Y = Y,
                       auxiliary.sample = auxiliary.sample,
                       learner = get.learner_regr(learner), # must be mlr3 object
-                      proxy.baseline.estimates = proxy.baseline.estimates,
+                      proxy_baseline.estimates = proxy_baseline.estimates,
                       min_variation = min_variation)
 
 } # END FUN
@@ -236,7 +236,7 @@ proxy_CATE <- function(Z, D, Y,
 proxy_CATE_NoChecks <- function(Z, D, Y,
                                 auxiliary.sample,
                                 learner = "random.forest",
-                                proxy.baseline.estimates = NULL,
+                                proxy_baseline.estimates = NULL,
                                 min_variation = 1e-05){
 
   # indices of the treated units in the auxiliary sample
@@ -250,7 +250,7 @@ proxy_CATE_NoChecks <- function(Z, D, Y,
   learner$predict_type = "response"
 
   # specify the task for estimating E[Y | D=1, Z]
-  task.proxy.cate.treated.estimator <- mlr3::TaskRegr$new(id = "cate.treated",
+  task.proxy_CATE.treated.estimator <- mlr3::TaskRegr$new(id = "cate.treated",
                                                           backend = data.frame(Y, Z),
                                                           target = "Y")
 
@@ -258,24 +258,24 @@ proxy_CATE_NoChecks <- function(Z, D, Y,
   learner.treated <- learner
 
   # fit the learner on the treated units in the auxiliary sample
-  learner.treated$train(task.proxy.cate.treated.estimator, row_ids = idx.auxiliary.treated)
+  learner.treated$train(task.proxy_CATE.treated.estimator, row_ids = idx.auxiliary.treated)
 
   # obtain predictions for E[Y | D=1, Z] for all observations
-  predictions.treated.obj <- learner.treated$predict(task.proxy.cate.treated.estimator)
+  predictions.treated.obj <- learner.treated$predict(task.proxy_CATE.treated.estimator)
   predictions.treated     <- predictions.treated.obj$response
 
 
-  if(!is.null(proxy.baseline.estimates)){
+  if(!is.null(proxy_baseline.estimates)){
 
     ## if proxy baseline estimates were provided, no need for second estimation
-    predictions.controls <- proxy.baseline.estimates
+    predictions.controls <- proxy_baseline.estimates
     mlr3.controls        <- "Not available as proxy estimates for the baseline were aprovided"
 
   } else{
 
     ## if no proxy baseline estimates were provided, estimate them
     # specify the task for estimating E[Y | D=0, Z]
-    task.proxy.cate.controls.estimator <- mlr3::TaskRegr$new(id = "cate.controls",
+    task.proxy_CATE.controls.estimator <- mlr3::TaskRegr$new(id = "cate.controls",
                                                              backend = data.frame(Y, Z),
                                                              target = "Y")
 
@@ -286,14 +286,14 @@ proxy_CATE_NoChecks <- function(Z, D, Y,
     idx.auxiliary.controls <- which(auxiliary.sample.logical & D == 0)
 
     # fit the learner on the control units in the auxiliary sample
-    learner.controls$train(task.proxy.cate.controls.estimator, row_ids = idx.auxiliary.controls)
+    learner.controls$train(task.proxy_CATE.controls.estimator, row_ids = idx.auxiliary.controls)
 
     # obtain predictions for E[Y | D=0, Z] for all observations
-    predictions.controls.obj <- learner.controls$predict(task.proxy.cate.controls.estimator)
+    predictions.controls.obj <- learner.controls$predict(task.proxy_CATE.controls.estimator)
     predictions.controls     <- predictions.controls.obj$response
 
     # prepare list for output
-    mlr3.controls <- list(task = task.proxy.cate.controls.estimator,
+    mlr3.controls <- list(task = task.proxy_CATE.controls.estimator,
                           learner = learner.controls)
 
   } # END IF
@@ -303,14 +303,14 @@ proxy_CATE_NoChecks <- function(Z, D, Y,
     list(predictions.Y1_main.sample = predictions.treated[main.sample],
          predictions.Y1_auxiliary.sample = predictions.treated[auxiliary.sample],
          predictions.Y1_full.sample = predictions.treated,
-         mlr3.objects = list(task = task.proxy.cate.treated.estimator,
+         mlr3_objects = list(task = task.proxy_CATE.treated.estimator,
                              learner = learner.treated))
 
   predictions.Y0 <-
     list(predictions.Y0_main.sample = predictions.controls[main.sample],
          predictions.Y0_auxiliary.sample = predictions.controls[auxiliary.sample],
          predictions.Y0_full.sample = predictions.controls,
-         mlr3.objects = mlr3.controls)
+         mlr3_objects = mlr3.controls)
 
   # get CATE predictions
   cate.predictions <- predictions.treated - predictions.controls

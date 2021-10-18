@@ -108,11 +108,11 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
   if(is.null(colnames(Z_CLAN))) colnames(Z_CLAN) <- paste0("V", 1:num.vars.in.Z_CLAN)
 
   # make the custom covariates a matrix to prevent bug later
-  if(!is.null(X1_BLP$custom_covariates)){
-    X1_BLP$custom_covariates <- as.matrix(X1_BLP$custom_covariates)
+  if(!is.null(X1_BLP$covariates)){
+    X1_BLP$covariates <- as.matrix(X1_BLP$covariates)
   } # IF
-  if(!is.null(X1_GATES$custom_covariates)){
-    X1_GATES$custom_covariates <- as.matrix(X1_GATES$custom_covariates)
+  if(!is.null(X1_GATES$covariates)){
+    X1_GATES$covariates <- as.matrix(X1_GATES$covariates)
   } # IF
 
   # initialize
@@ -248,11 +248,11 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
   if(is.null(colnames(Z_CLAN))) colnames(Z_CLAN) <- paste0("V", 1:num.vars.in.Z_CLAN)
 
   # make the custom covariates a matrix to prevent bug later
-  if(!is.null(X1_BLP$custom_covariates)){
-    X1_BLP$custom_covariates <- as.matrix(X1_BLP$custom_covariates)
+  if(!is.null(X1_BLP$covariates)){
+    X1_BLP$covariates <- as.matrix(X1_BLP$covariates)
   } # IF
-  if(!is.null(X1_GATES$custom_covariates)){
-    X1_GATES$custom_covariates <- as.matrix(X1_GATES$custom_covariates)
+  if(!is.null(X1_GATES$covariates)){
+    X1_GATES$covariates <- as.matrix(X1_GATES$covariates)
   } # IF
 
 
