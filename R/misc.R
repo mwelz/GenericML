@@ -105,22 +105,22 @@ quantile.group <- function(x,
 #' TODO: comments on CLAN: If there are categorical variables, apply one-hot-encoding to Z_CLAN. The interpretation then becomes: Is there a factor that is overproportionally present in the least or most affected group?
 #'
 #' @export
-get.generic.ml.for.given.learner <- function(Z, D, Y,
-                                             propensity.scores,
-                                             learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',
-                                             M.set, A.set,
-                                             Z_CLAN                     = NULL,
-                                             X1_BLP                     = setup_X1(),
-                                             X1_GATES                   = setup_X1(),
-                                             HT                         = FALSE,
-                                             vcov_BLP                   = setup_vcov(),
-                                             vcov_GATES                 = setup_vcov(),
-                                             equal_variances_CLAN       = FALSE,
-                                             quantile_cutoffs           = c(0.25, 0.5, 0.75),
-                                             diff_GATES                 = setup_diff(),
-                                             diff_CLAN                  = setup_diff(),
-                                             significance_level         = 0.05,
-                                             min_variation              = 1e-05){
+GenericML_single <- function(Z, D, Y,
+                             propensity.scores,
+                             learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',
+                             M.set, A.set,
+                             Z_CLAN                     = NULL,
+                             X1_BLP                     = setup_X1(),
+                             X1_GATES                   = setup_X1(),
+                             HT                         = FALSE,
+                             vcov_BLP                   = setup_vcov(),
+                             vcov_GATES                 = setup_vcov(),
+                             equal_variances_CLAN       = FALSE,
+                             quantile_cutoffs           = c(0.25, 0.5, 0.75),
+                             diff_GATES                 = setup_diff(),
+                             diff_CLAN                  = setup_diff(),
+                             significance_level         = 0.05,
+                             min_variation              = 1e-05){
 
   # input checks
   InputChecks_D(D)
@@ -139,28 +139,28 @@ get.generic.ml.for.given.learner <- function(Z, D, Y,
 
 
   # call the main function
-  get.generic.ml.for.given.learner_NoChecks(Z = Z, D = D, Y = Y,
-                                            propensity.scores = propensity.scores,
-                                            learner = learner,
-                                            M.set = M.set, A.set = A.set,
-                                            Z_CLAN                     = Z_CLAN,
-                                            X1_BLP                     = X1_BLP,
-                                            X1_GATES                   = X1_GATES,
-                                            HT                         = HT,
-                                            vcov_BLP                   = vcov_BLP,
-                                            vcov_GATES                 = vcov_GATES,
-                                            equal_variances_CLAN       = equal_variances_CLAN,
-                                            quantile_cutoffs           = quantile_cutoffs,
-                                            diff_GATES                 = diff_GATES,
-                                            diff_CLAN                  = diff_CLAN,
-                                            significance_level         = significance_level,
-                                            min_variation              = min_variation)
+  GenericML_single_NoChecks(Z = Z, D = D, Y = Y,
+                            propensity.scores = propensity.scores,
+                            learner = learner,
+                            M.set = M.set, A.set = A.set,
+                            Z_CLAN                     = Z_CLAN,
+                            X1_BLP                     = X1_BLP,
+                            X1_GATES                   = X1_GATES,
+                            HT                         = HT,
+                            vcov_BLP                   = vcov_BLP,
+                            vcov_GATES                 = vcov_GATES,
+                            equal_variances_CLAN       = equal_variances_CLAN,
+                            quantile_cutoffs           = quantile_cutoffs,
+                            diff_GATES                 = diff_GATES,
+                            diff_CLAN                  = diff_CLAN,
+                            significance_level         = significance_level,
+                            min_variation              = min_variation)
 
 } # END FUN
 
 
 # helper that skips the input checks
-get.generic.ml.for.given.learner_NoChecks <-
+GenericML_single_NoChecks <-
   function(Z, D, Y,
            propensity.scores,
            learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',

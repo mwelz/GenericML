@@ -146,22 +146,22 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
     for(i in 1:length(learners)){
 
       generic.ml.obj <-
-        get.generic.ml.for.given.learner_NoChecks(Z = Z, D = D, Y = Y,
-                                                  propensity.scores = propensity.scores,
-                                                  learner = learners[[i]],
-                                                  M.set = M.set, A.set = A.set,
-                                                  Z_CLAN                       = Z_CLAN,
-                                                  X1_BLP                       = X1_BLP,
-                                                  X1_GATES                     = X1_GATES,
-                                                  HT                           = HT,
-                                                  vcov_BLP                     = vcov_BLP,
-                                                  vcov_GATES                   = vcov_GATES,
-                                                  equal_variances_CLAN         = equal_variances_CLAN,
-                                                  quantile_cutoffs             = quantile_cutoffs,
-                                                  diff_GATES                   = diff_GATES,
-                                                  diff_CLAN                    = diff_CLAN,
-                                                  significance_level           = significance_level,
-                                                  min_variation                = min_variation)
+        GenericML_single_NoChecks(Z = Z, D = D, Y = Y,
+                                  propensity.scores = propensity.scores,
+                                  learner = learners[[i]],
+                                  M.set = M.set, A.set = A.set,
+                                  Z_CLAN                       = Z_CLAN,
+                                  X1_BLP                       = X1_BLP,
+                                  X1_GATES                     = X1_GATES,
+                                  HT                           = HT,
+                                  vcov_BLP                     = vcov_BLP,
+                                  vcov_GATES                   = vcov_GATES,
+                                  equal_variances_CLAN         = equal_variances_CLAN,
+                                  quantile_cutoffs             = quantile_cutoffs,
+                                  diff_GATES                   = diff_GATES,
+                                  diff_CLAN                    = diff_CLAN,
+                                  significance_level           = significance_level,
+                                  min_variation                = min_variation)
 
       generic.targets[[i]]$BLP[,,s]   <- generic.ml.obj$BLP$generic.targets
       generic.targets[[i]]$GATES[,,s] <- generic.ml.obj$GATES$generic.targets
@@ -292,22 +292,22 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
     for(i in 1:length(learners)){
 
       generic.ml.obj <-
-        get.generic.ml.for.given.learner_NoChecks(Z = Z, D = D, Y = Y,
-                                                  propensity.scores = propensity.scores,
-                                                  learner = learners[[i]],
-                                                  M.set = M.set, A.set = A.set,
-                                                  Z_CLAN                       = Z_CLAN,
-                                                  X1_BLP                       = X1_BLP,
-                                                  X1_GATES                     = X1_GATES,
-                                                  HT                           = HT,
-                                                  vcov_BLP                     = vcov_BLP,
-                                                  vcov_GATES                   = vcov_GATES,
-                                                  equal_variances_CLAN         = equal_variances_CLAN,
-                                                  quantile_cutoffs             = quantile_cutoffs,
-                                                  diff_GATES                   = diff_GATES,
-                                                  diff_CLAN                    = diff_CLAN,
-                                                  significance_level           = significance_level,
-                                                  min_variation                = min_variation)
+        GenericML_single_NoChecks(Z = Z, D = D, Y = Y,
+                                  propensity.scores = propensity.scores,
+                                  learner = learners[[i]],
+                                  M.set = M.set, A.set = A.set,
+                                  Z_CLAN                       = Z_CLAN,
+                                  X1_BLP                       = X1_BLP,
+                                  X1_GATES                     = X1_GATES,
+                                  HT                           = HT,
+                                  vcov_BLP                     = vcov_BLP,
+                                  vcov_GATES                   = vcov_GATES,
+                                  equal_variances_CLAN         = equal_variances_CLAN,
+                                  quantile_cutoffs             = quantile_cutoffs,
+                                  diff_GATES                   = diff_GATES,
+                                  diff_CLAN                    = diff_CLAN,
+                                  significance_level           = significance_level,
+                                  min_variation                = min_variation)
 
       blp.3d[,,i]   <- generic.ml.obj$BLP$generic.targets
       gates.3d[,,i] <- generic.ml.obj$GATES$generic.targets
