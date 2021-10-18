@@ -7,7 +7,7 @@
 GATES(
   D,
   Y,
-  propensity.scores,
+  propensity_scores,
   proxy.baseline,
   proxy.cate,
   group.membership.main.sample,
@@ -23,7 +23,7 @@ GATES(
 
 \item{Y}{a vector of responses of length \emph{|M|}}
 
-\item{propensity.scores}{a vector of propensity scores of length \emph{|M|}}
+\item{propensity_scores}{a vector of propensity scores of length \emph{|M|}}
 
 \item{proxy.baseline}{a vector of proxy baseline estimates of length \emph{M}}
 

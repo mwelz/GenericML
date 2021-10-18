@@ -1,6 +1,6 @@
 # helper functions
 generic.ml.across.learners <- function(Z, D, Y,
-                                       propensity.scores,
+                                       propensity_scores,
                                        learners, # need to be mlr3 objects!
                                        learners.names,
                                        num_splits           = 100,
@@ -28,7 +28,7 @@ generic.ml.across.learners <- function(Z, D, Y,
                             "generic.ml.across.learners_parallel",
                             "generic.ml.across.learners_serial")),
           args = list(Z = Z, D = D, Y = Y,
-                      propensity.scores          = propensity.scores,
+                      propensity_scores          = propensity_scores,
                       learners                   = learners,
                       learners.names             = learners.names,
                       num_splits                 = num_splits,
@@ -55,7 +55,7 @@ generic.ml.across.learners <- function(Z, D, Y,
 
 
 generic.ml.across.learners_serial <- function(Z, D, Y,
-                                              propensity.scores,
+                                              propensity_scores,
                                               learners, # need to be mlr3 objects!
                                               learners.names,
                                               num_splits           = 100,
@@ -147,7 +147,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
 
       generic.ml.obj <-
         GenericML_single_NoChecks(Z = Z, D = D, Y = Y,
-                                  propensity.scores = propensity.scores,
+                                  propensity_scores = propensity_scores,
                                   learner = learners[[i]],
                                   M.set = M.set, A.set = A.set,
                                   Z_CLAN                       = Z_CLAN,
@@ -193,7 +193,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
 
 
 generic.ml.across.learners_parallel <- function(Z, D, Y,
-                                              propensity.scores,
+                                              propensity_scores,
                                               learners, # need to be mlr3 objects!
                                               learners.names,
                                               num_splits           = 100,
@@ -293,7 +293,7 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
 
       generic.ml.obj <-
         GenericML_single_NoChecks(Z = Z, D = D, Y = Y,
-                                  propensity.scores = propensity.scores,
+                                  propensity_scores = propensity_scores,
                                   learner = learners[[i]],
                                   M.set = M.set, A.set = A.set,
                                   Z_CLAN                       = Z_CLAN,

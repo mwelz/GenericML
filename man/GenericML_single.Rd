@@ -8,7 +8,7 @@ GenericML_single(
   Z,
   D,
   Y,
-  propensity.scores,
+  propensity_scores,
   learner = "mlr3::lrn(\\"cv_glmnet\\", s = \\"lambda.min\\")",
   M.set,
   A.set,
@@ -33,7 +33,7 @@ GenericML_single(
 
 \item{Y}{a vector of responses of length}
 
-\item{propensity.scores}{a vector of propensity scores}
+\item{propensity_scores}{a vector of propensity scores}
 
 \item{learner}{The machine learner that shall be used}
 

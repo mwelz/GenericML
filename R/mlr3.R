@@ -2,10 +2,10 @@
 #'
 #' @import mlr3 mlr3learners
 #' @noRd
-propensity.score_mlr3 <- function(Z, D, learner = "random.forest"){
+propensity_score_mlr3 <- function(Z, D, learner = "random.forest"){
 
   # specify the task
-  task.propensity.score <- mlr3::TaskClassif$new(id = "propensity.score",
+  task.propensity_score <- mlr3::TaskClassif$new(id = "propensity_score",
                                                  backend = data.frame(D = as.factor(D), Z),
                                                  target = "D")
 
@@ -31,17 +31,17 @@ propensity.score_mlr3 <- function(Z, D, learner = "random.forest"){
   learner$predict_type = "prob"
 
   # fit the learner
-  learner$train(task.propensity.score)
+  learner$train(task.propensity_score)
 
   # extract the predictions
-  predictions <- learner$predict(task.propensity.score)
+  predictions <- learner$predict(task.propensity_score)
 
   # extract estimations of Pr(D = 1 | Z)
   probs <- predictions$prob
 
   # return
-  return(list(propensity.scores = probs[, colnames(probs) == "1"],
-              mlr3.objects = list(task = task.propensity.score,
+  return(list(propensity_scores = probs[, colnames(probs) == "1"],
+              mlr3.objects = list(task = task.propensity_score,
                                   learner = learner)))
 
 } # END FUN
@@ -56,7 +56,7 @@ propensity.score_mlr3 <- function(Z, D, learner = "random.forest"){
 #'
 #'
 #' @export
-propensity.score <- function(Z, D, estimator = "constant"){
+propensity_score <- function(Z, D, estimator = "constant"){
 
   # input checks
   InputChecks_D(D)
@@ -64,7 +64,7 @@ propensity.score <- function(Z, D, estimator = "constant"){
   InputChecks_equal.length2(Z, D)
 
   # function without input checks
-  propensity.score_NoChecks(Z = Z, D = D, estimator = estimator)
+  propensity_score_NoChecks(Z = Z, D = D, estimator = estimator)
 
 } # FUN
 
@@ -74,7 +74,7 @@ propensity.score <- function(Z, D, estimator = "constant"){
 #'
 #' @import mlr3 mlr3learners
 #' @noRd
-propensity.score_NoChecks <- function(Z, D, estimator = "constant"){
+propensity_score_NoChecks <- function(Z, D, estimator = "constant"){
 
   if(!is.character(estimator)){
 
@@ -82,13 +82,13 @@ propensity.score_NoChecks <- function(Z, D, estimator = "constant"){
     if(length(estimator) != length(D)) stop("User-supplied propensity scores in 'estimator' are not of same length as vectors Z and D!")
     if(any(estimator <= 0 | estimator >= 1)) stop("User-supplied propensity scores in 'estimator' must be contained in interval (0,1)!")
 
-    out <- list(propensity.scores = estimator,
+    out <- list(propensity_scores = estimator,
                 mlr3.objects = NULL)
 
   } else if(estimator == "constant"){
 
     ### case 2: propensity scores are estimated by mean of D
-    out <- list(propensity.scores = rep(mean(D), length(Z)),
+    out <- list(propensity_scores = rep(mean(D), length(Z)),
                 mlr3.objects = NULL)
 
   } else{
@@ -99,7 +99,7 @@ propensity.score_NoChecks <- function(Z, D, estimator = "constant"){
     if(estimator %in% c("elastic.net", "random.forest", "tree") |
        substr(estimator, start = 1, stop = 6) == "mlr3::"){
 
-      out <- propensity.score_mlr3(Z = Z, D = D, learner = make.mlr3.environment(estimator, regr = FALSE))
+      out <- propensity_score_mlr3(Z = Z, D = D, learner = make.mlr3.environment(estimator, regr = FALSE))
 
     } else stop("The argument 'estimator' must be equal to either 'constant', 'elastic.net', random.forest', 'tree', an mlr3 string, or a numeric vector of the same length as Z and D!")
 

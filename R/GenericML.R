@@ -76,16 +76,16 @@ GenericML <- function(Z, D, Y,
 
 
   ### step 1: compute propensity scores ----
-  propensity.scores.obj <- propensity.score_NoChecks(
+  propensity_scores.obj <- propensity_score_NoChecks(
     Z = Z, D = D, estimator = learner_propensity_score)
-  propensity.scores     <- propensity.scores.obj$propensity.scores
+  propensity_scores     <- propensity_scores.obj$propensity_scores
 
 
   ### step 2: for each ML method, do the generic ML analysis ----
 
   gen.ml.different.learners <-
     generic.ml.across.learners(Z = Z, D = D, Y = Y,
-                               propensity.scores          = propensity.scores,
+                               propensity_scores          = propensity_scores,
                                learners                   = learners,
                                learners.names             = learners_GenericML,
                                num_splits                 = num_splits,
@@ -120,8 +120,8 @@ GenericML <- function(Z, D, Y,
     structure(
      list(VEIN = vein,
               best.learners = best.learners,
-              propensity.scores = list(estimates = propensity.scores,
-                                       mlr3.objects = propensity.scores.obj$mlr3.objects),
+              propensity_scores = list(estimates = propensity_scores,
+                                       mlr3.objects = propensity_scores.obj$mlr3.objects),
               genericML.by.split = gen.ml.different.learners$genericML.by.split,
               splits = gen.ml.different.learners$splits,
               arguments = list(quantile_cutoffs = c(0.25, 0.5, 0.75),

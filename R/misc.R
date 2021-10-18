@@ -84,7 +84,7 @@ quantile_group <- function(x,
 #' @param Z a matrix or data frame of covariates
 #' @param D a binary vector of treatment status of length
 #' @param Y a vector of responses of length
-#' @param propensity.scores a vector of propensity scores
+#' @param propensity_scores a vector of propensity scores
 #' @param learner The machine learner that shall be used
 #' @param M.set main set
 #' @param A.set auxiliary set
@@ -106,7 +106,7 @@ quantile_group <- function(x,
 #'
 #' @export
 GenericML_single <- function(Z, D, Y,
-                             propensity.scores,
+                             propensity_scores,
                              learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',
                              M.set, A.set,
                              Z_CLAN                     = NULL,
@@ -140,7 +140,7 @@ GenericML_single <- function(Z, D, Y,
 
   # call the main function
   GenericML_single_NoChecks(Z = Z, D = D, Y = Y,
-                            propensity.scores = propensity.scores,
+                            propensity_scores = propensity_scores,
                             learner = learner,
                             M.set = M.set, A.set = A.set,
                             Z_CLAN                     = Z_CLAN,
@@ -162,7 +162,7 @@ GenericML_single <- function(Z, D, Y,
 # helper that skips the input checks
 GenericML_single_NoChecks <-
   function(Z, D, Y,
-           propensity.scores,
+           propensity_scores,
            learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',
            M.set, A.set,
            Z_CLAN                     = NULL,
@@ -203,7 +203,7 @@ GenericML_single_NoChecks <-
     blp.obj <- BLP_NoChecks(
       D = D[M.set],
       Y = Y[M.set],
-      propensity.scores  = propensity.scores[M.set],
+      propensity_scores  = propensity_scores[M.set],
       proxy.baseline     = proxy.baseline,
       proxy.cate         = proxy.cate,
       HT                 = HT,
@@ -222,7 +222,7 @@ GenericML_single_NoChecks <-
     gates.obj <- GATES_NoChecks(
       D = D[M.set],
       Y = Y[M.set],
-      propensity.scores   = propensity.scores[M.set],
+      propensity_scores   = propensity_scores[M.set],
       proxy.baseline      = proxy.baseline,
       proxy.cate          = proxy.cate,
       group.membership.main.sample = group.membership.main.sample,
