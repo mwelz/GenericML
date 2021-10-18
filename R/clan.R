@@ -2,7 +2,7 @@
 #'
 #' @param Z_CLAN.main.sample a matrix with _|M|_ rows. Each column represents a variable for which CLAN shall be performed.
 #' @param group.membership.main.sample a logical matrix with _M_ rows that indicate
-#' the group memberships (such a matrix is returned by the function quantile.group())
+#' the group memberships (such a matrix is returned by the function quantile_group())
 #' @param equal.group.variances logical. If TRUE, the the two within-group variances of the most and least affected group are assumed to be equal. Default is FALSE.
 #' @param diff Controls the generic targets of CLAN. See the documentation of \code{\link{setup_diff}}.
 #' @param significance_level Significance level. Default is 0.05.

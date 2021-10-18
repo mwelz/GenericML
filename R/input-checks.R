@@ -223,11 +223,11 @@ InputChecks_group.membership <- function(group.membership){
 
   if(is.null(attr(group.membership, which = "type"))) stop(paste0("The object ",
                                                        deparse(substitute(group.membership)),
-                                                       " needs to be returned by quantile.group()"))
+                                                       " needs to be returned by quantile_group()"))
 
   if(attr(group.membership, which = "type") != "quantile_group") stop(paste0("The object ",
                                                                   deparse(substitute(group.membership)),
-                                                                  " needs to be returned by quantile.group()"))
+                                                                  " needs to be returned by quantile_group()"))
 
 
 } # FUN

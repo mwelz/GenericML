@@ -16,7 +16,7 @@ CLAN(
 \item{Z_CLAN.main.sample}{a matrix with \emph{|M|} rows. Each column represents a variable for which CLAN shall be performed.}
 
 \item{group.membership.main.sample}{a logical matrix with \emph{M} rows that indicate
-the group memberships (such a matrix is returned by the function quantile.group())}
+the group memberships (such a matrix is returned by the function quantile_group())}
 
 \item{equal.group.variances}{logical. If TRUE, the the two within-group variances of the most and least affected group are assumed to be equal. Default is FALSE.}
 

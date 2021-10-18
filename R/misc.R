@@ -28,7 +28,7 @@ Med <- function(x){
 #' @param x the vector to be partitioned
 #' @param cutoffs the quantile cutoffs for the partition. Default are the quartiles.
 #' @param quantile.nam logical. Shall the cutoff values be included?
-quantile.group <- function(x,
+quantile_group <- function(x,
                            cutoffs = c(0.25, 0.5, 0.75),
                            quantile.nam = TRUE){
   # cutoffs are the quantile cutoffs (like c(0.25, 0.5, 0.75))
@@ -215,7 +215,7 @@ GenericML_single_NoChecks <-
 
     ### step 1c: estimate GATES parameters by OLS ----
     # group the proxy estimators for the CATE in the main sample by quantiles
-    group.membership.main.sample <- quantile.group(proxy.cate,
+    group.membership.main.sample <- quantile_group(proxy.cate,
                                                    cutoffs = quantile_cutoffs,
                                                    quantile.nam = TRUE)
 
@@ -267,7 +267,7 @@ GenericML_single_NoChecks <-
 #' @param GATES.obj an object as returned by get.BLP.parameters()
 #' @param proxy.cate.main.sample Proxy CATE estimators for the main sample
 #' @param group.membership.main.sample a logical matrix with _M_ rows that indicate
-#' the group memberships (such a matrix is returned by the function quantile.group())
+#' the group memberships (such a matrix is returned by the function quantile_group())
 #' @return lambda and lambda.bar parameters
 #'
 #' @export

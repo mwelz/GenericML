@@ -6,7 +6,7 @@
 #' @param proxy.baseline a vector of proxy baseline estimates of length _M_
 #' @param proxy.cate a vector of proxy CATE estimates of length _M_
 #' @param group.membership.main.sample a logical matrix with _M_ rows that indicate
-#' the group memberships (such a matrix is returned by the function quantile.group())
+#' the group memberships (such a matrix is returned by the function quantile_group())
 #' @param HT logical. If TRUE, a HT transformation is applied (GATES2 in the paper). Default is FALSE.
 #' @param X1_control Specifies the design matrix \eqn{X_1} in the regression. See the documentation of \code{\link{setup_X1}} for details.
 #' @param vcov_control Specifies the covariance matrix estimator. See the documentation of \code{\link{setup_vcov}} for details.

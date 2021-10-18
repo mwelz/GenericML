@@ -30,7 +30,7 @@ GATES(
 \item{proxy.cate}{a vector of proxy CATE estimates of length \emph{M}}
 
 \item{group.membership.main.sample}{a logical matrix with \emph{M} rows that indicate
-the group memberships (such a matrix is returned by the function quantile.group())}
+the group memberships (such a matrix is returned by the function quantile_group())}
 
 \item{HT}{logical. If TRUE, a HT transformation is applied (GATES2 in the paper). Default is FALSE.}
 

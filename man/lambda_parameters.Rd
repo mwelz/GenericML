@@ -19,7 +19,7 @@ lambda_parameters(
 \item{proxy.cate.main.sample}{Proxy CATE estimators for the main sample}
 
 \item{group.membership.main.sample}{a logical matrix with \emph{M} rows that indicate
-the group memberships (such a matrix is returned by the function quantile.group())}
+the group memberships (such a matrix is returned by the function quantile_group())}
 }
 \value{
 lambda and lambda.bar parameters
