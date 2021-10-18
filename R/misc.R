@@ -182,7 +182,7 @@ get.generic.ml.for.given.learner_NoChecks <-
     ### step 1a: learn proxy predictors by using the auxiliary set ----
 
     # get the proxy baseline estimator for the main sample
-    proxy.baseline.obj <- baseline.proxy.estimator_NoChecks(
+    proxy.baseline.obj <- proxy_baseline_NoChecks(
       Z = Z, D = D, Y = Y,
       auxiliary.sample = A.set,
       learner = learner,
@@ -190,7 +190,7 @@ get.generic.ml.for.given.learner_NoChecks <-
     proxy.baseline     <- proxy.baseline.obj$baseline.predictions.main.sample
 
     # get the proxy estimator of the CATE for the main sample
-    proxy.cate.obj <- CATE.proxy.estimator_NoChecks(
+    proxy.cate.obj <- proxy_CATE_NoChecks(
       Z = Z, D = D, Y = Y,
       auxiliary.sample = A.set,
       learner = learner,

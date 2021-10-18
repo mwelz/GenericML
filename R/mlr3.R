@@ -124,10 +124,10 @@ propensity.score_NoChecks <- function(Z, D, estimator = "constant"){
 #'
 #'
 #' @export
-baseline.proxy.estimator <- function(Z, D, Y,
-                                     auxiliary.sample,
-                                     learner = "random.forest",
-                                     min_variation = 1e-05){
+proxy_baseline <- function(Z, D, Y,
+                           auxiliary.sample,
+                           learner = "random.forest",
+                           min_variation = 1e-05){
 
   # input checks
   InputChecks_D(D)
@@ -136,10 +136,10 @@ baseline.proxy.estimator <- function(Z, D, Y,
   InputChecks_equal.length3(D, Y ,Z)
 
   # call main function
-  baseline.proxy.estimator_NoChecks(Z = Z, D = D, Y = Y,
-                                    auxiliary.sample = auxiliary.sample,
-                                    learner = get.learner_regr(learner),
-                                    min_variation = min_variation)
+  proxy_baseline_NoChecks(Z = Z, D = D, Y = Y,
+                          auxiliary.sample = auxiliary.sample,
+                          learner = get.learner_regr(learner),
+                          min_variation = min_variation)
 
 } # END FUN
 
@@ -148,10 +148,10 @@ baseline.proxy.estimator <- function(Z, D, Y,
 #'
 #' @import mlr3 mlr3learners
 #' @noRd
-baseline.proxy.estimator_NoChecks <- function(Z, D, Y,
-                                              auxiliary.sample,
-                                              learner, # must be mlr3 object
-                                              min_variation = 1e-05){
+proxy_baseline_NoChecks <- function(Z, D, Y,
+                                    auxiliary.sample,
+                                    learner, # must be mlr3 object
+                                    min_variation = 1e-05){
 
   # specify the task
   task.proxy.baseline.estimator <- mlr3::TaskRegr$new(id = "proxy.baseline",
@@ -207,11 +207,11 @@ baseline.proxy.estimator_NoChecks <- function(Z, D, Y,
 #' @return Estimates of the CATE, both for the auxiliary sample and all observations, and an 'mlr3' object of each employed model
 #'
 #' @export
-CATE.proxy.estimator <- function(Z, D, Y,
-                                 auxiliary.sample,
-                                 learner = "random.forest",
-                                 proxy.baseline.estimates = NULL,
-                                 min_variation = 1e-05){
+proxy_CATE <- function(Z, D, Y,
+                       auxiliary.sample,
+                       learner = "random.forest",
+                       proxy.baseline.estimates = NULL,
+                       min_variation = 1e-05){
 
   # input checks
   InputChecks_D(D)
@@ -220,11 +220,11 @@ CATE.proxy.estimator <- function(Z, D, Y,
   InputChecks_equal.length3(D, Y ,Z)
 
   # run main function
-  CATE.proxy.estimator_NoChecks(Z = Z, D = D, Y = Y,
-                                auxiliary.sample = auxiliary.sample,
-                                learner = get.learner_regr(learner), # must be mlr3 object
-                                proxy.baseline.estimates = proxy.baseline.estimates,
-                                min_variation = min_variation)
+  proxy_CATE_NoChecks(Z = Z, D = D, Y = Y,
+                      auxiliary.sample = auxiliary.sample,
+                      learner = get.learner_regr(learner), # must be mlr3 object
+                      proxy.baseline.estimates = proxy.baseline.estimates,
+                      min_variation = min_variation)
 
 } # END FUN
 
@@ -233,11 +233,11 @@ CATE.proxy.estimator <- function(Z, D, Y,
 #'
 #' @import mlr3 mlr3learners
 #' @noRd
-CATE.proxy.estimator_NoChecks <- function(Z, D, Y,
-                                          auxiliary.sample,
-                                          learner = "random.forest",
-                                          proxy.baseline.estimates = NULL,
-                                          min_variation = 1e-05){
+proxy_CATE_NoChecks <- function(Z, D, Y,
+                                auxiliary.sample,
+                                learner = "random.forest",
+                                proxy.baseline.estimates = NULL,
+                                min_variation = 1e-05){
 
   # indices of the treated units in the auxiliary sample
   auxiliary.sample.logical <- 1:length(Y) %in% auxiliary.sample

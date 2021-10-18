@@ -241,7 +241,7 @@ InputChecks_proxy.estimators <- function(proxy.estimators, baseline = TRUE){
 
       stop(paste0("The object ",
                   deparse(substitute(proxy.estimators)),
-                  " needs to be an instance of baseline.proxy.estimator()"))
+                  " needs to be an instance of proxy_baseline()"))
     }
 
   } else{
@@ -250,7 +250,7 @@ InputChecks_proxy.estimators <- function(proxy.estimators, baseline = TRUE){
 
       stop(paste0("The object ",
                   deparse(substitute(proxy.estimators)),
-                  " needs to be an instance of CATE.proxy.estimator()"))
+                  " needs to be an instance of proxy_CATE()"))
     }
 
   }
