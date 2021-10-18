@@ -243,10 +243,10 @@ get.generic.ml.for.given.learner_NoChecks <-
 
 
     ### step 1e: get parameters over which we maximize to find the "best" ML method ----
-    best.obj <- best.ml.method.parameters(BLP.obj = blp.obj,
-                                          GATES.obj = gates.obj,
-                                          proxy.cate.main.sample = proxy.cate,
-                                          group.membership.main.sample = group.membership.main.sample)
+    best.obj <- lambda_parameters(BLP.obj = blp.obj,
+                                  GATES.obj = gates.obj,
+                                  proxy.cate.main.sample = proxy.cate,
+                                  group.membership.main.sample = group.membership.main.sample)
 
     ### organize output in a list ----
     return(list(BLP = blp.obj,
@@ -271,10 +271,10 @@ get.generic.ml.for.given.learner_NoChecks <-
 #' @return lambda and lambda.bar parameters
 #'
 #' @export
-best.ml.method.parameters <- function(BLP.obj,
-                                      GATES.obj,
-                                      proxy.cate.main.sample,
-                                      group.membership.main.sample){
+lambda_parameters <- function(BLP.obj,
+                              GATES.obj,
+                              proxy.cate.main.sample,
+                              group.membership.main.sample){
 
   return(list(lambda = as.numeric(BLP.obj$blp.coefficients["beta.2"]^2 * stats::var(proxy.cate.main.sample)),
               lambda.bar = as.numeric(colMeans(group.membership.main.sample) %*%  GATES.obj$gates.coefficients^2)))
