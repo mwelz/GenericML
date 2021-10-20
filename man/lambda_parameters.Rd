@@ -4,14 +4,14 @@
 \alias{lambda_parameters}
 \title{returns the two parameters that are used to find the best ML method}
 \usage{
-lambda_parameters(BLP.obj, GATES.obj, proxy_CATE.main.sample, membership)
+lambda_parameters(BLP.obj, GATES.obj, proxy_CATE.M_set, membership)
 }
 \arguments{
 \item{BLP.obj}{an object as returned by CLAN()}
 
 \item{GATES.obj}{an object as returned by get.BLP.parameters()}
 
-\item{proxy_CATE.main.sample}{Proxy CATE estimators for the main sample}
+\item{proxy_CATE.M_set}{Proxy CATE estimators for the main sample}
 
 \item{membership}{a logical matrix with \emph{M} rows that indicate
 the group memberships (such a matrix is returned by the function quantile_group())}

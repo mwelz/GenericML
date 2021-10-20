@@ -8,7 +8,8 @@ proxy_baseline(
   Z,
   D,
   Y,
-  auxiliary.sample,
+  M_set,
+  A_set = setdiff(1:length(Y), M_set),
   learner = "random.forest",
   min_variation = 1e-05
 )
@@ -20,7 +21,9 @@ proxy_baseline(
 
 \item{Y}{a vector of responses of length \emph{n}}
 
-\item{auxiliary.sample}{a numerical vector of indices of observations in the auxiliary sample. Length is shorter than \emph{n}}
+\item{M_set}{a numerical vector of indices of observations in the main sample.}
+
+\item{A_set}{a numerical vector of indices of observations in the auxiliary sample.}
 
 \item{learner}{the classification machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default.}
 

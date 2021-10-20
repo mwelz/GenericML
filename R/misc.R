@@ -88,8 +88,8 @@ quantile_group <- function(x,
 #' @param Y a vector of responses of length
 #' @param propensity_scores a vector of propensity scores
 #' @param learner The machine learner that shall be used
-#' @param M.set main set
-#' @param A.set auxiliary set
+#' @param M_set a numerical vector of indices of observations in the main sample.
+#' @param A_set a numerical vector of indices of observations in the auxiliary sample.
 #' @param Z_CLAN A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z_CLAN = Z`, i.e. CLAN is performed for all variables in `Z`.
 #' @param X1_BLP Specifies the design matrix \eqn{X_1} in the BLP regression. See the documentation of \code{\link{setup_X1}} for details.
 #' @param X1_GATES Same as \code{X1_BLP}, just for the the GATES regression.
@@ -110,8 +110,8 @@ quantile_group <- function(x,
 GenericML_single <- function(Z, D, Y,
                              propensity_scores,
                              learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',
-                             M.set,
-                             A.set                      = setdiff(1:length(Y), M.set),
+                             M_set,
+                             A_set                      = setdiff(1:length(Y), M_set),
                              Z_CLAN                     = NULL,
                              X1_BLP                     = setup_X1(),
                              X1_GATES                   = setup_X1(),
@@ -145,7 +145,7 @@ GenericML_single <- function(Z, D, Y,
   GenericML_single_NoChecks(Z = Z, D = D, Y = Y,
                             propensity_scores = propensity_scores,
                             learner = learner,
-                            M.set = M.set, A.set = A.set,
+                            M_set = M_set, A_set = A_set,
                             Z_CLAN                     = Z_CLAN,
                             X1_BLP                     = X1_BLP,
                             X1_GATES                   = X1_GATES,
@@ -167,7 +167,7 @@ GenericML_single_NoChecks <-
   function(Z, D, Y,
            propensity_scores,
            learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',
-           M.set, A.set,
+           M_set, A_set,
            Z_CLAN                     = NULL,
            X1_BLP                     = setup_X1(),
            X1_GATES                   = setup_X1(),
@@ -187,26 +187,26 @@ GenericML_single_NoChecks <-
     # get the proxy baseline estimator for the main sample
     proxy_baseline.obj <- proxy_baseline_NoChecks(
       Z = Z, D = D, Y = Y,
-      auxiliary.sample = A.set,
+      M_set = M_set, A_set = A_set,
       learner = learner,
       min_variation = min_variation)
-    proxy_baseline     <- proxy_baseline.obj$baseline.predictions.main.sample
+    proxy_baseline     <- proxy_baseline.obj$baseline.predictions.M_set
 
     # get the proxy estimator of the CATE for the main sample
     proxy_CATE.obj <- proxy_CATE_NoChecks(
       Z = Z, D = D, Y = Y,
-      auxiliary.sample = A.set,
+      M_set = M_set, A_set = A_set,
       learner = learner,
       proxy_baseline.estimates = proxy_baseline.obj$baseline.predictions.full.sample,
       min_variation = min_variation)
-    proxy_CATE <- proxy_CATE.obj$CATE.predictions.main.sample
+    proxy_CATE <- proxy_CATE.obj$CATE.predictions.M_set
 
 
     ### step 1b: estimate BLP parameters by OLS ----
     blp.obj <- BLP_NoChecks(
-      D = D[M.set],
-      Y = Y[M.set],
-      propensity_scores  = propensity_scores[M.set],
+      D = D[M_set],
+      Y = Y[M_set],
+      propensity_scores  = propensity_scores[M_set],
       proxy_baseline     = proxy_baseline,
       proxy_CATE         = proxy_CATE,
       HT                 = HT,
@@ -223,9 +223,9 @@ GenericML_single_NoChecks <-
                                  quantile.nam = TRUE)
 
     gates.obj <- GATES_NoChecks(
-      D = D[M.set],
-      Y = Y[M.set],
-      propensity_scores   = propensity_scores[M.set],
+      D = D[M_set],
+      Y = Y[M_set],
+      propensity_scores   = propensity_scores[M_set],
       proxy_baseline      = proxy_baseline,
       proxy_CATE          = proxy_CATE,
       membership = membership,
@@ -238,7 +238,7 @@ GenericML_single_NoChecks <-
 
     ### step 1d: estimate CLAN parameters in the main sample ----
     clan.obj <- CLAN_NoChecks(
-      Z_CLAN = Z_CLAN[M.set,,drop = FALSE],
+      Z_CLAN = Z_CLAN[M_set,,drop = FALSE],
       membership = membership,
       equal_variances   = equal_variances_CLAN,
       diff                    = diff_CLAN,
@@ -248,7 +248,7 @@ GenericML_single_NoChecks <-
     ### step 1e: get parameters over which we maximize to find the "best" ML method ----
     best.obj <- lambda_parameters(BLP.obj = blp.obj,
                                   GATES.obj = gates.obj,
-                                  proxy_CATE.main.sample = proxy_CATE,
+                                  proxy_CATE.M_set = proxy_CATE,
                                   membership = membership)
 
     ### organize output in a list ----
@@ -268,7 +268,7 @@ GenericML_single_NoChecks <-
 #'
 #' @param BLP.obj an object as returned by CLAN()
 #' @param GATES.obj an object as returned by get.BLP.parameters()
-#' @param proxy_CATE.main.sample Proxy CATE estimators for the main sample
+#' @param proxy_CATE.M_set Proxy CATE estimators for the main sample
 #' @param membership a logical matrix with _M_ rows that indicate
 #' the group memberships (such a matrix is returned by the function quantile_group())
 #' @return lambda and lambda.bar parameters
@@ -276,13 +276,13 @@ GenericML_single_NoChecks <-
 #' @export
 lambda_parameters <- function(BLP.obj,
                               GATES.obj,
-                              proxy_CATE.main.sample,
+                              proxy_CATE.M_set,
                               membership){
 
   temp <- GATES.obj$coefficients
   gates.coefs <- temp[startsWith(rownames(temp), "gamma."), "Estimate"]
 
-  return(list(lambda = BLP.obj$coefficients["beta.2", "Estimate"]^2 * stats::var(proxy_CATE.main.sample),
+  return(list(lambda = BLP.obj$coefficients["beta.2", "Estimate"]^2 * stats::var(proxy_CATE.M_set),
               lambda.bar = as.numeric(colMeans(membership) %*%  gates.coefs^2)))
 
 } # END FUN

@@ -10,8 +10,8 @@ GenericML_single(
   Y,
   propensity_scores,
   learner = "mlr3::lrn(\\"cv_glmnet\\", s = \\"lambda.min\\")",
-  M.set,
-  A.set = setdiff(1:length(Y), M.set),
+  M_set,
+  A_set = setdiff(1:length(Y), M_set),
   Z_CLAN = NULL,
   X1_BLP = setup_X1(),
   X1_GATES = setup_X1(),
@@ -37,9 +37,9 @@ GenericML_single(
 
 \item{learner}{The machine learner that shall be used}
 
-\item{M.set}{main set}
+\item{M_set}{a numerical vector of indices of observations in the main sample.}
 
-\item{A.set}{auxiliary set}
+\item{A_set}{a numerical vector of indices of observations in the auxiliary sample.}
 
 \item{Z_CLAN}{A matrix of variables that shall be considered for the CLAN. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.}
 

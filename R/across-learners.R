@@ -130,14 +130,14 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
   for(s in 1:num_splits){
 
     # perform sample splitting into main set and auxiliary set
-    M.set <- sort(sample(x = N.set, size = floor(prop), replace = FALSE),
+    M_set <- sort(sample(x = N.set, size = floor(prop), replace = FALSE),
                   decreasing = FALSE)
-    A.set <- setdiff(N.set, M.set)
+    A_set <- setdiff(N.set, M_set)
 
     if(store_splits){
 
-      splits.mat[M.set, s] <- "M"
-      splits.mat[A.set, s] <- "A"
+      splits.mat[M_set, s] <- "M"
+      splits.mat[A_set, s] <- "A"
 
     } # IF
 
@@ -149,7 +149,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
         GenericML_single_NoChecks(Z = Z, D = D, Y = Y,
                                   propensity_scores = propensity_scores,
                                   learner = learners[[i]],
-                                  M.set = M.set, A.set = A.set,
+                                  M_set = M_set, A_set = A_set,
                                   Z_CLAN                       = Z_CLAN,
                                   X1_BLP                       = X1_BLP,
                                   X1_GATES                     = X1_GATES,
@@ -274,14 +274,14 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
 
 
     # perform sample splitting into main set and auxiliary set
-    M.set <- sort(sample(x = N.set, size = floor(prop), replace = FALSE),
+    M_set <- sort(sample(x = N.set, size = floor(prop), replace = FALSE),
                   decreasing = FALSE)
-    A.set <- setdiff(N.set, M.set)
+    A_set <- setdiff(N.set, M_set)
 
     if(store_splits){
 
       splits.vec        <- rep("M", N)
-      splits.vec[A.set] <- "A"
+      splits.vec[A_set] <- "A"
 
     } else{
       splits.vec <- NULL
@@ -295,7 +295,7 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
         GenericML_single_NoChecks(Z = Z, D = D, Y = Y,
                                   propensity_scores = propensity_scores,
                                   learner = learners[[i]],
-                                  M.set = M.set, A.set = A.set,
+                                  M_set = M_set, A_set = A_set,
                                   Z_CLAN                       = Z_CLAN,
                                   X1_BLP                       = X1_BLP,
                                   X1_GATES                     = X1_GATES,

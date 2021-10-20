@@ -117,7 +117,8 @@ propensity_score_NoChecks <- function(Z, D, estimator = "constant"){
 #' @param Z an ( _n_ x _d_) matrix or data frame of covariates
 #' @param D a binary vector of treatment status of length _n_
 #' @param Y a vector of responses of length _n_
-#' @param auxiliary.sample a numerical vector of indices of observations in the auxiliary sample. Length is shorter than _n_
+#' @param M_set a numerical vector of indices of observations in the main sample.
+#' @param A_set a numerical vector of indices of observations in the auxiliary sample.
 #' @param learner the classification machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default.
 #' @param min_variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
 #' @return Estimates of Y, both for the auxiliary sample and all observations, and an 'mlr3' object of the employed model
@@ -125,7 +126,8 @@ propensity_score_NoChecks <- function(Z, D, estimator = "constant"){
 #'
 #' @export
 proxy_baseline <- function(Z, D, Y,
-                           auxiliary.sample,
+                           M_set,
+                           A_set = setdiff(1:length(Y), M_set),
                            learner = "random.forest",
                            min_variation = 1e-05){
 
@@ -137,7 +139,7 @@ proxy_baseline <- function(Z, D, Y,
 
   # call main function
   proxy_baseline_NoChecks(Z = Z, D = D, Y = Y,
-                          auxiliary.sample = auxiliary.sample,
+                          M_set = M_set, A_set = A_set,
                           learner = get.learner_regr(learner),
                           min_variation = min_variation)
 
@@ -149,7 +151,8 @@ proxy_baseline <- function(Z, D, Y,
 #' @import mlr3 mlr3learners
 #' @noRd
 proxy_baseline_NoChecks <- function(Z, D, Y,
-                                    auxiliary.sample,
+                                    M_set,
+                                    A_set,
                                     learner, # must be mlr3 object
                                     min_variation = 1e-05){
 
@@ -162,11 +165,8 @@ proxy_baseline_NoChecks <- function(Z, D, Y,
   learner$predict_type = "response"
 
   # indices of the control units in the auxiliary sample
-  auxiliary.sample.logical <- 1:length(Y) %in% auxiliary.sample
-  idx <- which(auxiliary.sample.logical & D == 0)
-
-  # identify the main sample
-  main.sample <- setdiff(1:length(Y), auxiliary.sample)
+  A_set.logical <- 1:length(Y) %in% A_set
+  idx <- which(A_set.logical & D == 0)
 
   # fit the learner on the control units in the auxiliary sample
   learner$train(task.proxy_baseline.estimator, row_ids = idx)
@@ -185,10 +185,9 @@ proxy_baseline_NoChecks <- function(Z, D, Y,
 
   # return
   return(structure(
-    list(baseline.predictions.main.sample = predictions[main.sample],
-         baseline.predictions.auxiliary.sample = predictions[auxiliary.sample],
+    list(baseline.predictions.M_set = predictions[M_set],
+         baseline.predictions.A_set = predictions[A_set],
          baseline.predictions.full.sample = predictions,
-         auxiliary.sample = auxiliary.sample,
          mlr3_objects = list(task = task.proxy_baseline.estimator,
                              learner = learner)), class = "proxy_baseline"))
 
@@ -200,7 +199,8 @@ proxy_baseline_NoChecks <- function(Z, D, Y,
 #' @param Z an ( _n_ x _d_) matrix or data frame of covariates
 #' @param D a binary vector of treatment status of length _n_
 #' @param Y a vector of responses of length _n_
-#' @param auxiliary.sample a numerical vector of indices of observations in the auxiliary sample. Length is shorter than _n_
+#' @param M_set a numerical vector of indices of observations in the main sample.
+#' @param A_set a numerical vector of indices of observations in the auxiliary sample.
 #' @param learner the regression machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default.
 #' @param proxy_baseline.estimates A vector of length _n_ of proxy estimates of the baseline estimator \eqn{E[Y | D=0, Z]}. If NULL, these will be estimated separately.
 #' @param min_variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
@@ -208,7 +208,8 @@ proxy_baseline_NoChecks <- function(Z, D, Y,
 #'
 #' @export
 proxy_CATE <- function(Z, D, Y,
-                       auxiliary.sample,
+                       M_set,
+                       A_set   = setdiff(1:length(Y), M_set),
                        learner = "random.forest",
                        proxy_baseline.estimates = NULL,
                        min_variation = 1e-05){
@@ -221,7 +222,7 @@ proxy_CATE <- function(Z, D, Y,
 
   # run main function
   proxy_CATE_NoChecks(Z = Z, D = D, Y = Y,
-                      auxiliary.sample = auxiliary.sample,
+                      M_set = M_set, A_set = A_set,
                       learner = get.learner_regr(learner), # must be mlr3 object
                       proxy_baseline.estimates = proxy_baseline.estimates,
                       min_variation = min_variation)
@@ -234,17 +235,15 @@ proxy_CATE <- function(Z, D, Y,
 #' @import mlr3 mlr3learners
 #' @noRd
 proxy_CATE_NoChecks <- function(Z, D, Y,
-                                auxiliary.sample,
+                                M_set,
+                                A_set,
                                 learner = "random.forest",
                                 proxy_baseline.estimates = NULL,
                                 min_variation = 1e-05){
 
   # indices of the treated units in the auxiliary sample
-  auxiliary.sample.logical <- 1:length(Y) %in% auxiliary.sample
-  idx.auxiliary.treated <- which(auxiliary.sample.logical & D == 1)
-
-  # identify the main sample
-  main.sample <- setdiff(1:length(Y), auxiliary.sample)
+  A_set.logical <- 1:length(Y) %in% A_set
+  idx.auxiliary.treated <- which(A_set.logical & D == 1)
 
   # specify that the learner predicts Y
   learner$predict_type = "response"
@@ -283,7 +282,7 @@ proxy_CATE_NoChecks <- function(Z, D, Y,
     learner.controls <- learner
 
     # control units in the auxiliary sample
-    idx.auxiliary.controls <- which(auxiliary.sample.logical & D == 0)
+    idx.auxiliary.controls <- which(A_set.logical & D == 0)
 
     # fit the learner on the control units in the auxiliary sample
     learner.controls$train(task.proxy_CATE.controls.estimator, row_ids = idx.auxiliary.controls)
@@ -300,15 +299,15 @@ proxy_CATE_NoChecks <- function(Z, D, Y,
 
   # prepare returned objects
   predictions.Y1 <-
-    list(predictions.Y1_main.sample = predictions.treated[main.sample],
-         predictions.Y1_auxiliary.sample = predictions.treated[auxiliary.sample],
+    list(predictions.Y1_M_set = predictions.treated[M_set],
+         predictions.Y1_A_set = predictions.treated[A_set],
          predictions.Y1_full.sample = predictions.treated,
          mlr3_objects = list(task = task.proxy_CATE.treated.estimator,
                              learner = learner.treated))
 
   predictions.Y0 <-
-    list(predictions.Y0_main.sample = predictions.controls[main.sample],
-         predictions.Y0_auxiliary.sample = predictions.controls[auxiliary.sample],
+    list(predictions.Y0_M_set = predictions.controls[M_set],
+         predictions.Y0_A_set = predictions.controls[A_set],
          predictions.Y0_full.sample = predictions.controls,
          mlr3_objects = mlr3.controls)
 
@@ -324,11 +323,11 @@ proxy_CATE_NoChecks <- function(Z, D, Y,
   } # IF
 
   return(structure(
-    list(CATE.predictions.main.sample = cate.predictions[main.sample],
-         CATE.predictions.auxiliary.sample = cate.predictions[auxiliary.sample],
+    list(CATE.predictions.M_set = cate.predictions[M_set],
+         CATE.predictions.A_set = cate.predictions[A_set],
          CATE.predictions.full.sample = cate.predictions,
          Y1.predictions = predictions.Y1,
-         Y0.predictions = predictions.Y0,
-         auxiliary.sample = auxiliary.sample), class = "proxy_CATE"))
+         Y0.predictions = predictions.Y0),
+    class = "proxy_CATE"))
 
 } # FUN
