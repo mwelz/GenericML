@@ -2,7 +2,7 @@
 % Please edit documentation in R/mlr3.R
 \name{proxy_CATE}
 \alias{proxy_CATE}
-\title{Estimates the CATE proxy estimator \eqn{E[Y | D=1, Z] - E[Y | D=0, Z]} on the auxiliary sample}
+\title{Performs estimation of the conditional average treatment effect (CATE), \eqn{E[Y | D=1, Z] - E[Y | D=0, Z]}, on the auxiliary sample}
 \usage{
 proxy_CATE(
   Z,
@@ -10,7 +10,7 @@ proxy_CATE(
   Y,
   A_set,
   learner = "random.forest",
-  proxy_baseline = NULL,
+  proxy_BCA = NULL,
   min_variation = 1e-05
 )
 }
@@ -25,7 +25,7 @@ proxy_CATE(
 
 \item{learner}{the regression machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default.}
 
-\item{proxy_baseline}{A vector of length \emph{n} of proxy estimates of the baseline estimator \eqn{E[Y | D=0, Z]}. If NULL, these will be estimated separately.}
+\item{proxy_BCA}{A vector of length \emph{n} of proxy estimates of the baseline estimator \eqn{E[Y | D=0, Z]}. If NULL, these will be estimated separately.}
 
 \item{min_variation}{minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.}
 }
@@ -33,5 +33,5 @@ proxy_CATE(
 An object of the class \code{proxy_CATE}.
 }
 \description{
-Estimates the CATE proxy estimator \eqn{E[Y | D=1, Z] - E[Y | D=0, Z]} on the auxiliary sample
+Performs estimation of the conditional average treatment effect (CATE), \eqn{E[Y | D=1, Z] - E[Y | D=0, Z]}, on the auxiliary sample
 }

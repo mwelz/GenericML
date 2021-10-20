@@ -237,11 +237,11 @@ InputChecks_proxy.estimators <- function(proxy.estimators, baseline = TRUE){
 
   if(baseline){
 
-    if(!inherits(proxy.estimators, what = "proxy_baseline")){
+    if(!inherits(proxy.estimators, what = "proxy_BCA")){
 
       stop(paste0("The object ",
                   deparse(substitute(proxy.estimators)),
-                  " needs to be an instance of proxy_baseline()"))
+                  " needs to be an instance of proxy_BCA()"))
     }
 
   } else{

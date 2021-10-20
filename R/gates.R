@@ -5,7 +5,7 @@
 #' @param Y A vector of responses.
 #' @param D A binary vector of treatment status.
 #' @param propensity_scores A vector of propensity scores.
-#' @param proxy_baseline A vector of proxy baseline estimates.
+#' @param proxy_BCA A vector of proxy baseline estimates.
 #' @param proxy_CATE A vector of proxy CATE estimates.
 #' @param membership A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be an instance of \code{\link{quantile_group}}.
 #' @param HT Logical. If \code{TRUE}, a HT transformation is applied (GATES2 in the paper). Default is \code{FALSE}.
@@ -19,7 +19,7 @@
 #' @export
 GATES <- function(Y, D,
                   propensity_scores,
-                  proxy_baseline,
+                  proxy_BCA,
                   proxy_CATE,
                   membership,
                   HT                 = FALSE,
@@ -32,7 +32,7 @@ GATES <- function(Y, D,
   InputChecks_D(D)
   InputChecks_Y(Y)
   InputChecks_equal.length2(D, Y)
-  InputChecks_equal.length3(propensity_scores, proxy_baseline, proxy_CATE)
+  InputChecks_equal.length3(propensity_scores, proxy_BCA, proxy_CATE)
   InputChecks_equal.length2(Y, propensity_scores)
   InputChecks_X1(X1_control)
   InputChecks_vcov.control(vcov_control)
@@ -42,7 +42,7 @@ GATES <- function(Y, D,
   # fit model according to strategy 1 or 2 in the paper
   GATES_NoChecks(D = D, Y = Y,
                  propensity_scores   = propensity_scores,
-                 proxy_baseline      = proxy_baseline,
+                 proxy_BCA      = proxy_BCA,
                  proxy_CATE          = proxy_CATE,
                  membership          = membership,
                  X1_control          = X1_control,
@@ -56,7 +56,7 @@ GATES <- function(Y, D,
 # helper function that skips the input checks
 GATES_NoChecks <- function(D, Y,
                            propensity_scores,
-                           proxy_baseline,
+                           proxy_BCA,
                            proxy_CATE,
                            membership,
                            HT                  = FALSE,
@@ -69,7 +69,7 @@ GATES_NoChecks <- function(D, Y,
   do.call(what = get(ifelse(HT, "GATES.HT", "GATES.classic")),
           args = list(D = D, Y = Y,
                       propensity_scores   = propensity_scores,
-                      proxy_baseline      = proxy_baseline,
+                      proxy_BCA      = proxy_BCA,
                       proxy_CATE          = proxy_CATE,
                       membership          = membership,
                       X1_control          = X1_control,
@@ -83,7 +83,7 @@ GATES_NoChecks <- function(D, Y,
 # helper function for case when there is no HT transformation used. Wrapped by function "GATES"
 GATES.classic <- function(D, Y,
                           propensity_scores,
-                          proxy_baseline, proxy_CATE,
+                          proxy_BCA, proxy_CATE,
                           membership,
                           X1_control       = setup_X1(),
                           vcov_control       = setup_vcov(),
@@ -101,7 +101,7 @@ GATES.classic <- function(D, Y,
 
   # prepare matrix X1
   X1     <- get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy_CATE,
-                                                                B = proxy_baseline,
+                                                                B = proxy_BCA,
                                                                 p = propensity_scores),
                                      X1_control = X1_control)
 
@@ -137,7 +137,7 @@ GATES.classic <- function(D, Y,
 # helper function for case when there is a HT transformation used. Wrapped by function "GATES"
 GATES.HT <- function(D, Y,
                      propensity_scores,
-                     proxy_baseline, proxy_CATE,
+                     proxy_BCA, proxy_CATE,
                      membership,
                      X1_control       = setup_X1(),
                      vcov_control       = setup_vcov(),
@@ -155,7 +155,7 @@ GATES.HT <- function(D, Y,
 
   # prepare matrix X1
   X1 <- get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy_CATE,
-                                                            B = proxy_baseline,
+                                                            B = proxy_BCA,
                                                             p = propensity_scores),
                                  X1_control = X1_control)
 

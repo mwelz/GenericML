@@ -8,7 +8,7 @@ BLP(
   Y,
   D,
   propensity_scores,
-  proxy_baseline,
+  proxy_BCA,
   proxy_CATE,
   HT = FALSE,
   X1_control = setup_X1(),
@@ -23,7 +23,7 @@ BLP(
 
 \item{propensity_scores}{A vector of propensity scores.}
 
-\item{proxy_baseline}{A vector of proxy baseline estimates.}
+\item{proxy_BCA}{A vector of proxy baseline estimates.}
 
 \item{proxy_CATE}{A vector of proxy CATE estimates.}
 

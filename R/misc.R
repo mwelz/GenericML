@@ -117,7 +117,7 @@ quantile_group <- function(x,
 #' @param significance_level Significance level for VEIN. Default is 0.05.
 #' @param min_variation Minimum variation of the predictions before random noise with distribution \eqn{N(0, var(Y)/20)} is added. Default is \code{1e-05}.
 #'
-#' @return a list with instances of the classes \code{BLP}, \code{GATES}, \code{CLAN}, \code{proxy_baseline}, and \code{proxy_CATE}. In addition, the lambda parameters for finding the best learner are returned.
+#' @return a list with instances of the classes \code{BLP}, \code{GATES}, \code{CLAN}, \code{proxy_BCA}, and \code{proxy_CATE}. In addition, the lambda parameters for finding the best learner are returned.
 #'
 #' @export
 GenericML_single <- function(Z, D, Y,
@@ -198,14 +198,14 @@ GenericML_single_NoChecks <-
     ### step 1a: learn proxy predictors by using the auxiliary set ----
 
     # get proxy baseline estimates
-    proxy_baseline.obj <- proxy_baseline_NoChecks(
+    proxy_BCA.obj <- proxy_BCA_NoChecks(
       Z = Z, D = D, Y = Y,
       A_set         = A_set,
       learner       = learner,
       min_variation = min_variation)
 
     # get estimates on main sample
-    proxy_baseline_M     <- proxy_baseline.obj$estimates[M_set]
+    proxy_BCA_M     <- proxy_BCA.obj$estimates[M_set]
 
     # get the proxy estimates of the CATE
     proxy_CATE.obj <-
@@ -213,7 +213,7 @@ GenericML_single_NoChecks <-
         Z = Z, D = D, Y = Y,
         A_set          = A_set,
         learner        = learner,
-        proxy_baseline = proxy_baseline.obj$estimates,
+        proxy_BCA = proxy_BCA.obj$estimates,
         min_variation  = min_variation)
 
     # get estimates on main sample
@@ -225,7 +225,7 @@ GenericML_single_NoChecks <-
       D                  = D[M_set],
       Y                  = Y[M_set],
       propensity_scores  = propensity_scores[M_set],
-      proxy_baseline     = proxy_baseline_M,
+      proxy_BCA     = proxy_BCA_M,
       proxy_CATE         = proxy_CATE_M,
       HT                 = HT,
       X1_control         = setup_X1(),
@@ -245,7 +245,7 @@ GenericML_single_NoChecks <-
       D                   = D[M_set],
       Y                   = Y[M_set],
       propensity_scores   = propensity_scores[M_set],
-      proxy_baseline      = proxy_baseline_M,
+      proxy_BCA      = proxy_BCA_M,
       proxy_CATE          = proxy_CATE_M,
       membership          = membership_M,
       HT                  = HT,
@@ -275,7 +275,7 @@ GenericML_single_NoChecks <-
                 GATES          = gates.obj,
                 CLAN           = clan.obj,
                 proxy_CATE     = proxy_CATE.obj,
-                proxy_baseline = proxy_baseline.obj,
+                proxy_BCA = proxy_BCA.obj,
                 best           = best.obj
     ))
 

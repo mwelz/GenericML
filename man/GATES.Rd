@@ -8,7 +8,7 @@ GATES(
   Y,
   D,
   propensity_scores,
-  proxy_baseline,
+  proxy_BCA,
   proxy_CATE,
   membership,
   HT = FALSE,
@@ -25,7 +25,7 @@ GATES(
 
 \item{propensity_scores}{A vector of propensity scores.}
 
-\item{proxy_baseline}{A vector of proxy baseline estimates.}
+\item{proxy_BCA}{A vector of proxy baseline estimates.}
 
 \item{proxy_CATE}{A vector of proxy CATE estimates.}
 

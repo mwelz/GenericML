@@ -156,4 +156,4 @@ plot(genML, type = "CLAN", CLAN.variable = "z1", title = "CLAN of 'z1'")
 - [ ] Release beta on CRAN.
 
 ## Authors
-Max Welz (m.welz@erasmusmc.nl), Andreas Alfons (aalfons@ese.eur.nl), Mert Demirer (mdemirer@mit.edu), and Victor Chernozhukov (vchern@mit.edu).
+Max Welz (m.welz@erasmusmc.nl), Andreas Alfons (alfons@ese.eur.nl), Mert Demirer (mdemirer@mit.edu), and Victor Chernozhukov (vchern@mit.edu).

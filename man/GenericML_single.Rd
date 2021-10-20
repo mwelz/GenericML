@@ -66,7 +66,7 @@ GenericML_single(
 \item{min_variation}{Minimum variation of the predictions before random noise with distribution \eqn{N(0, var(Y)/20)} is added. Default is \code{1e-05}.}
 }
 \value{
-a list with instances of the classes \code{BLP}, \code{GATES}, \code{CLAN}, \code{proxy_baseline}, and \code{proxy_CATE}. In addition, the lambda parameters for finding the best learner are returned.
+a list with instances of the classes \code{BLP}, \code{GATES}, \code{CLAN}, \code{proxy_BCA}, and \code{proxy_CATE}. In addition, the lambda parameters for finding the best learner are returned.
 }
 \description{
 Can be seen as a single iteration of Algorithm 1 in the paper.

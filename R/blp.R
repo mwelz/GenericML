@@ -5,7 +5,7 @@
 #' @param Y A vector of responses.
 #' @param D A binary vector of treatment status.
 #' @param propensity_scores A vector of propensity scores.
-#' @param proxy_baseline A vector of proxy baseline estimates.
+#' @param proxy_BCA A vector of proxy baseline estimates.
 #' @param proxy_CATE A vector of proxy CATE estimates.
 #' @param HT Logical. If \code{TRUE}, a HT transformation is applied (BLP2 in the paper). Default is \code{FALSE}.
 #' @param X1_control Specifies the design matrix \eqn{X_1} in the regression. See the documentation of \code{\link{setup_X1}} for details.
@@ -17,7 +17,7 @@
 #' @export
 BLP <- function(Y, D,
                 propensity_scores,
-                proxy_baseline,
+                proxy_BCA,
                 proxy_CATE,
                 HT                 = FALSE,
                 X1_control         = setup_X1(),
@@ -29,15 +29,15 @@ BLP <- function(Y, D,
   InputChecks_Y(Y)
   InputChecks_D(D)
   InputChecks_equal.length2(Y, D)
-  InputChecks_equal.length2(proxy_baseline, proxy_CATE)
-  InputChecks_equal.length2(proxy_baseline, Y)
+  InputChecks_equal.length2(proxy_BCA, proxy_CATE)
+  InputChecks_equal.length2(proxy_BCA, Y)
   InputChecks_vcov.control(vcov_control)
   InputChecks_X1(X1_control)
 
   # fit model according to strategy 1 or 2 in the paper
   BLP_NoChecks(D = D, Y = Y,
                propensity_scores  = propensity_scores,
-               proxy_baseline     = proxy_baseline,
+               proxy_BCA     = proxy_BCA,
                proxy_CATE         = proxy_CATE,
                X1_control         = X1_control,
                vcov_control       = vcov_control,
@@ -49,7 +49,7 @@ BLP <- function(Y, D,
 # helper function to perform BLP w/o input checks
 BLP_NoChecks <- function(D, Y,
                          propensity_scores,
-                         proxy_baseline,
+                         proxy_BCA,
                          proxy_CATE,
                          HT                 = FALSE,
                          X1_control         = setup_X1(),
@@ -60,7 +60,7 @@ BLP_NoChecks <- function(D, Y,
   do.call(what = get(ifelse(HT, "BLP.HT", "BLP.classic")),
           args = list(D = D, Y = Y,
                       propensity_scores  = propensity_scores,
-                      proxy_baseline     = proxy_baseline,
+                      proxy_BCA     = proxy_BCA,
                       proxy_CATE         = proxy_CATE,
                       X1_control         = X1_control,
                       vcov_control       = vcov_control,
@@ -71,7 +71,7 @@ BLP_NoChecks <- function(D, Y,
 
 # helper function for case when there is no HT transformation used. Wrapped by function "BLP"
 BLP.classic <- function(D, Y, propensity_scores,
-                        proxy_baseline, proxy_CATE,
+                        proxy_BCA, proxy_CATE,
                         X1_control         = setup_X1(),
                         vcov_control       = setup_vcov(),
                         significance_level = 0.05){
@@ -81,7 +81,7 @@ BLP.classic <- function(D, Y, propensity_scores,
 
   # prepare covariate matrix X
   X <- data.frame(get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy_CATE,
-                                                                      B = proxy_baseline,
+                                                                      B = proxy_BCA,
                                                                       p = propensity_scores),
                                            X1_control = X1_control),
                   beta.1 = D - propensity_scores,
@@ -111,7 +111,7 @@ BLP.classic <- function(D, Y, propensity_scores,
 
 # helper function for case when there is a HT transformation used. Wrapped by function "BLP"
 BLP.HT <- function(D, Y, propensity_scores,
-                   proxy_baseline, proxy_CATE,
+                   proxy_BCA, proxy_CATE,
                    X1_control       = setup_X1(),
                    vcov_control       = setup_vcov(),
                    significance_level = 0.05){
@@ -121,7 +121,7 @@ BLP.HT <- function(D, Y, propensity_scores,
 
   # prepare matrix X1
   X1. <- get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy_CATE,
-                                                             B = proxy_baseline,
+                                                             B = proxy_BCA,
                                                              p = propensity_scores),
                                  X1_control = X1_control)
 

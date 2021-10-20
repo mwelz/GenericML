@@ -112,7 +112,7 @@ propensity_score_NoChecks <- function(Z, D, estimator = "constant"){
 
 
 
-#' Estimates the baseline proxy estimator \eqn{E[Y | D=0, Z]} on the auxiliary sample
+#' Performs estimation of the baseline conditional average (BCA), \eqn{E[Y | D=0, Z]}, on the auxiliary sample
 #'
 #' @param Z an ( _n_ x _d_) matrix or data frame of covariates
 #' @param D a binary vector of treatment status of length _n_
@@ -121,14 +121,14 @@ propensity_score_NoChecks <- function(Z, D, estimator = "constant"){
 #' @param learner the classification machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default.
 #' @param min_variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
 #'
-#' @return An object of the class \code{proxy_baseline}.
+#' @return An object of the class \code{proxy_BCA}.
 #'
 #'
 #' @export
-proxy_baseline <- function(Z, D, Y,
-                           A_set,
-                           learner = "random.forest",
-                           min_variation = 1e-05){
+proxy_BCA <- function(Z, D, Y,
+                      A_set,
+                      learner = "random.forest",
+                      min_variation = 1e-05){
 
   # input checks
   InputChecks_D(D)
@@ -137,7 +137,7 @@ proxy_baseline <- function(Z, D, Y,
   InputChecks_equal.length3(D, Y ,Z)
 
   # call main function
-  proxy_baseline_NoChecks(Z = Z, D = D, Y = Y,
+  proxy_BCA_NoChecks(Z = Z, D = D, Y = Y,
                           A_set = A_set,
                           learner = get.learner_regr(learner),
                           min_variation = min_variation)
@@ -149,13 +149,13 @@ proxy_baseline <- function(Z, D, Y,
 #'
 #' @import mlr3 mlr3learners
 #' @noRd
-proxy_baseline_NoChecks <- function(Z, D, Y,
+proxy_BCA_NoChecks <- function(Z, D, Y,
                                     A_set,
                                     learner, # must be mlr3 object
                                     min_variation = 1e-05){
 
   # specify the task
-  task.proxy_baseline.estimator <- mlr3::TaskRegr$new(id = "proxy_baseline",
+  task.proxy_BCA.estimator <- mlr3::TaskRegr$new(id = "proxy_BCA",
                                                       backend = data.frame(Y, Z),
                                                       target = "Y")
 
@@ -167,10 +167,10 @@ proxy_baseline_NoChecks <- function(Z, D, Y,
   idx <- which(A_set.logical & D == 0)
 
   # fit the learner on the control units in the auxiliary sample
-  learner$train(task.proxy_baseline.estimator, row_ids = idx)
+  learner$train(task.proxy_BCA.estimator, row_ids = idx)
 
   # obtain predictions for Y for all observations
-  predictions.obj <- learner$predict(task.proxy_baseline.estimator)
+  predictions.obj <- learner$predict(task.proxy_BCA.estimator)
   predictions     <- predictions.obj$response
 
   # if there is not much variation in the predictions, add Gaussian noise
@@ -184,20 +184,20 @@ proxy_baseline_NoChecks <- function(Z, D, Y,
   # return
   return(structure(
     list(estimates  = predictions,
-         mlr3_objects = list(task = task.proxy_baseline.estimator,
-                             learner = learner)), class = "proxy_baseline"))
+         mlr3_objects = list(task = task.proxy_BCA.estimator,
+                             learner = learner)), class = "proxy_BCA"))
 
 } # FUN
 
 
-#' Estimates the CATE proxy estimator \eqn{E[Y | D=1, Z] - E[Y | D=0, Z]} on the auxiliary sample
+#' Performs estimation of the conditional average treatment effect (CATE), \eqn{E[Y | D=1, Z] - E[Y | D=0, Z]}, on the auxiliary sample
 #'
 #' @param Z an ( _n_ x _d_) matrix or data frame of covariates
 #' @param D a binary vector of treatment status of length _n_
 #' @param Y a vector of responses of length _n_
 #' @param A_set a numerical vector of indices of observations in the auxiliary sample.
 #' @param learner the regression machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default.
-#' @param proxy_baseline A vector of length _n_ of proxy estimates of the baseline estimator \eqn{E[Y | D=0, Z]}. If NULL, these will be estimated separately.
+#' @param proxy_BCA A vector of length _n_ of proxy estimates of the baseline estimator \eqn{E[Y | D=0, Z]}. If NULL, these will be estimated separately.
 #' @param min_variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
 #' @return An object of the class \code{proxy_CATE}.
 #'
@@ -205,7 +205,7 @@ proxy_baseline_NoChecks <- function(Z, D, Y,
 proxy_CATE <- function(Z, D, Y,
                        A_set,
                        learner = "random.forest",
-                       proxy_baseline = NULL,
+                       proxy_BCA = NULL,
                        min_variation = 1e-05){
 
   # input checks
@@ -218,7 +218,7 @@ proxy_CATE <- function(Z, D, Y,
   proxy_CATE_NoChecks(Z = Z, D = D, Y = Y,
                       A_set = A_set,
                       learner = get.learner_regr(learner), # must be mlr3 object
-                      proxy_baseline = proxy_baseline,
+                      proxy_BCA = proxy_BCA,
                       min_variation = min_variation)
 
 } # END FUN
@@ -231,7 +231,7 @@ proxy_CATE <- function(Z, D, Y,
 proxy_CATE_NoChecks <- function(Z, D, Y,
                                 A_set,
                                 learner = "random.forest",
-                                proxy_baseline = NULL,
+                                proxy_BCA = NULL,
                                 min_variation = 1e-05){
 
   # indices of the treated units in the auxiliary sample
@@ -257,10 +257,10 @@ proxy_CATE_NoChecks <- function(Z, D, Y,
   predictions.treated     <- predictions.treated.obj$response
 
 
-  if(!is.null(proxy_baseline)){
+  if(!is.null(proxy_BCA)){
 
     ## if proxy baseline estimates were provided, no need for second estimation
-    predictions.controls <- proxy_baseline
+    predictions.controls <- proxy_BCA
     mlr3.controls        <- "Not available as proxy estimates for the baseline were provided"
 
   } else{
