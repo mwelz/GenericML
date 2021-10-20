@@ -104,10 +104,10 @@ get_blp.3d <- function(num.learners, learners.names){
 } # FUN
 
 
-get_gates.3d <- function(num.learners, learners.names, num.generic.targets.gates){
+get_gates.3d <- function(num.learners, learners.names, num.generic_targets.gates){
 
-  array(NA_real_, dim = c(num.generic.targets.gates, 7, num.learners),
-        dimnames = list(paste0("gamma.", 1:num.generic.targets.gates), c("Estimate", "CB lower", "CB upper", "Std. Error", "z value", "Pr(<z)", "Pr(>z)"), learners.names))
+  array(NA_real_, dim = c(num.generic_targets.gates, 7, num.learners),
+        dimnames = list(paste0("gamma.", 1:num.generic_targets.gates), c("Estimate", "CB lower", "CB upper", "Std. Error", "z value", "Pr(<z)", "Pr(>z)"), learners.names))
 
 } # FUN
 
@@ -120,10 +120,10 @@ get_best.3d <- function(num.learners, learners.names){
 } # FUN
 
 
-get_clan.3d.ls <- function(num.learners, learners.names, num.generic.targets.clan, num.vars.in.Z_CLAN, Z_CLAN.names){
+get_clan.3d.ls <- function(num.learners, learners.names, num.generic_targets.clan, num.vars.in.Z_CLAN, Z_CLAN.names){
 
   clan.3d.ls <- lapply(1:num.vars.in.Z_CLAN,
-                       function(...) array(NA_real_, dim = c(num.generic.targets.clan, 7, num.learners), dimnames = list(paste0("gamma.", 1:num.generic.targets.clan), c("Estimate", "CB lower", "CB upper", "Std. Error", "z value", "Pr(<z)", "Pr(>z)"), learners.names)) )
+                       function(...) array(NA_real_, dim = c(num.generic_targets.clan, 7, num.learners), dimnames = list(paste0("gamma.", 1:num.generic_targets.clan), c("Estimate", "CB lower", "CB upper", "Std. Error", "z value", "Pr(<z)", "Pr(>z)"), learners.names)) )
   names(clan.3d.ls) <- Z_CLAN.names
   return(clan.3d.ls)
 

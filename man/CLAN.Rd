@@ -2,31 +2,30 @@
 % Please edit documentation in R/clan.R
 \name{CLAN}
 \alias{CLAN}
-\title{Estimates the CLAN parameters in the main sample}
+\title{Estimates the CLAN parameters.}
 \usage{
 CLAN(
-  Z_CLAN.main.sample,
-  group.membership.main.sample,
-  equal.group.variances = FALSE,
+  Z_CLAN,
+  membership,
+  equal_variances = FALSE,
   diff = setup_diff(),
   significance_level = 0.05
 )
 }
 \arguments{
-\item{Z_CLAN.main.sample}{a matrix with \emph{|M|} rows. Each column represents a variable for which CLAN shall be performed.}
+\item{Z_CLAN}{A matrix of variables that shall be considered for the CLAN. Each column represents a variable for which CLAN shall be performed.}
 
-\item{group.membership.main.sample}{a logical matrix with \emph{M} rows that indicate
-the group memberships (such a matrix is returned by the function quantile_group())}
+\item{membership}{A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be an instance of \code{\link{quantile_group}}.}
 
-\item{equal.group.variances}{logical. If TRUE, the the two within-group variances of the most and least affected group are assumed to be equal. Default is FALSE.}
+\item{equal_variances}{Logical. If \code{TRUE}, the the two within-group variances of the differences between the CLAN generic targets are assumed to be equal. Default is \code{FALSE}.}
 
-\item{diff}{Controls the generic targets of CLAN. See the documentation of \code{\link{setup_diff}}.}
+\item{diff}{Specifies the generic targets of CLAN See the documentation of \code{\link{setup_diff}} for details.}
 
 \item{significance_level}{Significance level. Default is 0.05.}
 }
 \value{
-The two CLAN parameters ("most" affected and "least" affected) for each variable in Z_CLAN.main.sample
+An object of the class \code{CLAN}.
 }
 \description{
-Estimates the CLAN parameters in the main sample
+Estimates the parameters of the Classification Analysis (CLAN) on all variables in the supplied design matrix \code{Z_CLAN}.
 }

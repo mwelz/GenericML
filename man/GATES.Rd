@@ -2,7 +2,7 @@
 % Please edit documentation in R/gates.R
 \name{GATES}
 \alias{GATES}
-\title{Estimates the GATES parameters based on the main sample M.}
+\title{Performs GATES regression.}
 \usage{
 GATES(
   Y,
@@ -10,7 +10,7 @@ GATES(
   propensity_scores,
   proxy_baseline,
   proxy_CATE,
-  group.membership.main.sample,
+  membership,
   HT = FALSE,
   X1_control = setup_X1(),
   vcov_control = setup_vcov(),
@@ -19,29 +19,31 @@ GATES(
 )
 }
 \arguments{
-\item{Y}{a vector of responses of length \emph{|M|}}
+\item{Y}{A vector of responses.}
 
-\item{D}{a binary vector of treatment status of length \emph{|M|}}
+\item{D}{A binary vector of treatment status.}
 
-\item{propensity_scores}{a vector of propensity scores of length \emph{|M|}}
+\item{propensity_scores}{A vector of propensity scores.}
 
-\item{proxy_baseline}{a vector of proxy baseline estimates of length \emph{M}}
+\item{proxy_baseline}{A vector of proxy baseline estimates.}
 
-\item{proxy_CATE}{a vector of proxy CATE estimates of length \emph{M}}
+\item{proxy_CATE}{A vector of proxy CATE estimates.}
 
-\item{group.membership.main.sample}{a logical matrix with \emph{M} rows that indicate
-the group memberships (such a matrix is returned by the function quantile_group())}
+\item{membership}{A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be an instance of \code{\link{quantile_group}}.}
 
-\item{HT}{logical. If TRUE, a HT transformation is applied (GATES2 in the paper). Default is FALSE.}
+\item{HT}{Logical. If \code{TRUE}, a HT transformation is applied (GATES2 in the paper). Default is \code{FALSE}.}
 
 \item{X1_control}{Specifies the design matrix \eqn{X_1} in the regression. See the documentation of \code{\link{setup_X1}} for details.}
 
 \item{vcov_control}{Specifies the covariance matrix estimator. See the documentation of \code{\link{setup_vcov}} for details.}
 
-\item{diff}{Controls the generic targets of GATES See the documentation of \code{\link{setup_diff}}.}
+\item{diff}{Specifies the generic targets of GATES. See the documentation of \code{\link{setup_diff}} for details.}
 
-\item{significance_level}{significance level for construction of confidence intervals}
+\item{significance_level}{Significance level. Default is 0.05.}
+}
+\value{
+An object of the class \code{GATES}.
 }
 \description{
-Estimates the GATES parameters based on the main sample M.
+Performs the linear regression for the GATES procedure.
 }

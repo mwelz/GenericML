@@ -2,16 +2,17 @@
 #'
 #' Performs the linear regression for the "best linear predictor" procedure.
 #'
-#' @param Y a vector of responses.
-#' @param D a binary vector of treatment status.
-#' @param propensity_scores a vector of propensity scores.
-#' @param proxy_baseline a vector of proxy baseline estimates.
-#' @param proxy_CATE a vector of proxy CATE estimates.
-#' @param HT logical. If \code{TRUE}, a HT transformation is applied (BLP2 in the paper). Default is \code{FALSE}.
+#' @param Y A vector of responses.
+#' @param D A binary vector of treatment status.
+#' @param propensity_scores A vector of propensity scores.
+#' @param proxy_baseline A vector of proxy baseline estimates.
+#' @param proxy_CATE A vector of proxy CATE estimates.
+#' @param HT Logical. If \code{TRUE}, a HT transformation is applied (BLP2 in the paper). Default is \code{FALSE}.
 #' @param X1_control Specifies the design matrix \eqn{X_1} in the regression. See the documentation of \code{\link{setup_X1}} for details.
 #' @param vcov_control Specifies the covariance matrix estimator. See the documentation of \code{\link{setup_vcov}} for details.
-#' @param significance_level significance level for construction of confidence intervals
-#' @return An object of the class "BLP".
+#' @param significance_level Significance level. Default is 0.05.
+#'
+#' @return An object of the class \code{BLP}.
 #'
 #' @export
 BLP <- function(Y, D,
@@ -50,8 +51,8 @@ BLP_NoChecks <- function(D, Y,
                          propensity_scores,
                          proxy_baseline,
                          proxy_CATE,
-                         HT  = FALSE,
-                         X1_control       = setup_X1(),
+                         HT                 = FALSE,
+                         X1_control         = setup_X1(),
                          vcov_control       = setup_vcov(),
                          significance_level = 0.05){
 
@@ -61,7 +62,7 @@ BLP_NoChecks <- function(D, Y,
                       propensity_scores  = propensity_scores,
                       proxy_baseline     = proxy_baseline,
                       proxy_CATE         = proxy_CATE,
-                      X1_control       = X1_control,
+                      X1_control         = X1_control,
                       vcov_control       = vcov_control,
                       significance_level = significance_level))
 
@@ -98,10 +99,11 @@ BLP.classic <- function(D, Y, propensity_scores,
 
   # return
   return(structure(
-    list(lm.obj = blp.obj,
-         blp.coefficients = blp.obj$coefficients[c("beta.1", "beta.2")],
-         generic.targets = generic.targets_BLP(coefficients, significance_level = significance_level),
-         coefficients = coefficients), class = "BLP"))
+    list(generic_targets = generic_targets_BLP(coeftest.object = coefficients,
+                                               significance_level = significance_level),
+         coefficients = coefficients,
+         lm = blp.obj),
+    class = "BLP"))
 
 } # END FUN
 
@@ -158,16 +160,17 @@ BLP.HT <- function(D, Y, propensity_scores,
 
   # return
   return(structure(
-    list(lm.obj = blp.obj,
-              blp.coefficients = blp.obj$coefficients[c("beta.1", "beta.2")],
-              generic.targets = generic.targets_BLP(coefficients, significance_level = significance_level),
-              coefficients = coefficients), class = "BLP"))
+    list(generic_targets = generic_targets_BLP(coeftest.object = coefficients,
+                                               significance_level = significance_level),
+         coefficients = coefficients,
+         lm = blp.obj),
+    class = "BLP"))
 
 } # END FUN
 
 
 # helper function to calculate the generic targets of BLP
-generic.targets_BLP <- function(coeftest.object, significance_level = 0.05){
+generic_targets_BLP <- function(coeftest.object, significance_level = 0.05){
 
   # helper that computes generic targets beta.1, beta.2 in BLP
   coefficients.temp <- coeftest.object[c("beta.1", "beta.2"), 1:3]
@@ -176,12 +179,12 @@ generic.targets_BLP <- function(coeftest.object, significance_level = 0.05){
   p.left  <- stats::pnorm(coefficients.temp[,"z value"], lower.tail = TRUE)  # left p-value: Pr(Z<z)
   ci.lo   <- coefficients.temp[,"Estimate"] - stats::qnorm(1-significance_level/2) * coefficients.temp[,"Std. Error"]
   ci.up   <- coefficients.temp[,"Estimate"] + stats::qnorm(1-significance_level/2) * coefficients.temp[,"Std. Error"]
-  generic.targets <- cbind(coefficients.temp, ci.lo, ci.up, p.left, p.right)
-  colnames(generic.targets) <- c("Estimate", "Std. Error", "z value",
+  generic_targets <- cbind(coefficients.temp, ci.lo, ci.up, p.left, p.right)
+  colnames(generic_targets) <- c("Estimate", "Std. Error", "z value",
                                  "CB lower", "CB upper", "Pr(<z)", "Pr(>z)")
-  generic.targets <- generic.targets[,c("Estimate", "CB lower", "CB upper",
+  generic_targets <- generic_targets[,c("Estimate", "CB lower", "CB upper",
                                         "Std. Error", "z value", "Pr(<z)", "Pr(>z)")]
 
-  return(generic.targets)
+  return(generic_targets)
 
 } # FUN

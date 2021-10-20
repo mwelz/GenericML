@@ -28,6 +28,8 @@ Med <- function(x){
 #' @param x the vector to be partitioned
 #' @param cutoffs the quantile cutoffs for the partition. Default are the quartiles.
 #' @param quantile.nam logical. Shall the cutoff values be included?
+#'
+#' @export
 quantile_group <- function(x,
                            cutoffs = c(0.25, 0.5, 0.75),
                            quantile.nam = TRUE){
@@ -216,9 +218,9 @@ GenericML_single_NoChecks <-
 
     ### step 1c: estimate GATES parameters by OLS ----
     # group the proxy estimators for the CATE in the main sample by quantiles
-    group.membership.main.sample <- quantile_group(proxy_CATE,
-                                                   cutoffs = quantile_cutoffs,
-                                                   quantile.nam = TRUE)
+    membership <- quantile_group(proxy_CATE,
+                                 cutoffs = quantile_cutoffs,
+                                 quantile.nam = TRUE)
 
     gates.obj <- GATES_NoChecks(
       D = D[M.set],
@@ -226,7 +228,7 @@ GenericML_single_NoChecks <-
       propensity_scores   = propensity_scores[M.set],
       proxy_baseline      = proxy_baseline,
       proxy_CATE          = proxy_CATE,
-      group.membership.main.sample = group.membership.main.sample,
+      membership = membership,
       HT                  = HT,
       X1_control        = setup_X1(),
       vcov_control        = vcov_GATES,
@@ -236,9 +238,9 @@ GenericML_single_NoChecks <-
 
     ### step 1d: estimate CLAN parameters in the main sample ----
     clan.obj <- CLAN_NoChecks(
-      Z_CLAN.main.sample = Z_CLAN[M.set,,drop = FALSE],
-      group.membership.main.sample = group.membership.main.sample,
-      equal.group.variances   = equal_variances_CLAN,
+      Z_CLAN = Z_CLAN[M.set,,drop = FALSE],
+      membership = membership,
+      equal_variances   = equal_variances_CLAN,
       diff                    = diff_CLAN,
       significance_level      = significance_level)
 
@@ -247,7 +249,7 @@ GenericML_single_NoChecks <-
     best.obj <- lambda_parameters(BLP.obj = blp.obj,
                                   GATES.obj = gates.obj,
                                   proxy_CATE.main.sample = proxy_CATE,
-                                  group.membership.main.sample = group.membership.main.sample)
+                                  membership = membership)
 
     ### organize output in a list ----
     return(list(BLP            = blp.obj,
@@ -267,7 +269,7 @@ GenericML_single_NoChecks <-
 #' @param BLP.obj an object as returned by CLAN()
 #' @param GATES.obj an object as returned by get.BLP.parameters()
 #' @param proxy_CATE.main.sample Proxy CATE estimators for the main sample
-#' @param group.membership.main.sample a logical matrix with _M_ rows that indicate
+#' @param membership a logical matrix with _M_ rows that indicate
 #' the group memberships (such a matrix is returned by the function quantile_group())
 #' @return lambda and lambda.bar parameters
 #'
@@ -275,10 +277,13 @@ GenericML_single_NoChecks <-
 lambda_parameters <- function(BLP.obj,
                               GATES.obj,
                               proxy_CATE.main.sample,
-                              group.membership.main.sample){
+                              membership){
 
-  return(list(lambda = as.numeric(BLP.obj$blp.coefficients["beta.2"]^2 * stats::var(proxy_CATE.main.sample)),
-              lambda.bar = as.numeric(colMeans(group.membership.main.sample) %*%  GATES.obj$gates.coefficients^2)))
+  temp <- GATES.obj$coefficients
+  gates.coefs <- temp[startsWith(rownames(temp), "gamma."), "Estimate"]
+
+  return(list(lambda = BLP.obj$coefficients["beta.2", "Estimate"]^2 * stats::var(proxy_CATE.main.sample),
+              lambda.bar = as.numeric(colMeans(membership) %*%  gates.coefs^2)))
 
 } # END FUN
 

@@ -1,29 +1,31 @@
-#' Estimates the CLAN parameters in the main sample
+#' Estimates the CLAN parameters.
 #'
-#' @param Z_CLAN.main.sample a matrix with _|M|_ rows. Each column represents a variable for which CLAN shall be performed.
-#' @param group.membership.main.sample a logical matrix with _M_ rows that indicate
-#' the group memberships (such a matrix is returned by the function quantile_group())
-#' @param equal.group.variances logical. If TRUE, the the two within-group variances of the most and least affected group are assumed to be equal. Default is FALSE.
-#' @param diff Controls the generic targets of CLAN. See the documentation of \code{\link{setup_diff}}.
+#' Estimates the parameters of the Classification Analysis (CLAN) on all variables in the supplied design matrix \code{Z_CLAN}.
+#'
+#' @param Z_CLAN A matrix of variables that shall be considered for the CLAN. Each column represents a variable for which CLAN shall be performed.
+#' @param membership A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be an instance of \code{\link{quantile_group}}.
+#' @param equal_variances Logical. If \code{TRUE}, the the two within-group variances of the differences between the CLAN generic targets are assumed to be equal. Default is \code{FALSE}.
+#' @param diff Specifies the generic targets of CLAN See the documentation of \code{\link{setup_diff}} for details.
 #' @param significance_level Significance level. Default is 0.05.
-#' @return The two CLAN parameters ("most" affected and "least" affected) for each variable in Z_CLAN.main.sample
+#'
+#' @return An object of the class \code{CLAN}.
 #'
 #' @export
-CLAN <- function(Z_CLAN.main.sample,
-                 group.membership.main.sample,
-                 equal.group.variances = FALSE,
-                 diff = setup_diff(),
+CLAN <- function(Z_CLAN,
+                 membership,
+                 equal_variances    = FALSE,
+                 diff               = setup_diff(),
                  significance_level = 0.05){
 
   # input checks
-  InputChecks_group.membership(group.membership.main.sample)
-  InputChecks_equal.length2(Z_CLAN.main.sample, group.membership.main.sample)
-  InputChecks_diff(diff, K = ncol(group.membership.main.sample))
+  InputChecks_group.membership(membership)
+  InputChecks_equal.length2(Z_CLAN, membership)
+  InputChecks_diff(diff, K = ncol(membership))
 
   # run main function
-  CLAN_NoChecks(Z_CLAN.main.sample = Z_CLAN.main.sample,
-                group.membership.main.sample = group.membership.main.sample,
-                equal.group.variances = equal.group.variances,
+  CLAN_NoChecks(Z_CLAN = Z_CLAN,
+                membership = membership,
+                equal_variances = equal_variances,
                 diff = diff,
                 significance_level = significance_level)
 
@@ -32,9 +34,9 @@ CLAN <- function(Z_CLAN.main.sample,
 
 
 # performs CLAN without calling the input checks
-CLAN_NoChecks <- function(Z_CLAN.main.sample,
-                          group.membership.main.sample,
-                          equal.group.variances = FALSE,
+CLAN_NoChecks <- function(Z_CLAN,
+                          membership,
+                          equal_variances = FALSE,
                           diff = setup_diff(),
                           significance_level = 0.05){
 
@@ -42,18 +44,18 @@ CLAN_NoChecks <- function(Z_CLAN.main.sample,
   subtract_from  <- diff$subtract_from
   subtracted <- diff$subtracted
 
-  K <- ncol(group.membership.main.sample)
+  K <- ncol(membership)
   group.base <- ifelse(subtract_from == "least", 1, K)
 
   # initialize
-  generic.targets   <- rep(list(NULL), ncol(Z_CLAN.main.sample))
+  generic_targets   <- rep(list(NULL), ncol(Z_CLAN))
   clan.coefficients <- matrix(NA_real_,
                               nrow =  K + length(subtracted),
-                              ncol = ncol(Z_CLAN.main.sample))
+                              ncol = ncol(Z_CLAN))
   z                 <- stats::qnorm(1-significance_level/2) # the quantile
 
   # loop over the CLAN variables
-  for(j in 1:ncol(Z_CLAN.main.sample)){
+  for(j in 1:ncol(Z_CLAN)){
 
     # initialize matrix
     out.mat <- matrix(NA_real_,
@@ -65,16 +67,16 @@ CLAN_NoChecks <- function(Z_CLAN.main.sample,
     ### 1. get summary statistics for most and least affected group ----
     for(k in 1:K){
 
-      if(stats::var(Z_CLAN.main.sample[group.membership.main.sample[, k], j]) == 0){
+      if(stats::var(Z_CLAN[membership[, k], j]) == 0){
 
         # in case of zero variation, t.test() will throw an error. In this case, return uninformative out.mat[ct,]. NB: this bug has been spotted and fixed by Lucas Kitzmueller. All credits for this fix go to him!
-        mean.estimate <- mean(Z_CLAN.main.sample[group.membership.main.sample[, k], j])
+        mean.estimate <- mean(Z_CLAN[membership[, k], j])
         out.mat[ct,]  <- c(mean.estimate, mean.estimate, mean.estimate,
                            0.0, 0.0, 0.5, 0.5)
 
       } else{
 
-        ttest.deltak <- stats::t.test(Z_CLAN.main.sample[group.membership.main.sample[, k], j])
+        ttest.deltak <- stats::t.test(Z_CLAN[membership[, k], j])
         ci.lo        <- ttest.deltak$estimate - z * ttest.deltak$stderr
         ci.up        <- ttest.deltak$estimate + z * ttest.deltak$stderr
         p.right      <- stats::pnorm(ttest.deltak$statistic, lower.tail = FALSE) # right p-value: Pr(Z>z)
@@ -94,8 +96,8 @@ CLAN_NoChecks <- function(Z_CLAN.main.sample,
 
     for(k in subtracted){
 
-      x <- Z_CLAN.main.sample[group.membership.main.sample[, group.base], j]
-      y <- Z_CLAN.main.sample[group.membership.main.sample[, k], j]
+      x <- Z_CLAN[membership[, group.base], j]
+      y <- Z_CLAN[membership[, k], j]
 
       if((stats::var(x) == stats::var(y)) & (stats::var(x) == 0)){
 
@@ -107,7 +109,7 @@ CLAN_NoChecks <- function(Z_CLAN.main.sample,
       } else{
 
         ttest.diff   <- stats::t.test(x = x, y = y,
-                                      var.equal = equal.group.variances) # 2-sample t-test
+                                      var.equal = equal_variances) # 2-sample t-test
         diff.        <- ifelse(group.base == 1,
                                out.mat[1,1] - out.mat[k,1],
                                out.mat[K,1] - out.mat[k,1])
@@ -132,16 +134,17 @@ CLAN_NoChecks <- function(Z_CLAN.main.sample,
                                  "delta.", group.base, "-",
                                  "delta.", subtracted))
     # "delta.K-delta.1")
-    generic.targets[[j]]  <- out.mat
+    generic_targets[[j]]  <- out.mat
     clan.coefficients[,j] <- out.mat[,1]
 
   } # END FOR
 
-  names(generic.targets) <- colnames(clan.coefficients) <- colnames(Z_CLAN.main.sample)
+  names(generic_targets) <- colnames(clan.coefficients) <- colnames(Z_CLAN)
   rownames(clan.coefficients) <- rownames(out.mat)
 
   return(structure(
-    list(clan.coefficients = clan.coefficients,
-         generic.targets   = generic.targets), class = "CLAN"))
+    list(generic_targets   = generic_targets,
+         coefficients      = clan.coefficients),
+    class = "CLAN"))
 
 } # FUN

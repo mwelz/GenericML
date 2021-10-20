@@ -44,7 +44,7 @@ GenericML(
 
 \item{num_splits}{Number of sample splits. Default is 100.}
 
-\item{Z_CLAN}{A matrix of variables that shall be considered for the CLAN. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.}
+\item{Z_CLAN}{A matrix of variables that shall be considered for the CLAN. Each column represents a variable for which CLAN shall be performed. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.}
 
 \item{HT}{Logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.}
 
@@ -79,6 +79,9 @@ GenericML(
 \item{store_learners}{Logical. If \code{TRUE}, all intermediate results of the learners will be stored. Default is \code{FALSE}. \strong{Warning:} For large data sets and/or many splits in \code{num_splits}, having \code{store_learners = TRUE} might cause memory issues.}
 
 \item{store_splits}{Logical. If \code{TRUE}, information on the sample splits will be stored. Default is \code{FALSE}.}
+}
+\value{
+An object of the class \code{GenericML}.
 }
 \description{
 Performs generic machine learning inference as in Chernozhukov, Demirer, Duflo and Fernández-Val (2020). Link to working paper: \url{https://arxiv.org/abs/1712.04802}.

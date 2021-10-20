@@ -120,7 +120,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
                                         dimnames = c(NULL, paste0("split_", 1:num_splits)))
 
   # initialize
-  generic.targets <- initializer.for.splits(Z = Z, Z_CLAN = Z_CLAN,
+  generic_targets <- initializer.for.splits(Z = Z, Z_CLAN = Z_CLAN,
                                             learners = learners.names, num_splits = num_splits,
                                             quantile_cutoffs = quantile_cutoffs,
                                             diff_GATES = diff_GATES,
@@ -163,9 +163,9 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
                                   significance_level           = significance_level,
                                   min_variation                = min_variation)
 
-      generic.targets[[i]]$BLP[,,s]   <- generic.ml.obj$BLP$generic.targets
-      generic.targets[[i]]$GATES[,,s] <- generic.ml.obj$GATES$generic.targets
-      generic.targets[[i]]$best[,,s]  <- c(generic.ml.obj$best$lambda, generic.ml.obj$best$lambda.bar)
+      generic_targets[[i]]$BLP[,,s]   <- generic.ml.obj$BLP$generic_targets
+      generic_targets[[i]]$GATES[,,s] <- generic.ml.obj$GATES$generic_targets
+      generic_targets[[i]]$best[,,s]  <- c(generic.ml.obj$best$lambda, generic.ml.obj$best$lambda.bar)
 
       if(store_learners){
 
@@ -174,7 +174,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
       }
 
       for(j in 1:num.vars.in.Z_CLAN){
-        generic.targets[[i]]$CLAN[[j]][,,s] <- generic.ml.obj$CLAN$generic.targets[[j]]
+        generic_targets[[i]]$CLAN[[j]][,,s] <- generic.ml.obj$CLAN$generic_targets[[j]]
       }
 
     } # FOR learners
@@ -183,7 +183,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
   if(!store_learners) genericML.by.split <- NULL
   if(!store_splits)   splits.mat <- NULL
 
-  return(list(generic.targets = generic.targets,
+  return(list(generic_targets = generic_targets,
               genericML.by.split = genericML.by.split,
               splits = splits.mat))
 
@@ -237,8 +237,8 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
 
   num.vars.in.Z_CLAN <- ncol(Z_CLAN)
   K <- length(quantile_cutoffs) + 1
-  num.generic.targets.gates <- K + length(diff_GATES$subtracted)
-  num.generic.targets.clan <- K + length(diff_CLAN$subtracted)
+  num.generic_targets.gates <- K + length(diff_GATES$subtracted)
+  num.generic_targets.clan <- K + length(diff_CLAN$subtracted)
   N     <- length(Y)
   N.set <- 1:N
   num.learners <- length(learners)
@@ -261,9 +261,9 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
 
     # initialize
     blp.3d     <- get_blp.3d(num.learners, learners.names)
-    gates.3d   <- get_gates.3d(num.learners, learners.names, num.generic.targets.gates)
+    gates.3d   <- get_gates.3d(num.learners, learners.names, num.generic_targets.gates)
     best.3d    <- get_best.3d(num.learners, learners.names)
-    clan.3d.ls <- get_clan.3d.ls(num.learners, learners.names, num.generic.targets.clan, num.vars.in.Z_CLAN, colnames(Z_CLAN))
+    clan.3d.ls <- get_clan.3d.ls(num.learners, learners.names, num.generic_targets.clan, num.vars.in.Z_CLAN, colnames(Z_CLAN))
 
 
     if(store_learners){
@@ -309,12 +309,12 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
                                   significance_level           = significance_level,
                                   min_variation                = min_variation)
 
-      blp.3d[,,i]   <- generic.ml.obj$BLP$generic.targets
-      gates.3d[,,i] <- generic.ml.obj$GATES$generic.targets
+      blp.3d[,,i]   <- generic.ml.obj$BLP$generic_targets
+      gates.3d[,,i] <- generic.ml.obj$GATES$generic_targets
       best.3d[,,i]  <- c(generic.ml.obj$best$lambda, generic.ml.obj$best$lambda.bar)
 
       for(j in 1:num.vars.in.Z_CLAN){
-        clan.3d.ls[[j]][,,i] <- generic.ml.obj$CLAN$generic.targets[[j]]
+        clan.3d.ls[[j]][,,i] <- generic.ml.obj$CLAN$generic_targets[[j]]
       }
 
       if(store_learners) genericML.by.split.ls[[i]] <- generic.ml.obj
@@ -331,7 +331,7 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
 
 
   # now bring it in desired form:
-  generic.targets <- initializer.for.splits(Z = Z, Z_CLAN = Z_CLAN,
+  generic_targets <- initializer.for.splits(Z = Z, Z_CLAN = Z_CLAN,
                                             learners = learners.names, num_splits = num_splits,
                                             quantile_cutoffs = quantile_cutoffs,
                                             diff_GATES = diff_GATES,
@@ -340,12 +340,12 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
   for(s in 1:num_splits){
     for(i in 1:length(learners)){
 
-      generic.targets[[i]]$BLP[,,s]   <- out[[s]]$BLP[,,i]
-      generic.targets[[i]]$GATES[,,s] <- out[[s]]$GATES[,,i]
-      generic.targets[[i]]$best[,,s]  <- out[[s]]$best[,,i]
+      generic_targets[[i]]$BLP[,,s]   <- out[[s]]$BLP[,,i]
+      generic_targets[[i]]$GATES[,,s] <- out[[s]]$GATES[,,i]
+      generic_targets[[i]]$best[,,s]  <- out[[s]]$best[,,i]
 
       for(j in 1:num.vars.in.Z_CLAN){
-        generic.targets[[i]]$CLAN[[j]][,,s] <- out[[s]]$CLAN[[j]][,,i]
+        generic_targets[[i]]$CLAN[[j]][,,s] <- out[[s]]$CLAN[[j]][,,i]
       } # FOR
 
     } # FOR
@@ -374,7 +374,7 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
   } # IF
 
   # return
-  return(list(generic.targets = generic.targets,
+  return(list(generic_targets = generic_targets,
               genericML.by.split = stored.learners,
               splits = splits))
 

@@ -8,7 +8,7 @@
 #' @param learners_GenericML A vector of strings specifying the machine learners to be used for estimating the BCA and CATE. Either \code{'elastic.net'}, \code{'random.forest'}, or \code{'tree'}. Can alternatively be specified by using \code{mlr3} syntax \emph{without} specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keyords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.
 #' @param learner_propensity_score The estimator for the propensity scores. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to \code{'constant'} (estimates the propensity scores by \code{mean(D)}), \code{'elastic.net'}, \code{'random.forest'}, \code{'tree'}, or \code{mlr3} syntax. Note that in case of \code{mlr3} syntax, do \emph{not} specify if the learner is a regression learner or classification learner; Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keyords.
 #' @param num_splits Number of sample splits. Default is 100.
-#' @param Z_CLAN A matrix of variables that shall be considered for the CLAN. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.
+#' @param Z_CLAN A matrix of variables that shall be considered for the CLAN. Each column represents a variable for which CLAN shall be performed. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.
 #' @param HT Logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.
 #' @param X1_BLP Specifies the design matrix \eqn{X_1} in the BLP regression. See the documentation of \code{\link{setup_X1}} for details.
 #' @param X1_GATES Same as \code{X1_BLP}, just for the the GATES regression.
@@ -26,6 +26,8 @@
 #' @param seed Random seed. Default is \code{NULL} for no random seeding.
 #' @param store_learners Logical. If \code{TRUE}, all intermediate results of the learners will be stored. Default is \code{FALSE}. \strong{Warning:} For large data sets and/or many splits in \code{num_splits}, having \code{store_learners = TRUE} might cause memory issues.
 #' @param store_splits Logical. If \code{TRUE}, information on the sample splits will be stored. Default is \code{FALSE}.
+#'
+#' @return An object of the class \code{GenericML}.
 #'
 #' @export
 GenericML <- function(Z, D, Y,
@@ -109,11 +111,11 @@ GenericML <- function(Z, D, Y,
                                store_splits               = store_splits)
 
   # extract the best learners
-  best.learners <- get.best.learners(gen.ml.different.learners$generic.targets)
+  best.learners <- get.best.learners(gen.ml.different.learners$generic_targets)
 
 
   ### step 3: perform VEIN analysis ----
-  vein <- VEIN(gen.ml.different.learners$generic.targets, best.learners)
+  vein <- VEIN(gen.ml.different.learners$generic_targets, best.learners)
 
   # return instance of S3 class 'GenericML'
   return(

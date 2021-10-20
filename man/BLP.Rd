@@ -17,26 +17,26 @@ BLP(
 )
 }
 \arguments{
-\item{Y}{a vector of responses.}
+\item{Y}{A vector of responses.}
 
-\item{D}{a binary vector of treatment status.}
+\item{D}{A binary vector of treatment status.}
 
-\item{propensity_scores}{a vector of propensity scores.}
+\item{propensity_scores}{A vector of propensity scores.}
 
-\item{proxy_baseline}{a vector of proxy baseline estimates.}
+\item{proxy_baseline}{A vector of proxy baseline estimates.}
 
-\item{proxy_CATE}{a vector of proxy CATE estimates.}
+\item{proxy_CATE}{A vector of proxy CATE estimates.}
 
-\item{HT}{logical. If \code{TRUE}, a HT transformation is applied (BLP2 in the paper). Default is \code{FALSE}.}
+\item{HT}{Logical. If \code{TRUE}, a HT transformation is applied (BLP2 in the paper). Default is \code{FALSE}.}
 
 \item{X1_control}{Specifies the design matrix \eqn{X_1} in the regression. See the documentation of \code{\link{setup_X1}} for details.}
 
 \item{vcov_control}{Specifies the covariance matrix estimator. See the documentation of \code{\link{setup_vcov}} for details.}
 
-\item{significance_level}{significance level for construction of confidence intervals}
+\item{significance_level}{Significance level. Default is 0.05.}
 }
 \value{
-An object of the class "BLP".
+An object of the class \code{BLP}.
 }
 \description{
 Performs the linear regression for the "best linear predictor" procedure.

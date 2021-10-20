@@ -1,24 +1,27 @@
-#' Estimates the GATES parameters based on the main sample M.
+#' Performs GATES regression.
 #'
-#' @param Y a vector of responses of length _|M|_
-#' @param D a binary vector of treatment status of length _|M|_
-#' @param propensity_scores a vector of propensity scores of length _|M|_
-#' @param proxy_baseline a vector of proxy baseline estimates of length _M_
-#' @param proxy_CATE a vector of proxy CATE estimates of length _M_
-#' @param group.membership.main.sample a logical matrix with _M_ rows that indicate
-#' the group memberships (such a matrix is returned by the function quantile_group())
-#' @param HT logical. If TRUE, a HT transformation is applied (GATES2 in the paper). Default is FALSE.
+#' Performs the linear regression for the GATES procedure.
+#'
+#' @param Y A vector of responses.
+#' @param D A binary vector of treatment status.
+#' @param propensity_scores A vector of propensity scores.
+#' @param proxy_baseline A vector of proxy baseline estimates.
+#' @param proxy_CATE A vector of proxy CATE estimates.
+#' @param membership A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be an instance of \code{\link{quantile_group}}.
+#' @param HT Logical. If \code{TRUE}, a HT transformation is applied (GATES2 in the paper). Default is \code{FALSE}.
 #' @param X1_control Specifies the design matrix \eqn{X_1} in the regression. See the documentation of \code{\link{setup_X1}} for details.
 #' @param vcov_control Specifies the covariance matrix estimator. See the documentation of \code{\link{setup_vcov}} for details.
-#' @param diff Controls the generic targets of GATES See the documentation of \code{\link{setup_diff}}.
-#' @param significance_level significance level for construction of confidence intervals
+#' @param diff Specifies the generic targets of GATES. See the documentation of \code{\link{setup_diff}} for details.
+#' @param significance_level Significance level. Default is 0.05.
+#'
+#' @return An object of the class \code{GATES}.
 #'
 #' @export
 GATES <- function(Y, D,
                   propensity_scores,
                   proxy_baseline,
                   proxy_CATE,
-                  group.membership.main.sample,
+                  membership,
                   HT                 = FALSE,
                   X1_control         = setup_X1(),
                   vcov_control       = setup_vcov(),
@@ -33,18 +36,18 @@ GATES <- function(Y, D,
   InputChecks_equal.length2(Y, propensity_scores)
   InputChecks_X1(X1_control)
   InputChecks_vcov.control(vcov_control)
-  InputChecks_diff(diff, K = ncol(group.membership.main.sample))
-  InputChecks_group.membership(group.membership.main.sample)
+  InputChecks_diff(diff, K = ncol(membership))
+  InputChecks_group.membership(membership)
 
   # fit model according to strategy 1 or 2 in the paper
   GATES_NoChecks(D = D, Y = Y,
                  propensity_scores   = propensity_scores,
                  proxy_baseline      = proxy_baseline,
                  proxy_CATE          = proxy_CATE,
-                 group.membership.main.sample = group.membership.main.sample,
-                 X1_control        = X1_control,
+                 membership          = membership,
+                 X1_control          = X1_control,
                  vcov_control        = vcov_control,
-                 diff = diff,
+                 diff                = diff,
                  significance_level  = significance_level)
 
 } # FUN
@@ -55,9 +58,9 @@ GATES_NoChecks <- function(D, Y,
                            propensity_scores,
                            proxy_baseline,
                            proxy_CATE,
-                           group.membership.main.sample,
+                           membership,
                            HT                  = FALSE,
-                           X1_control        = setup_X1(),
+                           X1_control          = setup_X1(),
                            vcov_control        = setup_vcov(),
                            diff                = setup_diff(),
                            significance_level  = 0.05){
@@ -68,8 +71,8 @@ GATES_NoChecks <- function(D, Y,
                       propensity_scores   = propensity_scores,
                       proxy_baseline      = proxy_baseline,
                       proxy_CATE          = proxy_CATE,
-                      group.membership.main.sample = group.membership.main.sample,
-                      X1_control        = X1_control,
+                      membership          = membership,
+                      X1_control          = X1_control,
                       vcov_control        = vcov_control,
                       diff                = diff,
                       significance_level  = significance_level))
@@ -81,14 +84,14 @@ GATES_NoChecks <- function(D, Y,
 GATES.classic <- function(D, Y,
                           propensity_scores,
                           proxy_baseline, proxy_CATE,
-                          group.membership.main.sample,
+                          membership,
                           X1_control       = setup_X1(),
                           vcov_control       = setup_vcov(),
                           diff               = setup_diff(),
                           significance_level = 0.05){
 
   # make the group membership a binary matrix
-  groups <- 1 * group.membership.main.sample
+  groups <- 1 * membership
 
   # number of groups
   K <- ncol(groups)
@@ -116,21 +119,17 @@ GATES.classic <- function(D, Y,
 
   # extract the relevant coefficients
   coefficients                 <- lmtest::coeftest(gates.obj, vcov. = vcov.)
-  gates.coefficients           <- coefficients[paste0("gamma.", 1:K), 1]
-  gates.coefficients.quantiles <- colnames(groups)
-  names(gates.coefficients.quantiles) <- paste0("gamma.", 1:K)
 
   # return
   return(structure(
-    list(lm.obj = gates.obj,
-              gates.coefficients = gates.coefficients,
-              gates.coefficients.quantiles = gates.coefficients.quantiles,
-              generic.targets = generic.targets_GATES(coeftest.object = coefficients,
-                                                      K = K,
-                                                      vcov = vcov.,
-                                                      significance_level = significance_level,
-                                                      diff = diff),
-              coefficients = coefficients), class = "GATES"))
+    list(generic_targets = generic_targets_GATES(coeftest.object = coefficients,
+                                                 K = K,
+                                                 vcov = vcov.,
+                                                 significance_level = significance_level,
+                                                 diff = diff),
+         coefficients = coefficients,
+         lm = gates.obj),
+    class = "GATES"))
 
 } # END FUN
 
@@ -139,14 +138,14 @@ GATES.classic <- function(D, Y,
 GATES.HT <- function(D, Y,
                      propensity_scores,
                      proxy_baseline, proxy_CATE,
-                     group.membership.main.sample,
+                     membership,
                      X1_control       = setup_X1(),
                      vcov_control       = setup_vcov(),
                      diff               = setup_diff(),
                      significance_level = 0.05){
 
   # make the group membership a binary matrix
-  groups <- 1 * group.membership.main.sample
+  groups <- 1 * membership
 
   # number of groups
   K <- ncol(groups)
@@ -195,27 +194,23 @@ GATES.HT <- function(D, Y,
 
   # extract the relevant coefficients
   coefficients                 <- lmtest::coeftest(gates.obj, vcov. = vcov.)
-  gates.coefficients           <- coefficients[paste0("gamma.", 1:K), 1]
-  gates.coefficients.quantiles <- colnames(groups)
-  names(gates.coefficients.quantiles) <- paste0("gamma.", 1:K)
 
   # return
   return(structure(
-    list(lm.obj = gates.obj,
-              gates.coefficients = gates.coefficients,
-              gates.coefficients.quantiles = gates.coefficients.quantiles,
-              generic.targets = generic.targets_GATES(coeftest.object = coefficients,
-                                                      K = K,
-                                                      vcov = vcov.,
-                                                      significance_level = significance_level,
-                                                      diff = diff),
-              coefficients = coefficients), class = "GATES"))
+    list(generic_targets = generic_targets_GATES(coeftest.object = coefficients,
+                                                 K = K,
+                                                 vcov = vcov.,
+                                                 significance_level = significance_level,
+                                                 diff = diff),
+         coefficients = coefficients,
+         lm = gates.obj),
+    class = "GATES"))
 
 } # END FUN
 
 
 # helper function to calculate the generic targets of BLP (vcov is estimate, not list)
-generic.targets_GATES <- function(coeftest.object, K, vcov,
+generic_targets_GATES <- function(coeftest.object, K, vcov,
                                   significance_level = 0.05,
                                   diff = diff){
 
@@ -237,10 +232,10 @@ generic.targets_GATES <- function(coeftest.object, K, vcov,
   ci.up   <- coefficients.temp[,"Estimate"] + z * coefficients.temp[,"Std. Error"]
 
   # prepare generic targets of the gammas
-  generic.targets <- cbind(coefficients.temp, ci.lo, ci.up, p.left, p.right)
-  colnames(generic.targets) <- c("Estimate", "Std. Error", "z value",
+  generic_targets <- cbind(coefficients.temp, ci.lo, ci.up, p.left, p.right)
+  colnames(generic_targets) <- c("Estimate", "Std. Error", "z value",
                                  "CB lower", "CB upper", "Pr(<z)", "Pr(>z)")
-  generic.targets <- generic.targets[,c("Estimate", "CB lower", "CB upper",
+  generic_targets <- generic_targets[,c("Estimate", "CB lower", "CB upper",
                                         "Std. Error", "z value", "Pr(<z)", "Pr(>z)")]
 
   # GATES differences: estimate mean and variance of a difference
@@ -282,6 +277,6 @@ generic.targets_GATES <- function(coeftest.object, K, vcov,
   rownames(diff.mat) <- nam
 
   # return final matrix
-  rbind(generic.targets, diff.mat)
+  rbind(generic_targets, diff.mat)
 
 } # FUN
