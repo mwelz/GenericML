@@ -8,29 +8,29 @@
   x,
   learner = "best",
   type = "GATES",
-  CLAN.variable = NULL,
-  groups.to.be.plotted = "all",
+  CLAN_variable = NULL,
+  groups = "all",
   limits = NULL,
   title = NULL,
   ...
 )
 }
 \arguments{
-\item{x}{an object as returned by GenericML()}
+\item{x}{An instance of \code{\link{GenericML}}.}
 
-\item{learner}{the learner whose results are to be returned. Default is 'best'}
+\item{learner}{The learner whose results are to be returned. Default is \code{"best"} for the best learner as measured by the lambda parameters.}
 
-\item{type}{the analysis to be plotted. Either 'GATES', 'BLP', or 'CLAN'. Default is 'GATES'.}
+\item{type}{The analysis to be plotted. Either \code{"GATES"}, \code{"BLP"}, or \code{"CLAN"}. Default is \code{"GATES"}.}
 
-\item{CLAN.variable}{CLAN variable to be plotted. Only applicable if type = 'CLAN'.}
+\item{CLAN_variable}{Name of CLAN variable to be plotted. Only applicable if \code{type = "CLAN"}.}
 
-\item{groups.to.be.plotted}{The groups to be plotted for GATES and CLAN. Default is 'all'. If there are K groups, this variable can be set to a subset of {"G1", "G2",...,"GK", "GK-G1", "GK-G2",...}, but this set depends on the choices of the arguments 'diff_GATES' and 'diff_CLAN' of the GenericML() function that generated GenericML.obj.}
+\item{groups}{Character vector for the groups to be plotted for GATES and CLAN. Default is \code{"all"} for all groups. If there are \eqn{K} groups, this variable is a subset of \code{c("G1", "G2",...,"GK", "GK-G1", "GK-G2",...)}, but this set depends on the choices of the arguments \code{"diff_GATES"} and \code{"diff_CLAN"} of the \code{\link{GenericML}} function that generated the instance \code{x}.}
 
-\item{limits}{the limits of the y-axis of the plot.}
+\item{limits}{The limits of the y-axis of the plot.}
 
-\item{title}{the title of the plot.}
+\item{title}{The title of the plot.}
 
-\item{...}{Additional arguments}
+\item{...}{Additional arguments.}
 }
 \description{
 Makes plots for generic ML

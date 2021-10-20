@@ -7,14 +7,14 @@
 propensity_score(Z, D, estimator = "constant")
 }
 \arguments{
-\item{Z}{a matrix or data frame of covariates}
+\item{Z}{A matrix or data frame of covariates}
 
-\item{D}{a binary vector of treatment status}
+\item{D}{A binary vector of treatment status}
 
-\item{estimator}{the estimator to be used. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to 'constant' (estimates the propensity scores by mean(D)), 'elastic.net', 'random.forest', 'tree', or mlr3 syntax. Example for the latter: mlr3::lrn("classif.ranger", num.trees = 500) for a classification forest.}
+\item{estimator}{The estimator for the propensity scores. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to \code{'constant'} (estimates the propensity scores by \code{mean(D)}), \code{'elastic_net'}, \code{'random_forest'}, \code{'tree'}, or \code{mlr3} syntax. Note that in case of \code{mlr3} syntax, do \emph{not} specify if the learner is a regression learner or classification learner; Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords.}
 }
 \value{
-Estimates of \eqn{Pr(D = 1 | Z)} and an 'mlr3' object of the employed model (if applicable)
+Estimates of \eqn{Pr(D = 1 | Z)} and an \code{mlr3} object of the employed model (if applicable).
 }
 \description{
 Estimates the propensity score

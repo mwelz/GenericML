@@ -2,15 +2,15 @@
 % Please edit documentation in R/S3.R
 \name{print.GenericML}
 \alias{print.GenericML}
-\title{prints information on a GenericML instance}
+\title{prints information on an instance of \code{\link{GenericML}}.}
 \usage{
 \method{print}{GenericML}(x, ...)
 }
 \arguments{
-\item{x}{an object returned by \emph{GenericML()}}
+\item{x}{An instance of \code{\link{GenericML}}.}
 
 \item{...}{additional arguments to be passed}
 }
 \description{
-prints information on a GenericML instance
+prints information on an instance of \code{\link{GenericML}}.
 }

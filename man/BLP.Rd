@@ -23,7 +23,7 @@ BLP(
 
 \item{propensity_scores}{A vector of propensity scores.}
 
-\item{proxy_BCA}{A vector of proxy baseline estimates.}
+\item{proxy_BCA}{A vector of proxy BCA estimates.}
 
 \item{proxy_CATE}{A vector of proxy CATE estimates.}
 

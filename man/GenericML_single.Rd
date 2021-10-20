@@ -33,7 +33,7 @@ GenericML_single(
 
 \item{Y}{The response vector.}
 
-\item{learner}{A string specifying the machine learner to be used for estimating the BCA and CATE. Either \code{'elastic.net'}, \code{'random.forest'}, or \code{'tree'}. Can alternatively be specified by using \code{mlr3} syntax \emph{without} specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.}
+\item{learner}{A string specifying the machine learner to be used for estimating the BCA and CATE. Either \code{'elastic_net'}, \code{'random_forest'}, or \code{'tree'}. Can alternatively be specified by using \code{mlr3} syntax \emph{without} specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.}
 
 \item{propensity_scores}{A numeric vector of propensity scores.}
 

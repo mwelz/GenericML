@@ -5,7 +5,7 @@
 #' @param Y A vector of responses.
 #' @param D A binary vector of treatment status.
 #' @param propensity_scores A vector of propensity scores.
-#' @param proxy_BCA A vector of proxy baseline estimates.
+#' @param proxy_BCA A vector of proxy BCA estimates.
 #' @param proxy_CATE A vector of proxy CATE estimates.
 #' @param membership A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be an instance of \code{\link{quantile_group}}.
 #' @param HT Logical. If \code{TRUE}, a HT transformation is applied (GATES2 in the paper). Default is \code{FALSE}.

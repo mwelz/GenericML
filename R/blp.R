@@ -5,7 +5,7 @@
 #' @param Y A vector of responses.
 #' @param D A binary vector of treatment status.
 #' @param propensity_scores A vector of propensity scores.
-#' @param proxy_BCA A vector of proxy baseline estimates.
+#' @param proxy_BCA A vector of proxy BCA estimates.
 #' @param proxy_CATE A vector of proxy CATE estimates.
 #' @param HT Logical. If \code{TRUE}, a HT transformation is applied (BLP2 in the paper). Default is \code{FALSE}.
 #' @param X1_control Specifies the design matrix \eqn{X_1} in the regression. See the documentation of \code{\link{setup_X1}} for details.

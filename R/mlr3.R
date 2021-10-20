@@ -2,7 +2,7 @@
 #'
 #' @import mlr3 mlr3learners
 #' @noRd
-propensity_score_mlr3 <- function(Z, D, learner = "random.forest"){
+propensity_score_mlr3 <- function(Z, D, learner = "random_forest"){
 
   # specify the task
   task.propensity_score <- mlr3::TaskClassif$new(id = "propensity_score",
@@ -12,11 +12,11 @@ propensity_score_mlr3 <- function(Z, D, learner = "random.forest"){
   # specify the machine learner
   if(is.environment(learner)){
     learner <- learner
-  } else if(learner == "elastic.net"){
+  } else if(learner == "elastic_net"){
 
     learner <- mlr3::lrn("classif.cv_glmnet", s = "lambda.min")
 
-  } else if(learner == "random.forest"){
+  } else if(learner == "random_forest"){
 
     learner <- mlr3::lrn("classif.ranger", num.trees = 500)
 
@@ -49,10 +49,10 @@ propensity_score_mlr3 <- function(Z, D, learner = "random.forest"){
 
 #' Estimates the propensity score
 #'
-#' @param Z a matrix or data frame of covariates
-#' @param D a binary vector of treatment status
-#' @param estimator the estimator to be used. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to 'constant' (estimates the propensity scores by mean(D)), 'elastic.net', 'random.forest', 'tree', or mlr3 syntax. Example for the latter: mlr3::lrn("classif.ranger", num.trees = 500) for a classification forest.
-#' @return Estimates of \eqn{Pr(D = 1 | Z)} and an 'mlr3' object of the employed model (if applicable)
+#' @param Z A matrix or data frame of covariates
+#' @param D A binary vector of treatment status
+#' @param estimator The estimator for the propensity scores. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to \code{'constant'} (estimates the propensity scores by \code{mean(D)}), \code{'elastic_net'}, \code{'random_forest'}, \code{'tree'}, or \code{mlr3} syntax. Note that in case of \code{mlr3} syntax, do \emph{not} specify if the learner is a regression learner or classification learner; Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords.
+#' @return Estimates of \eqn{Pr(D = 1 | Z)} and an \code{mlr3} object of the employed model (if applicable).
 #'
 #'
 #' @export
@@ -96,12 +96,12 @@ propensity_score_NoChecks <- function(Z, D, estimator = "constant"){
     ### case 3: propensity scores are estimated by mlr3 (or illegal input)
 
     # for the following choices of the learner, we require mlr3:
-    if(estimator %in% c("elastic.net", "random.forest", "tree") |
+    if(estimator %in% c("elastic_net", "random_forest", "tree") |
        substr(estimator, start = 1, stop = 6) == "mlr3::"){
 
       out <- propensity_score_mlr3(Z = Z, D = D, learner = make.mlr3.environment(estimator, regr = FALSE))
 
-    } else stop("The argument 'estimator' must be equal to either 'constant', 'elastic.net', random.forest', 'tree', an mlr3 string, or a numeric vector of the same length as Z and D!")
+    } else stop("The argument 'estimator' must be equal to either 'constant', 'elastic_net', random_forest', 'tree', an mlr3 string, or a numeric vector of the same length as Z and D!")
 
   } # IF
 
@@ -114,12 +114,12 @@ propensity_score_NoChecks <- function(Z, D, estimator = "constant"){
 
 #' Performs estimation of the baseline conditional average (BCA), \eqn{E[Y | D=0, Z]}, on the auxiliary sample
 #'
-#' @param Z an ( _n_ x _d_) matrix or data frame of covariates
-#' @param D a binary vector of treatment status of length _n_
-#' @param Y a vector of responses of length _n_
+#' @param Z A matrix or data frame of the covariates.
+#' @param D A binary vector of treatment assignment.
+#' @param Y The response vector.
 #' @param A_set a numerical vector of indices of observations in the auxiliary sample.
-#' @param learner the classification machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default.
-#' @param min_variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
+#' @param learner A string specifying the machine learner to be used for estimation. Either \code{'elastic_net'}, \code{'random_forest'} (default), or \code{'tree'}. Can alternatively be specified by using \code{mlr3} syntax \emph{without} specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.
+#' @param min_variation Minimum variation of the predictions before random noise with distribution \eqn{N(0, var(Y)/20)} is added. Default is \code{1e-05}.
 #'
 #' @return An object of the class \code{proxy_BCA}.
 #'
@@ -127,7 +127,7 @@ propensity_score_NoChecks <- function(Z, D, estimator = "constant"){
 #' @export
 proxy_BCA <- function(Z, D, Y,
                       A_set,
-                      learner = "random.forest",
+                      learner = "random_forest",
                       min_variation = 1e-05){
 
   # input checks
@@ -192,19 +192,19 @@ proxy_BCA_NoChecks <- function(Z, D, Y,
 
 #' Performs estimation of the conditional average treatment effect (CATE), \eqn{E[Y | D=1, Z] - E[Y | D=0, Z]}, on the auxiliary sample
 #'
-#' @param Z an ( _n_ x _d_) matrix or data frame of covariates
-#' @param D a binary vector of treatment status of length _n_
-#' @param Y a vector of responses of length _n_
+#' @param Z A matrix or data frame of the covariates.
+#' @param D A binary vector of treatment assignment.
+#' @param Y The response vector.
 #' @param A_set a numerical vector of indices of observations in the auxiliary sample.
-#' @param learner the regression machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default.
-#' @param proxy_BCA A vector of length _n_ of proxy estimates of the baseline estimator \eqn{E[Y | D=0, Z]}. If NULL, these will be estimated separately.
-#' @param min_variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
+#' @param learner A string specifying the machine learner to be used for estimation. Either \code{'elastic_net'}, \code{'random_forest'} (default), or \code{'tree'}. Can alternatively be specified by using \code{mlr3} syntax \emph{without} specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.
+#' @param proxy_BCA A vector of proxy estimates of the baseline estimator BCA, \eqn{E[Y | D=0, Z]}. If \code{NULL}, these will be estimated separately.
+#' @param min_variation Minimum variation of the predictions before random noise with distribution \eqn{N(0, var(Y)/20)} is added. Default is \code{1e-05}.
 #' @return An object of the class \code{proxy_CATE}.
 #'
 #' @export
 proxy_CATE <- function(Z, D, Y,
                        A_set,
-                       learner = "random.forest",
+                       learner = "random_forest",
                        proxy_BCA = NULL,
                        min_variation = 1e-05){
 
@@ -230,7 +230,7 @@ proxy_CATE <- function(Z, D, Y,
 #' @noRd
 proxy_CATE_NoChecks <- function(Z, D, Y,
                                 A_set,
-                                learner = "random.forest",
+                                learner = "random_forest",
                                 proxy_BCA = NULL,
                                 min_variation = 1e-05){
 

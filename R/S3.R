@@ -1,5 +1,6 @@
-#' prints information on a GenericML instance
-#' @param x an object returned by \emph{GenericML()}
+#' prints information on an instance of \code{\link{GenericML}}.
+#'
+#' @param x An instance of \code{\link{GenericML}}.
 #' @param ... additional arguments to be passed
 #'
 #' @export

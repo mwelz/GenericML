@@ -9,25 +9,25 @@ proxy_CATE(
   D,
   Y,
   A_set,
-  learner = "random.forest",
+  learner = "random_forest",
   proxy_BCA = NULL,
   min_variation = 1e-05
 )
 }
 \arguments{
-\item{Z}{an ( \emph{n} x \emph{d}) matrix or data frame of covariates}
+\item{Z}{A matrix or data frame of the covariates.}
 
-\item{D}{a binary vector of treatment status of length \emph{n}}
+\item{D}{A binary vector of treatment assignment.}
 
-\item{Y}{a vector of responses of length \emph{n}}
+\item{Y}{The response vector.}
 
 \item{A_set}{a numerical vector of indices of observations in the auxiliary sample.}
 
-\item{learner}{the regression machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default.}
+\item{learner}{A string specifying the machine learner to be used for estimation. Either \code{'elastic_net'}, \code{'random_forest'} (default), or \code{'tree'}. Can alternatively be specified by using \code{mlr3} syntax \emph{without} specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.}
 
-\item{proxy_BCA}{A vector of length \emph{n} of proxy estimates of the baseline estimator \eqn{E[Y | D=0, Z]}. If NULL, these will be estimated separately.}
+\item{proxy_BCA}{A vector of proxy estimates of the baseline estimator BCA, \eqn{E[Y | D=0, Z]}. If \code{NULL}, these will be estimated separately.}
 
-\item{min_variation}{minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.}
+\item{min_variation}{Minimum variation of the predictions before random noise with distribution \eqn{N(0, var(Y)/20)} is added. Default is \code{1e-05}.}
 }
 \value{
 An object of the class \code{proxy_CATE}.
