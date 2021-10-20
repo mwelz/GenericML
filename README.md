@@ -46,7 +46,7 @@ quantile_cutoffs         <- c(0.2, 0.4, 0.6, 0.8) # 20%, 40%, 60%, 80% quantiles
 learner_propensity_score <- "mlr3::lrn('glmnet', lambda = 0, alpha = 1)"
 
 # specify the considered learners of the BCA and the CATE (here: elastic net, random forest, and SVM)
-learners_GenericML       <- c("elastic.net", "mlr3::lrn('ranger', num.trees = 100)", "mlr3::lrn('svm')")
+learners_GenericML       <- c("elastic_net", "mlr3::lrn('ranger', num.trees = 100)", "mlr3::lrn('svm')")
 
 # specify the data that shall be used for the CLAN
 # here, we use all variables of Z and uniformly distributed random noise
@@ -143,7 +143,7 @@ plot(genML, type = "GATES", title = "VEIN of GATES")
 
 # VEIN of CLAN for variable 'z1'
 genML$VEIN$best_learners$CLAN$z1
-plot(genML, type = "CLAN", CLAN.variable = "z1", title = "CLAN of 'z1'")
+plot(genML, type = "CLAN", CLAN_variable = "z1", title = "CLAN of 'z1'")
 # No indication of heterogeneity
 
 ```
@@ -152,7 +152,7 @@ plot(genML, type = "CLAN", CLAN.variable = "z1", title = "CLAN of 'z1'")
 - [ ] Add optional monotonization of the confindence bounds;
 - [ ] Make stratified sampling an argument;
 - [ ] Write accessor functions;
-- [ ] Make user interface homogeneous and double-check documentation for consistency;
+- [x] Make user interface homogeneous and double-check documentation for consistency;
 - [ ] Release beta on CRAN.
 
 ## Authors
