@@ -2,23 +2,22 @@
 % Please edit documentation in R/misc.R
 \name{lambda_parameters}
 \alias{lambda_parameters}
-\title{returns the two parameters that are used to find the best ML method}
+\title{Returns the two lambda parameters that are used to find the best ML method.}
 \usage{
-lambda_parameters(BLP.obj, GATES.obj, proxy_CATE.M_set, membership)
+lambda_parameters(BLP, GATES, proxy_CATE, membership)
 }
 \arguments{
-\item{BLP.obj}{an object as returned by CLAN()}
+\item{BLP}{An instance of the class \code{BLP}.}
 
-\item{GATES.obj}{an object as returned by get.BLP.parameters()}
+\item{GATES}{An instance of the class \code{GATES}.}
 
-\item{proxy_CATE.M_set}{Proxy CATE estimators for the main sample}
+\item{proxy_CATE}{Proxy estimates of the CATE.}
 
-\item{membership}{a logical matrix with \emph{M} rows that indicate
-the group memberships (such a matrix is returned by the function quantile_group())}
+\item{membership}{A logical matrix that indicates the group membership of each observation. Needs to be an instance of \code{\link{quantile_group}}.}
 }
 \value{
-lambda and lambda.bar parameters
+A list containing the parameters \code{lambda} and \code{lambda.bar}.
 }
 \description{
-returns the two parameters that are used to find the best ML method
+Returns the two lambda parameters that are used to find the best ML method.
 }

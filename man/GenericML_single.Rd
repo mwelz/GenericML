@@ -2,72 +2,72 @@
 % Please edit documentation in R/misc.R
 \name{GenericML_single}
 \alias{GenericML_single}
-\title{Performs generic ML for a given learning technique (with only one split of the data)}
+\title{Performs generic ML for a given learning technique and a given split of the data.}
 \usage{
 GenericML_single(
   Z,
   D,
   Y,
+  learner,
   propensity_scores,
-  learner = "mlr3::lrn(\\"cv_glmnet\\", s = \\"lambda.min\\")",
   M_set,
   A_set = setdiff(1:length(Y), M_set),
   Z_CLAN = NULL,
+  HT = FALSE,
+  quantile_cutoffs = c(0.25, 0.5, 0.75),
   X1_BLP = setup_X1(),
   X1_GATES = setup_X1(),
-  HT = FALSE,
+  diff_GATES = setup_diff(),
+  diff_CLAN = setup_diff(),
   vcov_BLP = setup_vcov(),
   vcov_GATES = setup_vcov(),
   equal_variances_CLAN = FALSE,
-  quantile_cutoffs = c(0.25, 0.5, 0.75),
-  diff_GATES = setup_diff(),
-  diff_CLAN = setup_diff(),
   significance_level = 0.05,
   min_variation = 1e-05
 )
 }
 \arguments{
-\item{Z}{a matrix or data frame of covariates}
+\item{Z}{A matrix or data frame of the covariates.}
 
-\item{D}{a binary vector of treatment status of length}
+\item{D}{A binary vector of treatment assignment.}
 
-\item{Y}{a vector of responses of length}
+\item{Y}{The response vector.}
 
-\item{propensity_scores}{a vector of propensity scores}
+\item{learner}{A string specifying the machine learner to be used for estimating the BCA and CATE. Either \code{'elastic.net'}, \code{'random.forest'}, or \code{'tree'}. Can alternatively be specified by using \code{mlr3} syntax \emph{without} specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.}
 
-\item{learner}{The machine learner that shall be used}
+\item{propensity_scores}{A numeric vector of propensity scores.}
 
 \item{M_set}{a numerical vector of indices of observations in the main sample.}
 
-\item{A_set}{a numerical vector of indices of observations in the auxiliary sample.}
+\item{A_set}{a numerical vector of indices of observations in the auxiliary sample. Default is complementary set to \code{M_set}.}
 
-\item{Z_CLAN}{A matrix of variables that shall be considered for the CLAN. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.}
+\item{Z_CLAN}{A matrix of variables that shall be considered for the CLAN. Each column represents a variable for which CLAN shall be performed. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.}
+
+\item{HT}{Logical. If \code{TRUE}, a HT transformation is applied in the BLP and GATES regressions. Default is \code{FALSE}.}
+
+\item{quantile_cutoffs}{The cutoff points of quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.}
 
 \item{X1_BLP}{Specifies the design matrix \eqn{X_1} in the BLP regression. See the documentation of \code{\link{setup_X1}} for details.}
 
 \item{X1_GATES}{Same as \code{X1_BLP}, just for the the GATES regression.}
 
-\item{HT}{logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.}
+\item{diff_GATES}{Specifies the generic targets of GATES. See the documentation of \code{\link{setup_diff}} for details.}
+
+\item{diff_CLAN}{Same as \code{diff_GATES}, just for the CLAN generic targets.}
 
 \item{vcov_BLP}{Specifies the covariance matrix estimator in the BLP regression. See the documentation of \code{\link{setup_vcov}} for details.}
 
 \item{vcov_GATES}{Same as \code{vcov_BLP}, just for the GATES regression.}
 
-\item{equal_variances_CLAN}{logical. If TRUE, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is FALSE.}
+\item{equal_variances_CLAN}{Logical. If \code{TRUE}, the the two within-group variances of the differences between the CLAN generic targets are assumed to be equal. Default is \code{FALSE}.}
 
-\item{quantile_cutoffs}{Cutoff points of quantiles that shall be used for GATES grouping}
+\item{significance_level}{Significance level for VEIN. Default is 0.05.}
 
-\item{diff_GATES}{Specifies the generic targets of GATES. See the documentation of \code{\link{setup_diff}}.}
-
-\item{diff_CLAN}{Same as \code{diff_GATES}, just for the CLAN generic targets.}
-
-\item{significance_level}{Significance level. Default is 0.05}
-
-\item{min_variation}{minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
-
-TODO: instructions on how mlr3 input is supposed to work (needs to be a string!)
-TODO: comments on CLAN: If there are categorical variables, apply one-hot-encoding to Z_CLAN. The interpretation then becomes: Is there a factor that is overproportionally present in the least or most affected group?}
+\item{min_variation}{Minimum variation of the predictions before random noise with distribution \eqn{N(0, var(Y)/20)} is added. Default is \code{1e-05}.}
+}
+\value{
+a list with instances of the classes \code{BLP}, \code{GATES}, \code{CLAN}, \code{proxy_baseline}, and \code{proxy_CATE}. In addition, the lambda parameters for finding the best learner are returned.
 }
 \description{
-Performs generic ML for a given learning technique (with only one split of the data)
+Can be seen as a single iteration of Algorithm 1 in the paper.
 }

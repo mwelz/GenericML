@@ -8,10 +8,9 @@ proxy_CATE(
   Z,
   D,
   Y,
-  M_set,
-  A_set = setdiff(1:length(Y), M_set),
+  A_set,
   learner = "random.forest",
-  proxy_baseline.estimates = NULL,
+  proxy_baseline = NULL,
   min_variation = 1e-05
 )
 }
@@ -22,18 +21,16 @@ proxy_CATE(
 
 \item{Y}{a vector of responses of length \emph{n}}
 
-\item{M_set}{a numerical vector of indices of observations in the main sample.}
-
 \item{A_set}{a numerical vector of indices of observations in the auxiliary sample.}
 
 \item{learner}{the regression machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default.}
 
-\item{proxy_baseline.estimates}{A vector of length \emph{n} of proxy estimates of the baseline estimator \eqn{E[Y | D=0, Z]}. If NULL, these will be estimated separately.}
+\item{proxy_baseline}{A vector of length \emph{n} of proxy estimates of the baseline estimator \eqn{E[Y | D=0, Z]}. If NULL, these will be estimated separately.}
 
 \item{min_variation}{minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.}
 }
 \value{
-Estimates of the CATE, both for the auxiliary sample and all observations, and an 'mlr3' object of each employed model
+An object of the class \code{proxy_CATE}.
 }
 \description{
 Estimates the CATE proxy estimator \eqn{E[Y | D=1, Z] - E[Y | D=0, Z]} on the auxiliary sample

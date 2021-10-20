@@ -1,5 +1,13 @@
 
-# get lower and upper median as in comment 4.2 in Chernozhukov et al. (2021)
+#' Find lower and upper median of a vector.
+#'
+#' See Comment 4.2 in the paper.
+#'
+#' @param x A numeric vector whose medians we are interested in.
+#'
+#' @return A list with the upper and lower median and the Med statistic.
+#'
+#' @export
 Med <- function(x){
 
   # get the empirical CDF of X
@@ -15,24 +23,28 @@ Med <- function(x){
                         lower,
                         max(upper.array)) # account for case where upper.array is empty
 
-  return(list(lower.median = lower,
-              upper.median = upper,
+  return(list(lower_median = lower,
+              upper_median = upper,
               Med = mean(c(lower, upper))))
 
 } # END FUN
 
 
 
-#' Partition a vector x into groups based on its quantiles
+#' Partition a vector into groups based on its quantiles.
 #'
-#' @param x the vector to be partitioned
-#' @param cutoffs the quantile cutoffs for the partition. Default are the quartiles.
-#' @param quantile.nam logical. Shall the cutoff values be included?
+#' Partitions a vector into quantile groups and returns a logical matrix indicating group membership.
+#'
+#' @param x The vector to be partitioned
+#' @param cutoffs The quantile cutoffs for the partition. Default are the quartiles: \code{c(0.25, 0.5, 0.75)}.
+#' @param names_quantile Logical. If \code{TRUE}, then the column names of the returned matrix are the quantiles as in \code{cutoffs}. If \code{FALSE}, the names are the numeric intervals that constitute the grouping.
+#'
+#' @return An object of the class \code{quantile_group}, which is a logical matrix indicating group membership
 #'
 #' @export
 quantile_group <- function(x,
                            cutoffs = c(0.25, 0.5, 0.75),
-                           quantile.nam = TRUE){
+                           names_quantile = TRUE){
   # cutoffs are the quantile cutoffs (like c(0.25, 0.5, 0.75))
 
   # get quatiles
@@ -71,7 +83,7 @@ quantile_group <- function(x,
     group.mat[,j] <- groups == group.nam[j]
   }
 
-  if(quantile.nam){
+  if(names_quantile){
     colnames(group.mat) <- nam
   } else{
     colnames(group.mat) <- group.nam
@@ -81,49 +93,50 @@ quantile_group <- function(x,
 
 
 
-#' Performs generic ML for a given learning technique (with only one split of the data)
+#' Performs generic ML for a given learning technique and a given split of the data.
 #'
-#' @param Z a matrix or data frame of covariates
-#' @param D a binary vector of treatment status of length
-#' @param Y a vector of responses of length
-#' @param propensity_scores a vector of propensity scores
-#' @param learner The machine learner that shall be used
+#' Can be seen as a single iteration of Algorithm 1 in the paper.
+#'
+#' @param Z A matrix or data frame of the covariates.
+#' @param D A binary vector of treatment assignment.
+#' @param Y The response vector.
+#' @param learner A string specifying the machine learner to be used for estimating the BCA and CATE. Either \code{'elastic.net'}, \code{'random.forest'}, or \code{'tree'}. Can alternatively be specified by using \code{mlr3} syntax \emph{without} specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.
+#' @param propensity_scores A numeric vector of propensity scores.
 #' @param M_set a numerical vector of indices of observations in the main sample.
-#' @param A_set a numerical vector of indices of observations in the auxiliary sample.
-#' @param Z_CLAN A matrix of variables that shall be considered for the CLAN. If `NULL` (default), then `Z_CLAN = Z`, i.e. CLAN is performed for all variables in `Z`.
+#' @param A_set a numerical vector of indices of observations in the auxiliary sample. Default is complementary set to \code{M_set}.
+#' @param Z_CLAN A matrix of variables that shall be considered for the CLAN. Each column represents a variable for which CLAN shall be performed. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.
+#' @param HT Logical. If \code{TRUE}, a HT transformation is applied in the BLP and GATES regressions. Default is \code{FALSE}.
+#' @param quantile_cutoffs The cutoff points of quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.
 #' @param X1_BLP Specifies the design matrix \eqn{X_1} in the BLP regression. See the documentation of \code{\link{setup_X1}} for details.
 #' @param X1_GATES Same as \code{X1_BLP}, just for the the GATES regression.
-#' @param HT logical. If TRUE, a HT transformation is applied in BLP and GATES. Default is FALSE.
+#' @param diff_GATES Specifies the generic targets of GATES. See the documentation of \code{\link{setup_diff}} for details.
+#' @param diff_CLAN Same as \code{diff_GATES}, just for the CLAN generic targets.
 #' @param vcov_BLP Specifies the covariance matrix estimator in the BLP regression. See the documentation of \code{\link{setup_vcov}} for details.
 #' @param vcov_GATES Same as \code{vcov_BLP}, just for the GATES regression.
-#' @param equal_variances_CLAN logical. If TRUE, the the two within-group variances of the most and least affected group in CLAN are assumed to be equal. Default is FALSE.
-#' @param quantile_cutoffs Cutoff points of quantiles that shall be used for GATES grouping
-#' @param diff_GATES Specifies the generic targets of GATES. See the documentation of \code{\link{setup_diff}}.
-#' @param diff_CLAN Same as \code{diff_GATES}, just for the CLAN generic targets.
-#' @param significance_level Significance level. Default is 0.05
-#' @param min_variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
+#' @param equal_variances_CLAN Logical. If \code{TRUE}, the the two within-group variances of the differences between the CLAN generic targets are assumed to be equal. Default is \code{FALSE}.
+#' @param significance_level Significance level for VEIN. Default is 0.05.
+#' @param min_variation Minimum variation of the predictions before random noise with distribution \eqn{N(0, var(Y)/20)} is added. Default is \code{1e-05}.
 #'
-#' TODO: instructions on how mlr3 input is supposed to work (needs to be a string!)
-#' TODO: comments on CLAN: If there are categorical variables, apply one-hot-encoding to Z_CLAN. The interpretation then becomes: Is there a factor that is overproportionally present in the least or most affected group?
+#' @return a list with instances of the classes \code{BLP}, \code{GATES}, \code{CLAN}, \code{proxy_baseline}, and \code{proxy_CATE}. In addition, the lambda parameters for finding the best learner are returned.
 #'
 #' @export
 GenericML_single <- function(Z, D, Y,
+                             learner,
                              propensity_scores,
-                             learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',
                              M_set,
-                             A_set                      = setdiff(1:length(Y), M_set),
-                             Z_CLAN                     = NULL,
-                             X1_BLP                     = setup_X1(),
-                             X1_GATES                   = setup_X1(),
-                             HT                         = FALSE,
-                             vcov_BLP                   = setup_vcov(),
-                             vcov_GATES                 = setup_vcov(),
-                             equal_variances_CLAN       = FALSE,
-                             quantile_cutoffs           = c(0.25, 0.5, 0.75),
-                             diff_GATES                 = setup_diff(),
-                             diff_CLAN                  = setup_diff(),
-                             significance_level         = 0.05,
-                             min_variation              = 1e-05){
+                             A_set                = setdiff(1:length(Y), M_set),
+                             Z_CLAN               = NULL,
+                             HT                   = FALSE,
+                             quantile_cutoffs     = c(0.25, 0.5, 0.75),
+                             X1_BLP               = setup_X1(),
+                             X1_GATES             = setup_X1(),
+                             diff_GATES           = setup_diff(),
+                             diff_CLAN            = setup_diff(),
+                             vcov_BLP             = setup_vcov(),
+                             vcov_GATES           = setup_vcov(),
+                             equal_variances_CLAN = FALSE,
+                             significance_level   = 0.05,
+                             min_variation        = 1e-05){
 
   # input checks
   InputChecks_D(D)
@@ -166,7 +179,7 @@ GenericML_single <- function(Z, D, Y,
 GenericML_single_NoChecks <-
   function(Z, D, Y,
            propensity_scores,
-           learner = 'mlr3::lrn("cv_glmnet", s = "lambda.min")',
+           learner,
            M_set, A_set,
            Z_CLAN                     = NULL,
            X1_BLP                     = setup_X1(),
@@ -184,33 +197,38 @@ GenericML_single_NoChecks <-
 
     ### step 1a: learn proxy predictors by using the auxiliary set ----
 
-    # get the proxy baseline estimator for the main sample
+    # get proxy baseline estimates
     proxy_baseline.obj <- proxy_baseline_NoChecks(
       Z = Z, D = D, Y = Y,
-      M_set = M_set, A_set = A_set,
-      learner = learner,
+      A_set         = A_set,
+      learner       = learner,
       min_variation = min_variation)
-    proxy_baseline     <- proxy_baseline.obj$baseline.predictions.M_set
 
-    # get the proxy estimator of the CATE for the main sample
-    proxy_CATE.obj <- proxy_CATE_NoChecks(
-      Z = Z, D = D, Y = Y,
-      M_set = M_set, A_set = A_set,
-      learner = learner,
-      proxy_baseline.estimates = proxy_baseline.obj$baseline.predictions.full.sample,
-      min_variation = min_variation)
-    proxy_CATE <- proxy_CATE.obj$CATE.predictions.M_set
+    # get estimates on main sample
+    proxy_baseline_M     <- proxy_baseline.obj$estimates[M_set]
+
+    # get the proxy estimates of the CATE
+    proxy_CATE.obj <-
+      proxy_CATE_NoChecks(
+        Z = Z, D = D, Y = Y,
+        A_set          = A_set,
+        learner        = learner,
+        proxy_baseline = proxy_baseline.obj$estimates,
+        min_variation  = min_variation)
+
+    # get estimates on main sample
+    proxy_CATE_M <- proxy_CATE.obj$estimates$CATE[M_set]
 
 
-    ### step 1b: estimate BLP parameters by OLS ----
+    ### step 1b: estimate BLP parameters ----
     blp.obj <- BLP_NoChecks(
-      D = D[M_set],
-      Y = Y[M_set],
+      D                  = D[M_set],
+      Y                  = Y[M_set],
       propensity_scores  = propensity_scores[M_set],
-      proxy_baseline     = proxy_baseline,
-      proxy_CATE         = proxy_CATE,
+      proxy_baseline     = proxy_baseline_M,
+      proxy_CATE         = proxy_CATE_M,
       HT                 = HT,
-      X1_control       = setup_X1(),
+      X1_control         = setup_X1(),
       vcov_control       = vcov_BLP,
       significance_level = significance_level)
 
@@ -218,45 +236,46 @@ GenericML_single_NoChecks <-
 
     ### step 1c: estimate GATES parameters by OLS ----
     # group the proxy estimators for the CATE in the main sample by quantiles
-    membership <- quantile_group(proxy_CATE,
-                                 cutoffs = quantile_cutoffs,
-                                 quantile.nam = TRUE)
+    membership_M <- quantile_group(proxy_CATE_M,
+                                   cutoffs = quantile_cutoffs,
+                                   names_quantile = TRUE)
 
+    # estimate GATES
     gates.obj <- GATES_NoChecks(
-      D = D[M_set],
-      Y = Y[M_set],
+      D                   = D[M_set],
+      Y                   = Y[M_set],
       propensity_scores   = propensity_scores[M_set],
-      proxy_baseline      = proxy_baseline,
-      proxy_CATE          = proxy_CATE,
-      membership = membership,
+      proxy_baseline      = proxy_baseline_M,
+      proxy_CATE          = proxy_CATE_M,
+      membership          = membership_M,
       HT                  = HT,
-      X1_control        = setup_X1(),
+      X1_control          = setup_X1(),
       vcov_control        = vcov_GATES,
       diff                = diff_GATES,
       significance_level  = significance_level)
 
 
-    ### step 1d: estimate CLAN parameters in the main sample ----
+    ### step 1d: estimate CLAN parameters on the main sample ----
     clan.obj <- CLAN_NoChecks(
-      Z_CLAN = Z_CLAN[M_set,,drop = FALSE],
-      membership = membership,
-      equal_variances   = equal_variances_CLAN,
-      diff                    = diff_CLAN,
-      significance_level      = significance_level)
+      Z_CLAN             = Z_CLAN[M_set,,drop = FALSE],
+      membership         = membership_M,
+      equal_variances    = equal_variances_CLAN,
+      diff               = diff_CLAN,
+      significance_level = significance_level)
 
 
     ### step 1e: get parameters over which we maximize to find the "best" ML method ----
-    best.obj <- lambda_parameters(BLP.obj = blp.obj,
-                                  GATES.obj = gates.obj,
-                                  proxy_CATE.M_set = proxy_CATE,
-                                  membership = membership)
+    best.obj <- lambda_parameters(BLP        = blp.obj,
+                                  GATES      = gates.obj,
+                                  proxy_CATE = proxy_CATE_M,
+                                  membership = membership_M)
 
     ### organize output in a list ----
     return(list(BLP            = blp.obj,
                 GATES          = gates.obj,
                 CLAN           = clan.obj,
                 proxy_CATE     = proxy_CATE.obj,
-                proxy_baseline = proxy_baseline,
+                proxy_baseline = proxy_baseline.obj,
                 best           = best.obj
     ))
 
@@ -264,25 +283,25 @@ GenericML_single_NoChecks <-
 
 
 
-#' returns the two parameters that are used to find the best ML method
+#' Returns the two lambda parameters that are used to find the best ML method.
 #'
-#' @param BLP.obj an object as returned by CLAN()
-#' @param GATES.obj an object as returned by get.BLP.parameters()
-#' @param proxy_CATE.M_set Proxy CATE estimators for the main sample
-#' @param membership a logical matrix with _M_ rows that indicate
-#' the group memberships (such a matrix is returned by the function quantile_group())
-#' @return lambda and lambda.bar parameters
+#' @param BLP An instance of the class \code{BLP}.
+#' @param GATES An instance of the class \code{GATES}.
+#' @param proxy_CATE Proxy estimates of the CATE.
+#' @param membership A logical matrix that indicates the group membership of each observation. Needs to be an instance of \code{\link{quantile_group}}.
+#'
+#' @return A list containing the parameters \code{lambda} and \code{lambda.bar}.
 #'
 #' @export
-lambda_parameters <- function(BLP.obj,
-                              GATES.obj,
-                              proxy_CATE.M_set,
+lambda_parameters <- function(BLP,
+                              GATES,
+                              proxy_CATE,
                               membership){
 
-  temp <- GATES.obj$coefficients
+  temp <- GATES$coefficients
   gates.coefs <- temp[startsWith(rownames(temp), "gamma."), "Estimate"]
 
-  return(list(lambda = BLP.obj$coefficients["beta.2", "Estimate"]^2 * stats::var(proxy_CATE.M_set),
+  return(list(lambda = BLP$coefficients["beta.2", "Estimate"]^2 * stats::var(proxy_CATE),
               lambda.bar = as.numeric(colMeans(membership) %*%  gates.coefs^2)))
 
 } # END FUN

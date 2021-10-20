@@ -2,17 +2,20 @@
 % Please edit documentation in R/misc.R
 \name{quantile_group}
 \alias{quantile_group}
-\title{Partition a vector x into groups based on its quantiles}
+\title{Partition a vector into groups based on its quantiles.}
 \usage{
-quantile_group(x, cutoffs = c(0.25, 0.5, 0.75), quantile.nam = TRUE)
+quantile_group(x, cutoffs = c(0.25, 0.5, 0.75), names_quantile = TRUE)
 }
 \arguments{
-\item{x}{the vector to be partitioned}
+\item{x}{The vector to be partitioned}
 
-\item{cutoffs}{the quantile cutoffs for the partition. Default are the quartiles.}
+\item{cutoffs}{The quantile cutoffs for the partition. Default are the quartiles: \code{c(0.25, 0.5, 0.75)}.}
 
-\item{quantile.nam}{logical. Shall the cutoff values be included?}
+\item{names_quantile}{Logical. If \code{TRUE}, then the column names of the returned matrix are the quantiles as in \code{cutoffs}. If \code{FALSE}, the names are the numeric intervals that constitute the grouping.}
+}
+\value{
+An object of the class \code{quantile_group}, which is a logical matrix indicating group membership
 }
 \description{
-Partition a vector x into groups based on its quantiles
+Partitions a vector into quantile groups and returns a logical matrix indicating group membership.
 }

@@ -117,17 +117,16 @@ propensity_score_NoChecks <- function(Z, D, estimator = "constant"){
 #' @param Z an ( _n_ x _d_) matrix or data frame of covariates
 #' @param D a binary vector of treatment status of length _n_
 #' @param Y a vector of responses of length _n_
-#' @param M_set a numerical vector of indices of observations in the main sample.
 #' @param A_set a numerical vector of indices of observations in the auxiliary sample.
 #' @param learner the classification machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default.
 #' @param min_variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
-#' @return Estimates of Y, both for the auxiliary sample and all observations, and an 'mlr3' object of the employed model
+#'
+#' @return An object of the class \code{proxy_baseline}.
 #'
 #'
 #' @export
 proxy_baseline <- function(Z, D, Y,
-                           M_set,
-                           A_set = setdiff(1:length(Y), M_set),
+                           A_set,
                            learner = "random.forest",
                            min_variation = 1e-05){
 
@@ -139,7 +138,7 @@ proxy_baseline <- function(Z, D, Y,
 
   # call main function
   proxy_baseline_NoChecks(Z = Z, D = D, Y = Y,
-                          M_set = M_set, A_set = A_set,
+                          A_set = A_set,
                           learner = get.learner_regr(learner),
                           min_variation = min_variation)
 
@@ -151,7 +150,6 @@ proxy_baseline <- function(Z, D, Y,
 #' @import mlr3 mlr3learners
 #' @noRd
 proxy_baseline_NoChecks <- function(Z, D, Y,
-                                    M_set,
                                     A_set,
                                     learner, # must be mlr3 object
                                     min_variation = 1e-05){
@@ -185,9 +183,7 @@ proxy_baseline_NoChecks <- function(Z, D, Y,
 
   # return
   return(structure(
-    list(baseline.predictions.M_set = predictions[M_set],
-         baseline.predictions.A_set = predictions[A_set],
-         baseline.predictions.full.sample = predictions,
+    list(estimates  = predictions,
          mlr3_objects = list(task = task.proxy_baseline.estimator,
                              learner = learner)), class = "proxy_baseline"))
 
@@ -199,19 +195,17 @@ proxy_baseline_NoChecks <- function(Z, D, Y,
 #' @param Z an ( _n_ x _d_) matrix or data frame of covariates
 #' @param D a binary vector of treatment status of length _n_
 #' @param Y a vector of responses of length _n_
-#' @param M_set a numerical vector of indices of observations in the main sample.
 #' @param A_set a numerical vector of indices of observations in the auxiliary sample.
 #' @param learner the regression machine learner to be used. Either 'glm', 'random.forest', or 'tree'. Can alternatively be specified by using the mlr3 framework, for example ml_g = mlr3::lrn("regr.ranger", num.trees = 500) for a regression forest, which is also the default.
-#' @param proxy_baseline.estimates A vector of length _n_ of proxy estimates of the baseline estimator \eqn{E[Y | D=0, Z]}. If NULL, these will be estimated separately.
+#' @param proxy_baseline A vector of length _n_ of proxy estimates of the baseline estimator \eqn{E[Y | D=0, Z]}. If NULL, these will be estimated separately.
 #' @param min_variation minimum variation of the predictions before random noise with distribution N(0, var(Y)/20) is added. Default is 1e-05.
-#' @return Estimates of the CATE, both for the auxiliary sample and all observations, and an 'mlr3' object of each employed model
+#' @return An object of the class \code{proxy_CATE}.
 #'
 #' @export
 proxy_CATE <- function(Z, D, Y,
-                       M_set,
-                       A_set   = setdiff(1:length(Y), M_set),
+                       A_set,
                        learner = "random.forest",
-                       proxy_baseline.estimates = NULL,
+                       proxy_baseline = NULL,
                        min_variation = 1e-05){
 
   # input checks
@@ -222,9 +216,9 @@ proxy_CATE <- function(Z, D, Y,
 
   # run main function
   proxy_CATE_NoChecks(Z = Z, D = D, Y = Y,
-                      M_set = M_set, A_set = A_set,
+                      A_set = A_set,
                       learner = get.learner_regr(learner), # must be mlr3 object
-                      proxy_baseline.estimates = proxy_baseline.estimates,
+                      proxy_baseline = proxy_baseline,
                       min_variation = min_variation)
 
 } # END FUN
@@ -235,10 +229,9 @@ proxy_CATE <- function(Z, D, Y,
 #' @import mlr3 mlr3learners
 #' @noRd
 proxy_CATE_NoChecks <- function(Z, D, Y,
-                                M_set,
                                 A_set,
                                 learner = "random.forest",
-                                proxy_baseline.estimates = NULL,
+                                proxy_baseline = NULL,
                                 min_variation = 1e-05){
 
   # indices of the treated units in the auxiliary sample
@@ -264,11 +257,11 @@ proxy_CATE_NoChecks <- function(Z, D, Y,
   predictions.treated     <- predictions.treated.obj$response
 
 
-  if(!is.null(proxy_baseline.estimates)){
+  if(!is.null(proxy_baseline)){
 
     ## if proxy baseline estimates were provided, no need for second estimation
-    predictions.controls <- proxy_baseline.estimates
-    mlr3.controls        <- "Not available as proxy estimates for the baseline were aprovided"
+    predictions.controls <- proxy_baseline
+    mlr3.controls        <- "Not available as proxy estimates for the baseline were provided"
 
   } else{
 
@@ -297,19 +290,6 @@ proxy_CATE_NoChecks <- function(Z, D, Y,
 
   } # END IF
 
-  # prepare returned objects
-  predictions.Y1 <-
-    list(predictions.Y1_M_set = predictions.treated[M_set],
-         predictions.Y1_A_set = predictions.treated[A_set],
-         predictions.Y1_full.sample = predictions.treated,
-         mlr3_objects = list(task = task.proxy_CATE.treated.estimator,
-                             learner = learner.treated))
-
-  predictions.Y0 <-
-    list(predictions.Y0_M_set = predictions.controls[M_set],
-         predictions.Y0_A_set = predictions.controls[A_set],
-         predictions.Y0_full.sample = predictions.controls,
-         mlr3_objects = mlr3.controls)
 
   # get CATE predictions
   cate.predictions <- predictions.treated - predictions.controls
@@ -322,12 +302,19 @@ proxy_CATE_NoChecks <- function(Z, D, Y,
 
   } # IF
 
+
+  # prepare output
+  estimates <- list(CATE = cate.predictions,
+                    Y1 = predictions.treated,
+                    Y0 = predictions.controls)
+
+  mlr3_objects <- list(Y1_learner = list(task = task.proxy_CATE.treated.estimator,
+                                         learner = learner.treated),
+                       Y0_learner = mlr3.controls)
+
   return(structure(
-    list(CATE.predictions.M_set = cate.predictions[M_set],
-         CATE.predictions.A_set = cate.predictions[A_set],
-         CATE.predictions.full.sample = cate.predictions,
-         Y1.predictions = predictions.Y1,
-         Y0.predictions = predictions.Y0),
-    class = "proxy_CATE"))
+           list(estimates    = estimates,
+                mlr3_objects = mlr3_objects),
+         class = "proxy_CATE"))
 
 } # FUN
