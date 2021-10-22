@@ -287,7 +287,9 @@ get.learner_regr <- function(learner){
 } # FUN
 
 
-
+#' A function that returns \code{TRUE} if your OS is a Unix system and \code{FALSE} otherwise.
+#'
+#' @export
 TrueIfUnix <- function(){
   .Platform$OS.type == "unix"
 }

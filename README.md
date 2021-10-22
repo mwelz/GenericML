@@ -132,17 +132,17 @@ genML$best_learners$CATE
 genML$best_learners$GATES
 
 # VEIN of BLP
-genML$VEIN$best_learners$BLP
+get_BLP(genML, plot = FALSE)
 plot(genML, type = "BLP") # plot.GenericML() method
 # No indication of treatment effect heterogeneity; see beta.2 coefficient
 
 # VEIN of GATES
-genML$VEIN$best_learners$GATES
-plot(genML, type = "GATES", title = "VEIN of GATES")
+get_GATES(genML, plot = FALSE)
+plot(genML, type = "GATES")
 # No indication of heterogeneity
 
 # VEIN of CLAN for variable 'z1'
-genML$VEIN$best_learners$CLAN$z1
+get_CLAN(genML, variable = "z1", plot = FALSE)
 plot(genML, type = "CLAN", CLAN_variable = "z1")
 # No indication of heterogeneity
 
