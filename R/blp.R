@@ -32,7 +32,7 @@ BLP <- function(Y, D,
   InputChecks_equal.length2(proxy_BCA, proxy_CATE)
   InputChecks_equal.length2(proxy_BCA, Y)
   InputChecks_vcov.control(vcov_control)
-  InputChecks_X1(X1_control)
+  InputChecks_X1(X1_control, length(Y))
 
   # fit model according to strategy 1 or 2 in the paper
   BLP_NoChecks(D = D, Y = Y,
@@ -81,8 +81,8 @@ BLP.classic <- function(D, Y, propensity_scores,
 
   # prepare covariate matrix X
   X <- data.frame(get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy_CATE,
-                                                                      B = proxy_BCA,
-                                                                      p = propensity_scores),
+                                                                    B = proxy_BCA,
+                                                                    p = propensity_scores),
                                            X1_control = X1_control),
                   beta.1 = D - propensity_scores,
                   beta.2 = (D - propensity_scores) * (proxy_CATE - mean(proxy_CATE)))
@@ -112,7 +112,7 @@ BLP.classic <- function(D, Y, propensity_scores,
 # helper function for case when there is a HT transformation used. Wrapped by function "BLP"
 BLP.HT <- function(D, Y, propensity_scores,
                    proxy_BCA, proxy_CATE,
-                   X1_control       = setup_X1(),
+                   X1_control         = setup_X1(),
                    vcov_control       = setup_vcov(),
                    significance_level = 0.05){
 
@@ -121,8 +121,8 @@ BLP.HT <- function(D, Y, propensity_scores,
 
   # prepare matrix X1
   X1. <- get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy_CATE,
-                                                             B = proxy_BCA,
-                                                             p = propensity_scores),
+                                                           B = proxy_BCA,
+                                                           p = propensity_scores),
                                  X1_control = X1_control)
 
 

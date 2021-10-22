@@ -102,7 +102,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
   genericML.by.split <- list()
   N     <- length(Y)
   N.set <- 1:N
-  prop <- prop_main * N
+  prop  <- floor(prop_main * N)
 
   # set variable names fo CLAN
   if(is.null(colnames(Z_CLAN))) colnames(Z_CLAN) <- paste0("V", 1:num.vars.in.Z_CLAN)
@@ -130,7 +130,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
   for(s in 1:num_splits){
 
     # perform sample splitting into main set and auxiliary set
-    M_set <- sort(sample(x = N.set, size = floor(prop), replace = FALSE),
+    M_set <- sort(sample(x = N.set, size = prop, replace = FALSE),
                   decreasing = FALSE)
     A_set <- setdiff(N.set, M_set)
 
@@ -274,7 +274,7 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
 
 
     # perform sample splitting into main set and auxiliary set
-    M_set <- sort(sample(x = N.set, size = floor(prop), replace = FALSE),
+    M_set <- sort(sample(x = N.set, size = prop, replace = FALSE),
                   decreasing = FALSE)
     A_set <- setdiff(N.set, M_set)
 

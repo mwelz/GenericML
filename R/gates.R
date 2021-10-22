@@ -34,7 +34,7 @@ GATES <- function(Y, D,
   InputChecks_equal.length2(D, Y)
   InputChecks_equal.length3(propensity_scores, proxy_BCA, proxy_CATE)
   InputChecks_equal.length2(Y, propensity_scores)
-  InputChecks_X1(X1_control)
+  InputChecks_X1(X1_control, length(Y))
   InputChecks_vcov.control(vcov_control)
   InputChecks_diff(diff, K = ncol(membership))
   InputChecks_group.membership(membership)

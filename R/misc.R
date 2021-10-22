@@ -143,8 +143,8 @@ GenericML_single <- function(Z, D, Y,
   InputChecks_Y(Y)
   InputChecks_Z(Z)
   InputChecks_equal.length3(D, Y, Z)
-  InputChecks_X1(X1_BLP)
-  InputChecks_X1(X1_GATES)
+  InputChecks_X1(X1_BLP, length(Y))
+  InputChecks_X1(X1_GATES, length(Y))
   InputChecks_vcov.control(vcov_BLP)
   InputChecks_vcov.control(vcov_GATES)
   InputChecks_diff(diff_GATES, K = length(quantile_cutoffs) + 1)
@@ -213,11 +213,19 @@ GenericML_single_NoChecks <-
         Z = Z, D = D, Y = Y,
         A_set          = A_set,
         learner        = learner,
-        proxy_BCA = proxy_BCA.obj$estimates,
+        proxy_BCA      = proxy_BCA.obj$estimates,
         min_variation  = min_variation)
 
     # get estimates on main sample
     proxy_CATE_M <- proxy_CATE.obj$estimates$CATE[M_set]
+
+    # restrict the X1_controls to M_set
+    X1_BLP_M   <- setup_X1(funs_Z        = X1_BLP$funs_Z,
+                           covariates    = X1_BLP$covariates[M_set,,drop = FALSE],
+                           fixed_effects = X1_BLP$fixed_effects[M_set])
+    X1_GATES_M <- setup_X1(funs_Z        = X1_GATES$funs_Z,
+                           covariates    = X1_GATES$covariates[M_set,,drop = FALSE],
+                           fixed_effects = X1_GATES$fixed_effects[M_set])
 
 
     ### step 1b: estimate BLP parameters ----
@@ -225,10 +233,10 @@ GenericML_single_NoChecks <-
       D                  = D[M_set],
       Y                  = Y[M_set],
       propensity_scores  = propensity_scores[M_set],
-      proxy_BCA     = proxy_BCA_M,
+      proxy_BCA          = proxy_BCA_M,
       proxy_CATE         = proxy_CATE_M,
       HT                 = HT,
-      X1_control         = setup_X1(),
+      X1_control         = X1_BLP_M,
       vcov_control       = vcov_BLP,
       significance_level = significance_level)
 
@@ -245,11 +253,11 @@ GenericML_single_NoChecks <-
       D                   = D[M_set],
       Y                   = Y[M_set],
       propensity_scores   = propensity_scores[M_set],
-      proxy_BCA      = proxy_BCA_M,
+      proxy_BCA           = proxy_BCA_M,
       proxy_CATE          = proxy_CATE_M,
       membership          = membership_M,
       HT                  = HT,
-      X1_control          = setup_X1(),
+      X1_control          = X1_GATES_M,
       vcov_control        = vcov_GATES,
       diff                = diff_GATES,
       significance_level  = significance_level)
