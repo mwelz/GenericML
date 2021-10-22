@@ -24,6 +24,17 @@ plot.GenericML <- function(x,
   # for better readability
   GenericML.obj <- x
 
+  # specify the title
+  if(is.null(title)){
+
+    if(type == "CLAN"){
+      title <- paste0("VEIN of CLAN for variable '", CLAN_variable, "'")
+    } else{
+      title <- paste0("VEIN of ", type)
+    }
+
+  } # IF
+
   ## 0. input check ----
   if(type == "CLAN"){
 

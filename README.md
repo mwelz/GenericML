@@ -133,7 +133,7 @@ genML$best_learners$GATES
 
 # VEIN of BLP
 genML$VEIN$best_learners$BLP
-plot(genML, type = "BLP", title = "VEIN of BLP") # plot.GenericML() method
+plot(genML, type = "BLP") # plot.GenericML() method
 # No indication of treatment effect heterogeneity; see beta.2 coefficient
 
 # VEIN of GATES
@@ -143,13 +143,13 @@ plot(genML, type = "GATES", title = "VEIN of GATES")
 
 # VEIN of CLAN for variable 'z1'
 genML$VEIN$best_learners$CLAN$z1
-plot(genML, type = "CLAN", CLAN_variable = "z1", title = "CLAN of 'z1'")
+plot(genML, type = "CLAN", CLAN_variable = "z1")
 # No indication of heterogeneity
 
 ```
 
 ## TODO
-- [ ] Add optional monotonization of the confindence bounds;
+- [ ] Add optional monotonization of the confidence bounds;
 - [ ] Make stratified sampling an argument;
 - [ ] Write accessor functions;
 - [x] Make user interface homogeneous and double-check documentation for consistency;
