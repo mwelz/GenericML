@@ -151,7 +151,7 @@ plot(genML, type = "CLAN", CLAN_variable = "z1")
 ## TODO
 - [ ] Add optional monotonization of the confidence bounds;
 - [ ] Make stratified sampling an argument;
-- [ ] Write accessor functions;
+- [x] Write accessor functions;
 - [x] Make user interface homogeneous and double-check documentation for consistency;
 - [ ] Release beta on CRAN.
 
