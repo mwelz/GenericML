@@ -17,7 +17,7 @@ generic.ml.across.learners <- function(Z, D, Y,
                                        diff_CLAN            = setup_diff(),
                                        significance_level   = 0.05,
                                        min_variation        = 1e-05,
-                                       parallel             = .Platform$OS.type == "unix",
+                                       parallel             = TrueIfUnix(),
                                        num_cores            = parallel::detectCores(),
                                        seed                 = NULL,
                                        store_learners       = FALSE,
@@ -106,14 +106,6 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
 
   # set variable names fo CLAN
   if(is.null(colnames(Z_CLAN))) colnames(Z_CLAN) <- paste0("V", 1:num.vars.in.Z_CLAN)
-
-  # make the custom covariates a matrix to prevent bug later
-  if(!is.null(X1_BLP$covariates)){
-    X1_BLP$covariates <- as.matrix(X1_BLP$covariates)
-  } # IF
-  if(!is.null(X1_GATES$covariates)){
-    X1_GATES$covariates <- as.matrix(X1_GATES$covariates)
-  } # IF
 
   # initialize
   if(store_splits) splits.mat <- matrix(NA_character_, N, num_splits,
@@ -242,18 +234,10 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
   N     <- length(Y)
   N.set <- 1:N
   num.learners <- length(learners)
-  prop <- prop_main * N
+  prop <- floor(prop_main * N)
 
   # set variable names fo CLAN
   if(is.null(colnames(Z_CLAN))) colnames(Z_CLAN) <- paste0("V", 1:num.vars.in.Z_CLAN)
-
-  # make the custom covariates a matrix to prevent bug later
-  if(!is.null(X1_BLP$covariates)){
-    X1_BLP$covariates <- as.matrix(X1_BLP$covariates)
-  } # IF
-  if(!is.null(X1_GATES$covariates)){
-    X1_GATES$covariates <- as.matrix(X1_GATES$covariates)
-  } # IF
 
 
   # loop over the sample splits

@@ -2,7 +2,7 @@
 #'
 #' Performs generic machine learning inference as in Chernozhukov, Demirer, Duflo and Fernández-Val (2020). Link to working paper: \url{https://arxiv.org/abs/1712.04802}.
 #'
-#' @param Z A matrix or data frame of the covariates.
+#' @param Z A matrix of the covariates.
 #' @param D A binary vector of treatment assignment.
 #' @param Y The response vector.
 #' @param learners_GenericML A vector of strings specifying the machine learners to be used for estimating the BCA and CATE. Either \code{'elastic_net'}, \code{'random_forest'}, or \code{'tree'}. Can alternatively be specified by using \code{mlr3} syntax \emph{without} specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.
@@ -47,7 +47,7 @@ GenericML <- function(Z, D, Y,
                       prop_main                = 0.5,
                       significance_level       = 0.05,
                       min_variation            = 1e-05,
-                      parallel                 = .Platform$OS.type == "unix",
+                      parallel                 = TrueIfUnix(),
                       num_cores                = parallel::detectCores(),
                       seed                     = NULL,
                       store_learners           = FALSE,
@@ -66,7 +66,7 @@ GenericML <- function(Z, D, Y,
   InputChecks_diff(diff_GATES, K = length(quantile_cutoffs) + 1)
   InputChecks_diff(diff_CLAN, K = length(quantile_cutoffs) + 1)
 
-  if(parallel & .Platform$OS.type != "unix"){
+  if(parallel & !TrueIfUnix()){
     message("Parallelization is currently only supported on Unix systems (you are using Windows). Therefore, no parallelization will be employed", call. = FALSE)
     parallel <- FALSE
 

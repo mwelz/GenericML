@@ -27,7 +27,7 @@ GenericML_single(
 )
 }
 \arguments{
-\item{Z}{A matrix or data frame of the covariates.}
+\item{Z}{A matrix of the covariates.}
 
 \item{D}{A binary vector of treatment assignment.}
 

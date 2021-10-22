@@ -7,7 +7,7 @@
 propensity_score(Z, D, estimator = "constant")
 }
 \arguments{
-\item{Z}{A matrix or data frame of covariates}
+\item{Z}{A matrix of covariates}
 
 \item{D}{A binary vector of treatment status}
 

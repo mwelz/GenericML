@@ -49,7 +49,7 @@ propensity_score_mlr3 <- function(Z, D, learner = "random_forest"){
 
 #' Estimates the propensity score
 #'
-#' @param Z A matrix or data frame of covariates
+#' @param Z A matrix of covariates
 #' @param D A binary vector of treatment status
 #' @param estimator The estimator for the propensity scores. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to \code{'constant'} (estimates the propensity scores by \code{mean(D)}), \code{'elastic_net'}, \code{'random_forest'}, \code{'tree'}, or \code{mlr3} syntax. Note that in case of \code{mlr3} syntax, do \emph{not} specify if the learner is a regression learner or classification learner; Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords.
 #' @return Estimates of \eqn{Pr(D = 1 | Z)} and an \code{mlr3} object of the employed model (if applicable).
@@ -114,7 +114,7 @@ propensity_score_NoChecks <- function(Z, D, estimator = "constant"){
 
 #' Performs estimation of the baseline conditional average (BCA), \eqn{E[Y | D=0, Z]}, on the auxiliary sample
 #'
-#' @param Z A matrix or data frame of the covariates.
+#' @param Z A matrix of the covariates.
 #' @param D A binary vector of treatment assignment.
 #' @param Y The response vector.
 #' @param A_set a numerical vector of indices of observations in the auxiliary sample.
@@ -192,7 +192,7 @@ proxy_BCA_NoChecks <- function(Z, D, Y,
 
 #' Performs estimation of the conditional average treatment effect (CATE), \eqn{E[Y | D=1, Z] - E[Y | D=0, Z]}, on the auxiliary sample
 #'
-#' @param Z A matrix or data frame of the covariates.
+#' @param Z A matrix of the covariates.
 #' @param D A binary vector of treatment assignment.
 #' @param Y The response vector.
 #' @param A_set a numerical vector of indices of observations in the auxiliary sample.

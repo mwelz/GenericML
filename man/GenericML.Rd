@@ -24,7 +24,7 @@ GenericML(
   prop_main = 0.5,
   significance_level = 0.05,
   min_variation = 1e-05,
-  parallel = .Platform$OS.type == "unix",
+  parallel = TrueIfUnix(),
   num_cores = parallel::detectCores(),
   seed = NULL,
   store_learners = FALSE,
@@ -32,7 +32,7 @@ GenericML(
 )
 }
 \arguments{
-\item{Z}{A matrix or data frame of the covariates.}
+\item{Z}{A matrix of the covariates.}
 
 \item{D}{A binary vector of treatment assignment.}
 

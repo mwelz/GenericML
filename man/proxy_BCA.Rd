@@ -7,7 +7,7 @@
 proxy_BCA(Z, D, Y, A_set, learner = "random_forest", min_variation = 1e-05)
 }
 \arguments{
-\item{Z}{A matrix or data frame of the covariates.}
+\item{Z}{A matrix of the covariates.}
 
 \item{D}{A binary vector of treatment assignment.}
 

@@ -31,30 +31,27 @@ InputChecks_equal.length2 <- function(x, y){
 InputChecks_D <- function(D){
 
   # input checks
+  if(!(is.numeric(D) & is.vector(D))) stop("D must be a numeric vector", call. = FALSE)
   if((!all(c(0, 1) %in% unique(D))) | (length(unique(D)) != 2)) stop("Treatment assignment D is not binary", call. = FALSE)
-  if(!is.numeric(D)) stop("D is not numeric", call. = FALSE)
+  if(any(is.na(D))) stop("D contains missing values", call. = FALSE)
 
 } # FUN
 
 
 InputChecks_Y <- function(Y){
 
-  if(!is.numeric(Y)) stop("Y is not numeric", call. = FALSE)
-  if(!(is.matrix(Y) | is.data.frame(Y) | is.vector(Y))) stop("Y must be either a vector, data frame, or matrix", call. = FALSE)
-
-  if(is.matrix(Y) | is.data.frame(Y)){
-
-    if(ncol(Y) != 1) stop("The matrix/data frame Y must have only one column", call. = FALSE)
-
-  } # IF
+  # input checks
+  if(!(is.numeric(Y) & is.vector(Y))) stop("Y must be a numeric vector", call. = FALSE)
+  if(any(is.na(Y))) stop("Y contains missing values", call. = FALSE)
 
 } # FUN
 
 
 InputChecks_Z <- function(Z){
 
-  if(!is.numeric(Z)) stop("Z is not numeric", call. = FALSE)
-  if(!(is.matrix(Z) | is.data.frame(Z))) stop("Z must be either a data frame or matrix", call. = FALSE)
+  # input checks
+  if(!(is.numeric(Z) & is.matrix(Z))) stop("Z must be a numeric matrix. Did you supply a data frame?", call. = FALSE)
+  if(any(is.na(Z))) stop("Z contains missing values", call. = FALSE)
 
 } # FUN
 
@@ -63,10 +60,11 @@ InputChecks_Z_CLAN <- function(Z_CLAN){
 
   if(!is.null(Z_CLAN)){
 
-    if(!(is.matrix(Z_CLAN) | is.data.frame(Z_CLAN) )){
-      stop("Z_CLAN must be either a data frame or matrix", call. = FALSE)
-    }
-  }
+    # input checks
+    if(!(is.numeric(Z_CLAN) & is.matrix(Z_CLAN))) stop("Z_CLAN must be a numeric matrix. Did you supply a data frame?", call. = FALSE)
+    if(any(is.na(Z_CLAN))) stop("Z_CLAN contains missing values", call. = FALSE)
+
+  } # IF
 
 } # FUN
 
@@ -82,24 +80,18 @@ InputChecks_X1 <- function(X1_control, num.obs){
     } # IF
 
 
-  if(!(is.matrix(X1_control$covariates) | is.vector(X1_control$covariates) | is.null(X1_control$covariates))){
-    stop(paste0(deparse(substitute(X1_control)), "$covariates must be either NULL, a vector, or a matrix"), call. = FALSE)
+  if(!(is.matrix(X1_control$covariates) | is.null(X1_control$covariates))){
+    stop(paste0(deparse(substitute(X1_control)), "$covariates must be either NULL or a numeric matrix. Did you supply a data frame?"), call. = FALSE)
   } # IF
 
 
   if(!is.null(X1_control$covariates)){
-    if(!is.numeric(X1_control$covariates)) stop(paste0(deparse(substitute(X1_control)), "$covariates must be numeric or NULL"), call. = FALSE)
+    if(!is.numeric(X1_control$covariates)) stop(paste0(deparse(substitute(X1_control)), "$covariates must be a numeric matrix or NULL"), call. = FALSE)
 
-    if(is.vector(X1_control$covariates)){
-
-      if(length(X1_control$covariates) != num.obs){
-        stop(paste0(deparse(substitute(X1_control)), "$covariates must be NULL or of the same length as Y"), call. = FALSE)
-      } # IF
-
-    } else{
+    if(is.matrix(X1_control$covariates)){
 
       if(nrow(X1_control$covariates) != num.obs){
-        stop(paste0(deparse(substitute(X1_control)), "$covariates must be NULL or of the same length as Y"), call. = FALSE)
+        stop(paste0(deparse(substitute(X1_control)), "$covariates must be NULL or a matrix with the number of rows equal to the length of Y"), call. = FALSE)
       } # IF
 
     } # IF
@@ -108,7 +100,7 @@ InputChecks_X1 <- function(X1_control, num.obs){
 
 
   if(!(is.vector(X1_control$fixed_effects) | is.null(X1_control$fixed_effects))){
-    stop(paste0(deparse(substitute(X1_control)), "$fixed_effects must be either NULL or a vector"), call. = FALSE)
+    stop(paste0(deparse(substitute(X1_control)), "$fixed_effects must be either NULL or a numeric vector"), call. = FALSE)
   } # IF
 
 
@@ -216,6 +208,14 @@ InputChecks_diff <- function(diff, K){
                 " must be a subset of {1,2,...,K}, where K = ", K, " is the number of groups with the supplied arguments (controlled through the argument 'quantile_cutoffs')"), call. = FALSE)
   }
 
+  if(diff$subtract_from == "most" & K %in% diff$subtracted){
+    stop("The most affected group cannot be subtracted from itself")
+  }
+
+  if(diff$subtract_from == "least" & 1 %in% diff$subtracted){
+    stop("The least affected group cannot be subtracted from itself")
+  }
+
 } # FUN
 
 
@@ -285,3 +285,9 @@ get.learner_regr <- function(learner){
   return(learner)
 
 } # FUN
+
+
+
+TrueIfUnix <- function(){
+  .Platform$OS.type == "unix"
+}
