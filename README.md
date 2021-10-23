@@ -1,5 +1,5 @@
 # GenericML
-R implementation of [Generic Machine Learning (Chernozhukov, V., Demirer, M., Duflo, E., &amp; Fernández-Val, I., 2021)](https://arxiv.org/abs/1712.04802) using the `mlr3` framework. We intend to extend this implementation to a fully-fledged R package for the CRAN. Please note that this implementation is still work in progress and has not yet been thoroughy tested, so we cannot yet guarantee correctness. If you find a bug, please open an issue or let us know via email.
+Highly parallelized and customizable `R` implementation of [Generic Machine Learning (Chernozhukov, V., Demirer, M., Duflo, E., &amp; Fernández-Val, I., 2021)](https://arxiv.org/abs/1712.04802) using the `mlr3` framework. We intend to extend this implementation to a fully-fledged R package for the CRAN. Please note that this implementation is still work in progress and has not yet been thoroughly tested, so we cannot yet guarantee correctness. If you find a bug or have wishes for additional functionalities, please open an issue or let us know via email.
 
 ## Installation
 ```
@@ -8,7 +8,7 @@ devtools::install_github("mwelz/GenericML")
 ```
 
 ## Example
-We generate `n=5,000` samples that adhere to a simple linear data generating process. We emulate a randomized experiment. There is no treatment effect heterogeneity since the treatment effect is constant at value two. Hence, Generic ML should not indicate the existence of treatment effect heterogeneity.
+We generate `n=5000` samples that adhere to a simple linear data generating process. We emulate a randomized experiment. There is no treatment effect heterogeneity since the treatment effect is constant at value two. Hence, Generic ML should not indicate the existence of treatment effect heterogeneity.
 
 ```{r example}
 
@@ -156,4 +156,4 @@ plot(genML, type = "CLAN", CLAN_variable = "z1")
 - [ ] Release beta on CRAN.
 
 ## Authors
-Max Welz (m.welz@erasmusmc.nl), Andreas Alfons (alfons@ese.eur.nl), Mert Demirer (mdemirer@mit.edu), and Victor Chernozhukov (vchern@mit.edu).
+Max Welz (welz@ese.eur.nl), Andreas Alfons (alfons@ese.eur.nl), Mert Demirer (mdemirer@mit.edu), and Victor Chernozhukov (vchern@mit.edu).
