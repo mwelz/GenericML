@@ -37,57 +37,36 @@ Med <- function(x){
 #'
 #' @param x The vector to be partitioned
 #' @param cutoffs The quantile cutoffs for the partition. Default are the quartiles: \code{c(0.25, 0.5, 0.75)}.
-#' @param names_quantile Logical. If \code{TRUE}, then the column names of the returned matrix are the quantiles as in \code{cutoffs}. If \code{FALSE}, the names are the numeric intervals that constitute the grouping.
 #'
-#' @return An object of the class \code{quantile_group}, which is a logical matrix indicating group membership
+#' @return A logical matrix indicating group membership
 #'
 #' @export
 quantile_group <- function(x,
-                           cutoffs = c(0.25, 0.5, 0.75),
-                           names_quantile = TRUE){
+                           cutoffs = c(0.25, 0.5, 0.75)){
   # cutoffs are the quantile cutoffs (like c(0.25, 0.5, 0.75))
-
   # get quatiles
   q         <- stats::quantile(x, cutoffs)
   q         <- c(-Inf, q, Inf)
-
   # check if breaks are unique: if x exhibits low variation, there might be empty quantile bins, which can cause an error in the cut() function. In this case, we add random noise to x to induce variation. NB: this bug has been spotted and fixed by Lucas Kitzmueller. All credits for this fix go to him!
   if(length(unique(q)) != length(q)){
-
     # specify standard deviation of the noise (x may have zero variation)
     sd <- ifelse(stats::var(x) == 0, 0.001, sqrt(stats::var(x) / 20))
-
     # add noise and updare quantiles
     x <- x + stats::rnorm(length(x), mean = 0, sd = sd)
     q <- stats::quantile(x, cutoffs)
     q <- c(-Inf, q, Inf)
-
   } # IF
-
   groups    <- as.character(cut(x, breaks = q, include.lowest = TRUE, right = FALSE, dig.lab = 3))
   group.nam <- unique(groups)
   group.nam <- group.nam[order(
     as.numeric(substr(sub("\\,.*", "", group.nam), 2, stop = 1e8L)),
     decreasing = FALSE)] # ensure the order is correct
-  group.mat <- matrix(NA, length(x), length(group.nam))
-  nam       <- rep(NA, length(group.nam))
 
-  for(j in 1:length(group.nam)){
-    if(j == 1){
-      nam[j] <- paste0("<", 100*cutoffs[j], "% quantile")
-    } else if (j == length(group.nam)){
-      nam[j] <- paste0(">=", 100*cutoffs[j-1], "% quantile")
-    } else{
-      nam[j] <- paste0("[", 100*cutoffs[j-1], ",", 100*cutoffs[j], ")% quantile")
-    }
-    group.mat[,j] <- groups == group.nam[j]
-  }
+  # get the grouping matrix
+  group.mat <- sapply(1:length(group.nam), function(j) groups == group.nam[j])
+  colnames(group.mat) <- gsub(",", ", ", gsub(" ", "", group.nam))
 
-  if(names_quantile){
-    colnames(group.mat) <- nam
-  } else{
-    colnames(group.mat) <- group.nam
-  }
+  # return
   return(structure(group.mat, type = "quantile_group"))
 } # FUN
 
@@ -245,8 +224,7 @@ GenericML_single_NoChecks <-
     ### step 1c: estimate GATES parameters by OLS ----
     # group the proxy estimators for the CATE in the main sample by quantiles
     membership_M <- quantile_group(proxy_CATE_M,
-                                   cutoffs = quantile_cutoffs,
-                                   names_quantile = TRUE)
+                                   cutoffs = quantile_cutoffs)
 
     # estimate GATES
     gates.obj <- GATES_NoChecks(

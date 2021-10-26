@@ -4,17 +4,15 @@
 \alias{quantile_group}
 \title{Partition a vector into groups based on its quantiles.}
 \usage{
-quantile_group(x, cutoffs = c(0.25, 0.5, 0.75), names_quantile = TRUE)
+quantile_group(x, cutoffs = c(0.25, 0.5, 0.75))
 }
 \arguments{
 \item{x}{The vector to be partitioned}
 
 \item{cutoffs}{The quantile cutoffs for the partition. Default are the quartiles: \code{c(0.25, 0.5, 0.75)}.}
-
-\item{names_quantile}{Logical. If \code{TRUE}, then the column names of the returned matrix are the quantiles as in \code{cutoffs}. If \code{FALSE}, the names are the numeric intervals that constitute the grouping.}
 }
 \value{
-An object of the class \code{quantile_group}, which is a logical matrix indicating group membership
+A logical matrix indicating group membership
 }
 \description{
 Partitions a vector into quantile groups and returns a logical matrix indicating group membership.
