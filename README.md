@@ -10,7 +10,7 @@ devtools::install_github("mwelz/GenericML")
 ## Example
 We generate `n=5000` samples that adhere to a simple linear data generating process. We emulate a randomized experiment. There is no treatment effect heterogeneity since the treatment effect is constant at value two. Hence, Generic ML should not indicate the existence of treatment effect heterogeneity.
 
-```{r example}
+```R
 
 ### 1. Data Generation (linear, no treatment effect heterogeneity) ----
 library(GenericML)
