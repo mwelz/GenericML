@@ -164,7 +164,7 @@ plot.GenericML <- function(x,
     df <- data.frame(point.estimate = data[, "Estimate"],
                      ci.lower = data[, "CB lower"],
                      ci.upper = data[, "CB upper"],
-                     group = c("beta.1 (ATE)", "beta.2 (HTE)"))
+                     group = c("beta.1", "beta.2"))
 
     p <- ggplot(mapping = aes(x = group,
                               y = point.estimate), data = df) +
@@ -177,7 +177,10 @@ plot.GenericML <- function(x,
       ylab("Treatment Effect") +
       xlab(paste0(type, " with ",  100*confidence.level, "% CB")) +
       ylim(limits[1], limits[2]) +
-      ggtitle(title)
+      ggtitle(title) +
+      scale_x_discrete(breaks = c("beta.1", "beta.2"),
+                       labels = c(expression(paste(beta[1], " (ATE)")),
+                                  expression(paste(beta[2], " (HTE)"))))
 
     return(p)
 
