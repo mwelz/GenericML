@@ -2,20 +2,40 @@
 % Please edit documentation in R/mlr3.R
 \name{propensity_score}
 \alias{propensity_score}
-\title{Estimates the propensity score}
+\title{Estimates the propensity scores}
 \usage{
 propensity_score(Z, D, estimator = "constant")
 }
 \arguments{
-\item{Z}{A matrix of covariates}
+\item{Z}{A numeric design matrix that holds the covariates in its columns.}
 
-\item{D}{A binary vector of treatment status}
+\item{D}{A binary vector of treatment assignment. Value one denotes assignment to the treatment group and value zero assignment to the control group.}
 
-\item{estimator}{The estimator for the propensity scores. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to \code{'constant'} (estimates the propensity scores by \code{mean(D)}), \code{'elastic_net'}, \code{'random_forest'}, \code{'tree'}, or \code{mlr3} syntax. Note that in case of \code{mlr3} syntax, do \emph{not} specify if the learner is a regression learner or classification learner; Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords.}
+\item{estimator}{The estimator of the propensity scores. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. In the latter case, the string must either be equal to \code{'constant'} (estimates the propensity scores by \code{mean(D)}), \code{'elastic_net'}, \code{'random_forest'}, \code{'tree'}, or \code{mlr3} syntax. Note that in case of \code{mlr3} syntax, do \emph{not} specify if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.}
 }
 \value{
-Estimates of \eqn{Pr(D = 1 | Z)} and an \code{mlr3} object of the employed model (if applicable).
+An object of class \code{propensity_score}, consisting of the following components:
+\describe{
+\item{\code{estimates}}{A numeric vector of propensity score estimates.}
+\item{\code{mlr3_objects}}{\code{mlr3} objects used for estimation. Only non-empty if \code{mlr3} was used.}
+}
 }
 \description{
-Estimates the propensity score
+Estimates the propensity scores \eqn{Pr[D = 1 | Z]} for binary treatment assignment \eqn{D} and covariates \eqn{Z}. Either done by taking the empirical mean of \eqn{D} (which should equal roughly 0.5, since we assume a randomized experiment), or by direct machine learning estimation.
+}
+\examples{
+## generate data
+library(GenericML)
+set.seed(1)
+n  <- 200                        # number of observations
+p  <- 5                          # number of covariates
+D  <- rbinom(n, 1, 0.5)          # random treatment assignment
+Z  <- matrix(runif(n*p), n, p)   # design matrix
+
+## estimate propensity scores
+propensity_score(Z, D)
+
+}
+\references{
+Rosenbaum, P.R. and Rubin, D.B. (1983). The Central Role of the Propensity Score in Observational Studies for Causal Effects. \emph{Biometrika}, 70(1):41--55. \url{https://doi.org/10.1093/biomet/70.1.41}.
 }

@@ -40,20 +40,42 @@ propensity_score_mlr3 <- function(Z, D, learner = "random_forest"){
   probs <- predictions$prob
 
   # return
-  return(list(propensity_scores = probs[, colnames(probs) == "1"],
+  return(list(estimates = probs[, colnames(probs) == "1"],
               mlr3_objects = list(task = task.propensity_score,
                                   learner = learner)))
 
 } # END FUN
 
 
-#' Estimates the propensity score
+#' Estimates the propensity scores
 #'
-#' @param Z A matrix of covariates
-#' @param D A binary vector of treatment status
-#' @param estimator The estimator for the propensity scores. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. The string must either be equal to \code{'constant'} (estimates the propensity scores by \code{mean(D)}), \code{'elastic_net'}, \code{'random_forest'}, \code{'tree'}, or \code{mlr3} syntax. Note that in case of \code{mlr3} syntax, do \emph{not} specify if the learner is a regression learner or classification learner; Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords.
-#' @return Estimates of \eqn{Pr(D = 1 | Z)} and an \code{mlr3} object of the employed model (if applicable).
+#' Estimates the propensity scores \eqn{Pr[D = 1 | Z]} for binary treatment assignment \eqn{D} and covariates \eqn{Z}. Either done by taking the empirical mean of \eqn{D} (which should equal roughly 0.5, since we assume a randomized experiment), or by direct machine learning estimation.
 #'
+#' @param Z A numeric design matrix that holds the covariates in its columns.
+#' @param D A binary vector of treatment assignment. Value one denotes assignment to the treatment group and value zero assignment to the control group.
+#' @param estimator The estimator of the propensity scores. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. In the latter case, the string must either be equal to \code{'constant'} (estimates the propensity scores by \code{mean(D)}), \code{'elastic_net'}, \code{'random_forest'}, \code{'tree'}, or \code{mlr3} syntax. Note that in case of \code{mlr3} syntax, do \emph{not} specify if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.
+#'
+#' @return
+#' An object of class \code{propensity_score}, consisting of the following components:
+#' \describe{
+#'   \item{\code{estimates}}{A numeric vector of propensity score estimates.}
+#'   \item{\code{mlr3_objects}}{\code{mlr3} objects used for estimation. Only non-empty if \code{mlr3} was used.}
+#'   }
+#'
+#' @references
+#' Rosenbaum, P.R. and Rubin, D.B. (1983). The Central Role of the Propensity Score in Observational Studies for Causal Effects. \emph{Biometrika}, 70(1):41--55. \url{https://doi.org/10.1093/biomet/70.1.41}.
+#'
+#' @examples
+#' ## generate data
+#' library(GenericML)
+#' set.seed(1)
+#' n  <- 200                        # number of observations
+#' p  <- 5                          # number of covariates
+#' D  <- rbinom(n, 1, 0.5)          # random treatment assignment
+#' Z  <- matrix(runif(n*p), n, p)   # design matrix
+#'
+#' ## estimate propensity scores
+#' propensity_score(Z, D)
 #'
 #' @export
 propensity_score <- function(Z, D, estimator = "constant"){
@@ -82,13 +104,13 @@ propensity_score_NoChecks <- function(Z, D, estimator = "constant"){
     if(length(estimator) != length(D)) stop("User-supplied propensity scores in 'estimator' are not of same length as vectors Z and D!")
     if(any(estimator <= 0 | estimator >= 1)) stop("User-supplied propensity scores in 'estimator' must be contained in interval (0,1)!")
 
-    out <- list(propensity_scores = estimator,
+    out <- list(estimates = estimator,
                 mlr3_objects = NULL)
 
   } else if(estimator == "constant"){
 
     ### case 2: propensity scores are estimated by mean of D
-    out <- list(propensity_scores = rep(mean(D), length(Z)),
+    out <- list(estimates = rep(mean(D), length(Z)),
                 mlr3_objects = NULL)
 
   } else{
@@ -106,7 +128,7 @@ propensity_score_NoChecks <- function(Z, D, estimator = "constant"){
   } # IF
 
   # return
-  return(out)
+  return(structure(out, class = "propensity_score"))
 
 } # FUN
 

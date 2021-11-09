@@ -110,7 +110,7 @@ GenericML <- function(Z, D, Y,
   ### step 1: compute propensity scores ----
   propensity_scores.obj <- propensity_score_NoChecks(
     Z = Z, D = D, estimator = learner_propensity_score)
-  propensity_scores     <- propensity_scores.obj$propensity_scores
+  propensity_scores     <- propensity_scores.obj$estimates
 
 
   ### step 2: for each ML method, do the generic ML analysis ----
