@@ -2,36 +2,37 @@
 % Please edit documentation in R/mlr3.R
 \name{proxy_CATE}
 \alias{proxy_CATE}
-\title{Performs estimation of the conditional average treatment effect (CATE), \eqn{E[Y | D=1, Z] - E[Y | D=0, Z]}, on the auxiliary sample}
+\title{Conditional Average Treatment Effect}
 \usage{
-proxy_CATE(
-  Z,
-  D,
-  Y,
-  A_set,
-  learner = "random_forest",
-  proxy_BCA = NULL,
-  min_variation = 1e-05
-)
+proxy_CATE(Z, D, Y, A_set, learner, proxy_BCA = NULL, min_variation = 1e-05)
 }
 \arguments{
-\item{Z}{A matrix of the covariates.}
+\item{Z}{A numeric design matrix that holds the covariates in its columns.}
 
-\item{D}{A binary vector of treatment assignment.}
+\item{D}{A binary vector of treatment assignment. Value one denotes assignment to the treatment group and value zero assignment to the control group.}
 
-\item{Y}{The response vector.}
+\item{Y}{A numeric vector containing the response variable.}
 
-\item{A_set}{a numerical vector of indices of observations in the auxiliary sample.}
+\item{A_set}{a numerical vector of indices of observations in the auxiliary sample. The}
 
-\item{learner}{A string specifying the machine learner to be used for estimation. Either \code{'elastic_net'}, \code{'random_forest'} (default), or \code{'tree'}. Can alternatively be specified by using \code{mlr3} syntax \emph{without} specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.}
+\item{learner}{A string specifying the machine learner for the estimation. Either \code{'elastic_net'}, \code{'random_forest'}, \code{'tree'}, or a custom learner specified with \code{mlr3} syntax. In the latter case, do \emph{not} specify in the \code{mlr3} syntax specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 100)'} for a random forest learner with 100 trees. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.}
 
-\item{proxy_BCA}{A vector of proxy estimates of the baseline estimator BCA, \eqn{E[Y | D=0, Z]}. If \code{NULL}, these will be estimated separately.}
+\item{proxy_BCA}{A vector of proxy estimates of the baseline conditional average, BCA, \eqn{E[Y | D=0, Z]}. If \code{NULL}, these will be estimated separately.}
 
 \item{min_variation}{Minimum variation of the predictions before random noise with distribution \eqn{N(0, var(Y)/20)} is added. Default is \code{1e-05}.}
 }
 \value{
-An object of the class \code{proxy_CATE}.
+An object of class \code{proxy_CATE}, consisting of the following components:
+\describe{
+\item{\code{estimates}}{A numeric vector of CATE estimates of each observation.}
+\item{\code{mlr3_objects}}{\code{mlr3} objects used for estimation of \eqn{E[Y | D=1, Z]} (\code{Y1_learner}) and \eqn{E[Y | D=0, Z]} (\code{Y0_learner}). The latter is not available if \code{proxy_BCA = NULL}.}
+}
 }
 \description{
-Performs estimation of the conditional average treatment effect (CATE), \eqn{E[Y | D=1, Z] - E[Y | D=0, Z]}, on the auxiliary sample
+Proxy estimation of the Conditional Average Treatment Effect (CATE), defined by \eqn{E[Y | D=1, Z] - E[Y | D=0, Z]}. Estimation is done on the auxiliary sample, while CATE predictions are made for all observations.
+}
+\references{
+Chernozhukov, V., Demirer, M., Duflo, E., and Fernández-Val, I. (2021). Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments. \href{https://arxiv.org/abs/1712.04802}{\emph{arXiv preprint arXiv:1712.04802}}.
+
+\code{\link{proxy_BCA}}
 }

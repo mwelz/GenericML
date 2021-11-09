@@ -2,7 +2,7 @@
 % Please edit documentation in R/mlr3.R
 \name{propensity_score}
 \alias{propensity_score}
-\title{Estimates the propensity scores}
+\title{Propensity score estimation}
 \usage{
 propensity_score(Z, D, estimator = "constant")
 }
