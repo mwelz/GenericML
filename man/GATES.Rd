@@ -2,7 +2,7 @@
 % Please edit documentation in R/gates.R
 \name{GATES}
 \alias{GATES}
-\title{Performs GATES regression.}
+\title{Performs GATES regression}
 \usage{
 GATES(
   Y,
@@ -19,19 +19,19 @@ GATES(
 )
 }
 \arguments{
-\item{Y}{A vector of responses.}
+\item{Y}{A numeric vector containing the response variable.}
 
-\item{D}{A binary vector of treatment status.}
+\item{D}{A binary vector of treatment assignment. Value one denotes assignment to the treatment group and value zero assignment to the control group.}
 
-\item{propensity_scores}{A vector of propensity scores.}
+\item{propensity_scores}{A numeric vector of propensity scores. We recommend to use the estimates of a \code{\link{propensity_score}} object.}
 
-\item{proxy_BCA}{A vector of proxy BCA estimates.}
+\item{proxy_BCA}{A numeric vector of proxy baseline conditional average (BCA) estimates. We recommend to use the estimates of a \code{\link{proxy_BCA}} object.}
 
-\item{proxy_CATE}{A vector of proxy CATE estimates.}
+\item{proxy_CATE}{A numeric vector of proxy conditional average treatment effect (CATE) estimates. We recommend to use the estimates of a \code{\link{proxy_CATE}} object.}
 
-\item{membership}{A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be an instance of \code{\link{quantile_group}}.}
+\item{membership}{A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be of type \code{\link{quantile_group}}. Typically, the grouping is based on CATE estimates, which are for instance returned by \code{proxy_CATE}.}
 
-\item{HT}{Logical. If \code{TRUE}, a HT transformation is applied (GATES2 in the paper). Default is \code{FALSE}.}
+\item{HT}{Logical. If \code{TRUE}, a Horvitz-Thompson (HT) transformation is applied (BLP2 in the paper). Default is \code{FALSE}.}
 
 \item{X1_control}{Specifies the design matrix \eqn{X_1} in the regression. See the documentation of \code{\link{setup_X1}} for details.}
 
@@ -42,8 +42,41 @@ GATES(
 \item{significance_level}{Significance level. Default is 0.05.}
 }
 \value{
-An object of the class \code{GATES}.
+An object of class \code{GATES}, consisting of the following components:
+\describe{
+\item{\code{generic_targets}}{A matrix of the inferential results on the GATES generic targets.}
+\item{\code{coefficients}}{An object of class \code{\link[lmtest]{coeftest}}, contains the coefficients of the GATES regression.}
+\item{\code{lm}}{An object of class \code{\link[stats]{lm}} used to fit the linear regression model.}
+}
 }
 \description{
-Performs the linear regression for the GATES procedure.
+Performs the linear regression for the Group Average Treatments Effects (GATES) procedure.
+}
+\examples{
+## generate data
+library(GenericML)
+set.seed(1)
+n  <- 200                                # number of observations
+p  <- 5                                  # number of covariates
+D  <- rbinom(n, 1, 0.5)                  # random treatment assignment
+Y  <- runif(n)                           # outcome variable
+propensity_scores <- rep(0.5, n)         # propensity scores
+proxy_BCA         <- runif(n)            # proxy BCA estimates
+proxy_CATE        <- runif(n)            # proxy CATE estimates
+membership <- quantile_group(proxy_CATE) # group membership
+
+## perform GATES
+GATES(Y, D, propensity_scores, proxy_BCA, proxy_CATE, membership)
+
+}
+\references{
+Chernozhukov, V., Demirer, M., Duflo, E., and Fernández-Val, I. (2021). Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments. \href{https://arxiv.org/abs/1712.04802}{\emph{arXiv preprint arXiv:1712.04802}}.
+}
+\seealso{
+\code{\link{setup_X1}},
+\code{\link{setup_diff}},
+\code{\link{setup_vcov}},
+\code{\link{propensity_score}},
+\code{\link{proxy_BCA}},
+\code{\link{proxy_CATE}}
 }

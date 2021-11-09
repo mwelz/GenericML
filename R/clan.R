@@ -1,14 +1,37 @@
-#' Estimates the CLAN parameters.
+#' Performs CLAN
 #'
-#' Estimates the parameters of the Classification Analysis (CLAN) on all variables in the supplied design matrix \code{Z_CLAN}.
+#' Performs Classification Analysis (CLAN) on all variables in a design matrix.
 #'
-#' @param Z_CLAN A matrix of variables that shall be considered for the CLAN. Each column represents a variable for which CLAN shall be performed.
-#' @param membership A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be an instance of \code{\link{quantile_group}}.
-#' @param equal_variances Logical. If \code{TRUE}, the the two within-group variances of the differences between the CLAN generic targets are assumed to be equal. Default is \code{FALSE}.
-#' @param diff Specifies the generic targets of CLAN See the documentation of \code{\link{setup_diff}} for details.
+#' @param Z_CLAN A numeric matrix holding variables on which classification analysis (CLAN) shall be performed. CLAN will be performed on each column of the matrix.
+#' @param membership A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be of type \code{\link{quantile_group}}. Typically, the grouping is based on CATE estimates, which are for instance returned by \code{proxy_CATE}.
+#' @param equal_variances If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.
+#' @param diff Specifies the generic targets of CLAN. See the documentation of \code{\link{setup_diff}} for details.
 #' @param significance_level Significance level. Default is 0.05.
 #'
-#' @return An object of the class \code{CLAN}.
+#' @return An object of the class \code{CLAN}, consisting of the following components:
+#' \describe{
+#'   \item{\code{generic_targets}}{A list of result matrices for each variable in \code{Z_CLAN}. Each matrix contains inferential results on the CLAN generic targets.}
+#'   \item{\code{coefficients}}{A matrix of point estimates of each CLAN generic target parameter.}
+#'   }
+#'
+#' @seealso
+#' \code{\link{quantile_group}},
+#' \code{\link{setup_diff}}
+#'
+#' @references
+#' Chernozhukov, V., Demirer, M., Duflo, E., and Fernández-Val, I. (2021). Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments. \href{https://arxiv.org/abs/1712.04802}{\emph{arXiv preprint arXiv:1712.04802}}.
+#'
+#' @examples
+#' ## generate data
+#' library(GenericML)
+#' set.seed(1)
+#' n  <- 200                              # number of observations
+#' p  <- 5                                # number of covariates
+#' Z_CLAN <- matrix(runif(n*p), n, p)     # design matrix to perform CLAN on
+#' membership <- quantile_group(rnorm(n)) # group membership
+#'
+#' ## perform CLAN
+#' CLAN(Z_CLAN, membership)
 #'
 #' @export
 CLAN <- function(Z_CLAN,
@@ -18,9 +41,15 @@ CLAN <- function(Z_CLAN,
                  significance_level = 0.05){
 
   # input checks
+  stopifnot(is.numeric(Z_CLAN) & is.matrix(Z_CLAN))
+  stopifnot(is.numeric(significance_level))
+  stopifnot(is.logical(equal_variances))
   InputChecks_group.membership(membership)
   InputChecks_equal.length2(Z_CLAN, membership)
   InputChecks_diff(diff, K = ncol(membership))
+
+  # assign variable names if there are none
+  if(is.null(colnames(Z_CLAN))) colnames(Z_CLAN) <- paste0("V", 1:ncol(Z_CLAN))
 
   # run main function
   CLAN_NoChecks(Z_CLAN = Z_CLAN,

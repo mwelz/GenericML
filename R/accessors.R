@@ -4,7 +4,7 @@
 #' @param learner A character string of the learner whose BLP generic target estimates shall be accessed. Default is \code{"best"} for the best learner for BLP.
 #' @param plot Logical. If \code{TRUE} (default), a plot is printed.
 #'
-#' @return A numeric matrix of BLP generic target estimates
+#' @return A numeric matrix of BLP generic target estimates. Furthermore, prints a plot if \code{plot = TRUE}.
 #'
 #' @export
 get_BLP <- function(x, learner = "best", plot = TRUE){
@@ -42,7 +42,7 @@ get_BLP <- function(x, learner = "best", plot = TRUE){
 #' @param learner A character string of the learner whose GATES generic target estimates shall be accessed. Default is \code{"best"} for the best learner for GATES.
 #' @param plot Logical. If \code{TRUE} (default), a plot is printed.
 #'
-#' @return A numeric matrix of GATES generic target estimates
+#' @return A numeric matrix of GATES generic target estimates. Furthermore, prints a plot if \code{plot = TRUE}.
 #'
 #' @export
 get_GATES <- function(x, learner = "best", plot = TRUE){
@@ -79,7 +79,7 @@ get_GATES <- function(x, learner = "best", plot = TRUE){
 #' @param learner A character string of the learner whose CLAN generic target estimates shall be accessed. Default is \code{"best"} for the best learner for CLAN
 #' @param plot Logical. If \code{TRUE} (default), a plot is printed.
 #'
-#' @return A numeric matrix of CLAN generic target estimates
+#' @return A numeric matrix of CLAN generic target estimates. Furthermore, prints a plot if \code{plot = TRUE}.
 #'
 #' @export
 get_CLAN <- function(x, variable, learner = "best", plot = TRUE){

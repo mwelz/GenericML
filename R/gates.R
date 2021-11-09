@@ -1,20 +1,53 @@
-#' Performs GATES regression.
+#' Performs GATES regression
 #'
-#' Performs the linear regression for the GATES procedure.
+#' Performs the linear regression for the Group Average Treatments Effects (GATES) procedure.
 #'
-#' @param Y A vector of responses.
-#' @param D A binary vector of treatment status.
-#' @param propensity_scores A vector of propensity scores.
-#' @param proxy_BCA A vector of proxy BCA estimates.
-#' @param proxy_CATE A vector of proxy CATE estimates.
-#' @param membership A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be an instance of \code{\link{quantile_group}}.
-#' @param HT Logical. If \code{TRUE}, a HT transformation is applied (GATES2 in the paper). Default is \code{FALSE}.
+#' @param Y A numeric vector containing the response variable.
+#' @param D A binary vector of treatment assignment. Value one denotes assignment to the treatment group and value zero assignment to the control group.
+#' @param propensity_scores A numeric vector of propensity scores. We recommend to use the estimates of a \code{\link{propensity_score}} object.
+#' @param proxy_BCA A numeric vector of proxy baseline conditional average (BCA) estimates. We recommend to use the estimates of a \code{\link{proxy_BCA}} object.
+#' @param proxy_CATE A numeric vector of proxy conditional average treatment effect (CATE) estimates. We recommend to use the estimates of a \code{\link{proxy_CATE}} object.
+#' @param membership A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be of type \code{\link{quantile_group}}. Typically, the grouping is based on CATE estimates, which are for instance returned by \code{proxy_CATE}.
+#' @param HT Logical. If \code{TRUE}, a Horvitz-Thompson (HT) transformation is applied (BLP2 in the paper). Default is \code{FALSE}.
 #' @param X1_control Specifies the design matrix \eqn{X_1} in the regression. See the documentation of \code{\link{setup_X1}} for details.
 #' @param vcov_control Specifies the covariance matrix estimator. See the documentation of \code{\link{setup_vcov}} for details.
 #' @param diff Specifies the generic targets of GATES. See the documentation of \code{\link{setup_diff}} for details.
 #' @param significance_level Significance level. Default is 0.05.
 #'
-#' @return An object of the class \code{GATES}.
+#' @return
+#' An object of class \code{GATES}, consisting of the following components:
+#' \describe{
+#'   \item{\code{generic_targets}}{A matrix of the inferential results on the GATES generic targets.}
+#'   \item{\code{coefficients}}{An object of class \code{\link[lmtest]{coeftest}}, contains the coefficients of the GATES regression.}
+#'   \item{\code{lm}}{An object of class \code{\link[stats]{lm}} used to fit the linear regression model.}
+#'   }
+#'
+#' @references
+#' Chernozhukov, V., Demirer, M., Duflo, E., and Fernández-Val, I. (2021). Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments. \href{https://arxiv.org/abs/1712.04802}{\emph{arXiv preprint arXiv:1712.04802}}.
+#'
+#' @examples
+#' ## generate data
+#' library(GenericML)
+#' set.seed(1)
+#' n  <- 200                                # number of observations
+#' p  <- 5                                  # number of covariates
+#' D  <- rbinom(n, 1, 0.5)                  # random treatment assignment
+#' Y  <- runif(n)                           # outcome variable
+#' propensity_scores <- rep(0.5, n)         # propensity scores
+#' proxy_BCA         <- runif(n)            # proxy BCA estimates
+#' proxy_CATE        <- runif(n)            # proxy CATE estimates
+#' membership <- quantile_group(proxy_CATE) # group membership
+#'
+#' ## perform GATES
+#' GATES(Y, D, propensity_scores, proxy_BCA, proxy_CATE, membership)
+#'
+#' @seealso
+#' \code{\link{setup_X1}},
+#' \code{\link{setup_diff}},
+#' \code{\link{setup_vcov}},
+#' \code{\link{propensity_score}},
+#' \code{\link{proxy_BCA}},
+#' \code{\link{proxy_CATE}}
 #'
 #' @export
 GATES <- function(Y, D,
@@ -38,11 +71,16 @@ GATES <- function(Y, D,
   InputChecks_vcov.control(vcov_control)
   InputChecks_diff(diff, K = ncol(membership))
   InputChecks_group.membership(membership)
+  stopifnot(is.numeric(propensity_scores))
+  stopifnot(is.numeric(proxy_BCA))
+  stopifnot(is.numeric(proxy_CATE))
+  stopifnot(is.logical(HT))
+  stopifnot(is.numeric(significance_level))
 
   # fit model according to strategy 1 or 2 in the paper
   GATES_NoChecks(D = D, Y = Y,
                  propensity_scores   = propensity_scores,
-                 proxy_BCA      = proxy_BCA,
+                 proxy_BCA           = proxy_BCA,
                  proxy_CATE          = proxy_CATE,
                  membership          = membership,
                  X1_control          = X1_control,

@@ -1,5 +1,5 @@
-# GenericML
-Highly parallelized and customizable `R` implementation of [Generic Machine Learning (Chernozhukov, V., Demirer, M., Duflo, E., &amp; Fernández-Val, I., 2021)](https://arxiv.org/abs/1712.04802) using the `mlr3` framework. We intend to extend this implementation to a fully-fledged R package for the CRAN. Please note that this implementation is still work in progress and has not yet been thoroughly tested, so we cannot yet guarantee correctness. If you find a bug or have wishes for additional functionalities, please open an issue or let us know via email.
+# GenericML: An R package for generic machine learning inference on heterogeneous treatment effects in randomized experiments
+Highly parallelized and customizable `R` implementation of [Generic Machine Learning (Chernozhukov, V., Demirer, M., Duflo, E., &amp; Fernández-Val, I., 2021)](https://arxiv.org/abs/1712.04802) using the `mlr3` framework. We intend to extend this implementation to a fully-fledged `R` package for the CRAN. Please note that this implementation is still work in progress and has not yet been thoroughly tested, so we cannot yet guarantee correctness. If you find a bug or have wishes for additional functionalities, please open an issue or let us know via email.
 
 ## Installation
 ```
@@ -85,8 +85,8 @@ equal_variances_CLAN <- FALSE
 prop_main   <- 0.5
 
 # specify whether or not the splits and auxiliary results of the learners shall be stored
-store_splits             <- FALSE
-store_learners           <- FALSE
+store_splits             <- TRUE
+store_learners           <- TRUE
 
 # parallelization options (currently only supported on Unix systems)
 parallel  <- TRUE

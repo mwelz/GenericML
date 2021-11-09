@@ -16,7 +16,7 @@ get_CLAN(x, variable, learner = "best", plot = TRUE)
 \item{plot}{Logical. If \code{TRUE} (default), a plot is printed.}
 }
 \value{
-A numeric matrix of CLAN generic target estimates
+A numeric matrix of CLAN generic target estimates. Furthermore, prints a plot if \code{plot = TRUE}.
 }
 \description{
 Accessor function for the CLAN generic target estimates after VEIN
