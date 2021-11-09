@@ -1,0 +1,32 @@
+citHeader("To cite GenericML in publications use:")
+
+citEntry(entry = "misc",
+  title        = "{GenericML}: An {R} package for generic machine learning inference on heterogeneous treatment effects in randomized experiments",
+  author       = c(person(given = "Max",
+			  family = "Welz",
+			  role = c("aut", "cre"),
+			  email = "welz@ese.eur.nl",
+		   	  comment = c(ORCID = "0000-0003-2945-1860")),
+	           person(given = "Andreas",
+		          family = "Alfons",
+		          role = "aut",
+		          email = "alfons@ese.eur.nl",
+		          comment = c(ORCID = "0000-0002-2513-3788")), 
+	           person(given = "Mert",
+		          family = "Demirer",
+		          role = "aut",
+		          email = "mdemirer@mit.edu"), 
+	           person(given = "Victor",
+		          family = "Chernozhukov",
+		          role = "aut",
+		          email = "vchern@mit.edu")), 
+  journal      = "GitHub repository",
+  publisher    = "GitHub",
+  howpublished = "https://github.com/mwelz/GenericML", 
+
+  textVersion  =
+  paste("Max Welz, Andreas Alfons, Mert Demirer and Victor Chernozhukov (2021).",
+        "GenericML: An R package for generic machine learning inference on heterogeneous treatment effects in randomized experiments.",
+        "GitHub repository.",
+        "https://github.com/mwelz/GenericML.")
+)
