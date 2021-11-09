@@ -18,9 +18,9 @@ print.GenericML <- function(x, ...){
   cat("\t beta.2: (",
       round(x$VEIN$best_learners$BLP["beta.2", "CB lower"], 3), ",",
       round(x$VEIN$best_learners$BLP["beta.2", "CB upper"], 3), ")\n")
-  cat("The best learner for the CATE is ", x$best_learners$CATE,
-      " (lambda of ", round(max(x$best_learners$lambda[,"lambda"]), 3), ")\n",
-      "The best learner for the GATES and CLAN is ", x$best_learners$GATES,
-      " (lambda.bar of ", round(max(x$best_learners$lambda[,"lambda.bar"]), 3), ")", sep = "")
+  cat("The best learner for the BLP is ", x$best$BLP,
+      " (lambda of ", round(max(x$best$overview[,"lambda"]), 3), ")\n",
+      "The best learner for the GATES and CLAN is ", x$best$GATES,
+      " (lambda.bar of ", round(max(x$best$overview[,"lambda.bar"]), 3), ")", sep = "")
 
 } # FUN

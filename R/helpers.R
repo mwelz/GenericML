@@ -29,9 +29,10 @@ get.best.learners <- function(generic.ml.across.learners.obj){
                           function(learner) apply(generic.ml.across.learners.obj[[learner]]$best, c(1,2), stats::median))
   rownames(best.analysis) <- c("lambda", "lambda.bar")
 
-  return(list(CATE   = learners[which.max(best.analysis["lambda", ])],
-              GATES  = learners[which.max(best.analysis["lambda.bar", ])],
-              lambda = t(best.analysis)))
+  return(list(BLP      = learners[which.max(best.analysis["lambda", ])],
+              GATES    = learners[which.max(best.analysis["lambda.bar", ])],
+              CLAN     = learners[which.max(best.analysis["lambda.bar", ])],
+              overview = t(best.analysis)))
 
 } # END FUN
 
@@ -95,9 +96,9 @@ VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
   } # FOR learners
 
 
-  return(list(best_learners = list(BLP = gen.ml.ls$BLP[[best.learners.obj$CATE]],
+  return(list(best_learners = list(BLP = gen.ml.ls$BLP[[best.learners.obj$BLP]],
                                    GATES = gen.ml.ls$GATES[[best.learners.obj$GATES]],
-                                   CLAN = gen.ml.ls$CLAN[[best.learners.obj$GATES]]),
+                                   CLAN = gen.ml.ls$CLAN[[best.learners.obj$CLAN]]),
               all_learners = gen.ml.ls))
 
 } # END FUN

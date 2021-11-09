@@ -123,13 +123,15 @@ genML <- GenericML(Z = Z, D = D, Y = Y,
 
 ### 4. Analyze the output ----
 # the line below returns the medians of the estimated  \Lambda and \bar{\Lambda}
-genML$best_learners$lambda
+genML$best$overview
 
-# Get best learner for CATE
-genML$best_learners$CATE
+# Get best learner for BLP
+genML$best$BLP
 
-# Get best learner for GATES
-genML$best_learners$GATES
+# Get best learner for GATES and CLAN (this is the same learner)
+genML$best$GATES
+genML$best$CLAN
+
 
 # VEIN of BLP
 get_BLP(genML, plot = FALSE)
