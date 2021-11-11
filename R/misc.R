@@ -35,10 +35,11 @@ Med <- function(x){
 #'
 #' Partitions a vector into quantile groups and returns a logical matrix indicating group membership.
 #'
-#' @param x The vector to be partitioned
+#' @param x The vector to be partitioned.
 #' @param cutoffs The quantile cutoffs for the partition. Default are the quartiles: \code{c(0.25, 0.5, 0.75)}.
 #'
-#' @return A logical matrix indicating group membership
+#' @return
+#' An object of type \code{quantile_group}, which is a logical matrix indicating group membership.
 #'
 #' @export
 quantile_group <- function(x,

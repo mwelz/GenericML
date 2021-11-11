@@ -74,10 +74,10 @@ InputChecks_Z_CLAN <- function(Z_CLAN){
 # helper that throws error in case of illegal input in 'X1_control'
 InputChecks_X1 <- function(X1_control, num.obs){
 
-  if(!all(c("funs_Z", "covariates", "fixed_effects") %in% names(X1_control))){
-      stop(paste0("The list ", deparse(substitute(X1_control)), "must consist of three elements called ",
-                  "'funs_Z', 'covariates', and 'fixed_effects"), call. = FALSE)
-    } # IF
+  if(class(X1_control) != "setup_X1"){
+    stop(paste0(deparse(substitute(X1_control))),
+         " must be an instance of setup_X1()", call. = FALSE)
+  } # IF
 
 
   if(!(is.matrix(X1_control$covariates) | is.null(X1_control$covariates))){
@@ -140,17 +140,9 @@ InputChecks_X1 <- function(X1_control, num.obs){
 
 InputChecks_vcov.control <- function(vcov_control){
 
-  if(!is.list(vcov_control)) stop(paste0(deparse(substitute(vcov_control))),
-                                  " must be a list", call. = FALSE)
-
-  if(length(vcov_control) != 2) stop(paste0("The list ", deparse(substitute(vcov_control))),
-                                     " must be of length 2", call. = FALSE)
-
-  if(!all(c("estimator", "arguments") %in% names(vcov_control))){
-
-    stop(paste0("The list ", deparse(substitute(vcov_control))),
-         " must have two elements called 'estimator' and 'arguments', respectively", call. = FALSE)
-
+  if(class(vcov_control) != "setup_vcov"){
+    stop(paste0(deparse(substitute(vcov_control))),
+                " must be an instance of setup_vcov()", call. = FALSE)
   } # IF
 
 
@@ -159,53 +151,19 @@ InputChecks_vcov.control <- function(vcov_control){
          " needs to be in c('vcovBS', 'vcovCL', 'vcovHAC', 'vcovHC')", call. = FALSE)
   } # IF
 
-  if(!is.list(vcov_control$arguments)){
-
-    stop(paste0(deparse(substitute(vcov_control))),
-         "$arguments must be a list", call. = FALSE)
-
-  } else{
-
-    if(!"type" %in% names(vcov_control$arguments)) stop(paste0("The list ", deparse(substitute(vcov_control))),
-                                                 "$arguments must contain an element called 'type'",
-                                                 call. = FALSE)
-
-  } # IF
-
 } # FUN
 
 
 InputChecks_diff <- function(diff, K){
 
-  if(!is.list(diff)) stop(paste0(deparse(substitute(diff))),
-                                         " must be a list", call. = FALSE)
-
-  if(length(diff) != 2) stop(paste0("The list ", deparse(substitute(diff))),
-                                       " must be of length 2", call. = FALSE)
-
-  if(!all(c("subtract_from", "subtracted") %in% names(diff))){
-
-    stop(paste0("The list ", deparse(substitute(diff))),
-         " must have two elements called 'subtract_from' and 'subtracted', respectively", call. = FALSE)
-
+  if(class(diff) != "setup_diff"){
+    stop(paste0(deparse(substitute(diff))),
+         " must be an instance of setup_diff()", call. = FALSE)
   } # IF
-
-
-  if(!diff$subtract_from %in% c("most", "least")){
-    stop(paste0("The element ", deparse(substitute(diff)), "$subtract_from",
-         " must be equal to 'most' or 'least'"), call. = FALSE)
-  }
-
-  if(!(is.vector(diff$subtracted) | is.numeric(diff$subtracted))){
-
-    stop(paste0(deparse(substitute(diff)), "$subtracted",
-                " must be a numeric vector"), call. = FALSE)
-
-  }
 
   if(any(diff$subtracted < 1) | any(diff$subtracted > K)){
     stop(paste0("The numeric vector ", deparse(substitute(diff)), "$subtracted",
-                " must be a subset of {1,2,...,K}, where K = ", K, " is the number of groups with the supplied arguments (controlled through the argument 'quantile_cutoffs')"), call. = FALSE)
+                " must be a subset of {1,2,...,K}, where K = ", K, " is the number of groups that were supplied  (controlled through the argument 'quantile_cutoffs'). K is equal to the cardinality of 'quantile_cutoffs' plus one."), call. = FALSE)
   }
 
   if(diff$subtract_from == "most" & K %in% diff$subtracted){
@@ -222,12 +180,12 @@ InputChecks_diff <- function(diff, K){
 InputChecks_group.membership <- function(group.membership){
 
   if(is.null(attr(group.membership, which = "type"))) stop(paste0("The object ",
-                                                       deparse(substitute(group.membership)),
-                                                       " needs to be returned by quantile_group()"))
-
-  if(attr(group.membership, which = "type") != "quantile_group") stop(paste0("The object ",
                                                                   deparse(substitute(group.membership)),
                                                                   " needs to be returned by quantile_group()"))
+
+  if(attr(group.membership, which = "type") != "quantile_group") stop(paste0("The object ",
+                                                                             deparse(substitute(group.membership)),
+                                                                             " needs to be returned by quantile_group()"))
 
 
 } # FUN

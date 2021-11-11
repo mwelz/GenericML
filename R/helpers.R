@@ -104,10 +104,16 @@ VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
 } # END FUN
 
 
-# helper function that calculates an error covariance matrix estimator of a linear model
-#
-## @param x a linear model object
-## @param vcov_control a list with two elements called 'estimator' and 'arguments'. The argument 'estimator' is a string specifying the covariance matrix estimator to be used; specifies a covariance estimator function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are "vcovBS", "vcovCL", "vcovHAC", and "vcovHC". Default is 'vcovHC'. The element 'arguments' is a list of arguments that shall be passed to the function specified in the element 'estimator'. Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
+#' helper function that calculates an error covariance matrix estimator of a linear model
+#'
+#' (internal use only)
+#'
+#' @param x a linear model object
+#' @param vcov_control a list with two elements called 'estimator' and 'arguments'. The argument 'estimator' is a string specifying the covariance matrix estimator to be used; specifies a covariance estimator function in the sandwich package (https://cran.r-project.org/web/packages/sandwich/sandwich.pdf). Recommended estimators are "vcovBS", "vcovCL", "vcovHAC", and "vcovHC". Default is 'vcovHC'. The element 'arguments' is a list of arguments that shall be passed to the function specified in the element 'estimator'. Default leads to the (homoskedastic) ordinary least squares covariance matrix estimator. See the reference manual of the sandwich package for details (https://cran.r-project.org/web/packages/sandwich/vignettes/sandwich.pdf).
+#'
+#' @import sandwich
+#'
+#' @noRd
 get.vcov <- function(x,
                      vcov_control = setup_vcov()){
 
@@ -118,6 +124,7 @@ get.vcov <- function(x,
   # return the estimate
   do.call(what = eval(parse(text = paste0("sandwich::", vcov_control$estimator))),
           args = arguments)
+  # do.call(what = vcov_control$estimator, args = arguments)
 
 } # FUN
 
