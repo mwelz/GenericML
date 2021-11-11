@@ -19,7 +19,7 @@ CLAN(
 
 \item{equal_variances}{If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.}
 
-\item{diff}{Specifies the generic targets of CLAN. See the documentation of \code{\link{setup_diff}} for details.}
+\item{diff}{Specifies the generic targets of CLAN. Must be an instance of \code{\link{setup_diff}}. See the documentation of \code{\link{setup_diff}} for details.}
 
 \item{significance_level}{Significance level. Default is 0.05.}
 }
@@ -35,7 +35,6 @@ Performs Classification Analysis (CLAN) on all variables in a design matrix.
 }
 \examples{
 ## generate data
-library(GenericML)
 set.seed(1)
 n  <- 200                              # number of observations
 p  <- 5                                # number of covariates
@@ -47,7 +46,7 @@ CLAN(Z_CLAN, membership)
 
 }
 \references{
-Chernozhukov, V., Demirer, M., Duflo, E., and Fernández-Val, I. (2021). Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments. \href{https://arxiv.org/abs/1712.04802}{\emph{arXiv preprint arXiv:1712.04802}}.
+Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 }
 \seealso{
 \code{\link{quantile_group}},

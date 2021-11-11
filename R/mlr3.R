@@ -63,19 +63,24 @@ propensity_score_mlr3 <- function(Z, D, learner = "random_forest"){
 #'   }
 #'
 #' @references
-#' Rosenbaum, P.R. and Rubin, D.B. (1983). The Central Role of the Propensity Score in Observational Studies for Causal Effects. \emph{Biometrika}, 70(1):41--55. \url{https://doi.org/10.1093/biomet/70.1.41}.
+#' Rosenbaum P.R., Rubin D.B. (1983). \dQuote{The Central Role of the Propensity Score in Observational Studies for Causal Effects.} \emph{Biometrika}, \bold{70}(1), 41--55. \doi{10.1093/biomet/70.1.41}.
 #'
 #' @examples
 #' ## generate data
-#' library(GenericML)
 #' set.seed(1)
 #' n  <- 200                        # number of observations
 #' p  <- 5                          # number of covariates
 #' D  <- rbinom(n, 1, 0.5)          # random treatment assignment
 #' Z  <- matrix(runif(n*p), n, p)   # design matrix
 #'
-#' ## estimate propensity scores
-#' propensity_score(Z, D)
+#' ## estimate propensity scores via mean(D)...
+#' propensity_score(Z, D, estimator = "constant")
+#'
+#' ## ... and via random forest
+#' if(require("ranger")){
+#'   propensity_score(Z, D,
+#'    estimator = 'mlr3::lrn("ranger", num.trees = 20)')
+#' }
 #'
 #' @export
 propensity_score <- function(Z, D, estimator = "constant"){
@@ -141,7 +146,7 @@ propensity_score_NoChecks <- function(Z, D, estimator = "constant"){
 #' @param Z A numeric design matrix that holds the covariates in its columns.
 #' @param D A binary vector of treatment assignment. Value one denotes assignment to the treatment group and value zero assignment to the control group.
 #' @param Y A numeric vector containing the response variable.
-#' @param A_set a numerical vector of indices of observations in the auxiliary sample. The
+#' @param A_set A numerical vector of the indices of the observations in the auxiliary sample.
 #' @param learner A string specifying the machine learner for the estimation. Either \code{'elastic_net'}, \code{'random_forest'}, \code{'tree'}, or a custom learner specified with \code{mlr3} syntax. In the latter case, do \emph{not} specify in the \code{mlr3} syntax specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 100)'} for a random forest learner with 100 trees. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.
 #' @param min_variation Specifies a threshold for the minimum variation of the predictions. If the variation of a BCA prediction falls below this threshold, random noise with distribution \eqn{N(0, var(Y)/20)} is added to it. Default is \code{1e-05}.
 #'
@@ -153,9 +158,26 @@ propensity_score_NoChecks <- function(Z, D, estimator = "constant"){
 #'   }
 #'
 #' @references
-#' Chernozhukov, V., Demirer, M., Duflo, E., and Fernández-Val, I. (2021). Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments. \href{https://arxiv.org/abs/1712.04802}{\emph{arXiv preprint arXiv:1712.04802}}.
+#' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 #'
 #' @seealso \code{\link{proxy_CATE}}
+#'
+#' @examples
+#' if(require("ranger")){
+#' ## generate data
+#' set.seed(1)
+#' n  <- 200                                  # number of observations
+#' p  <- 5                                    # number of covariates
+#' D  <- rbinom(n, 1, 0.5)                    # random treatment assignment
+#' Z  <- matrix(runif(n*p), n, p)             # design matrix
+#' Y0 <- as.numeric(Z %*% rexp(p) + rnorm(n)) # potential outcome without treatment
+#' Y1 <- 2 + Y0                               # potential outcome under treatment
+#' Y  <- ifelse(D == 1, Y1, Y0)               # observed outcome
+#' A_set <- sample(1:n, size = n/2)           # auxiliary set
+#'
+#' ## BCA predictions via random forest
+#' proxy_BCA(Z, D, Y, A_set, learner = "mlr3::lrn('ranger', num.trees = 30)")
+#' }
 #'
 #' @export
 proxy_BCA <- function(Z, D, Y,
@@ -172,10 +194,11 @@ proxy_BCA <- function(Z, D, Y,
   stopifnot(is.numeric(A_set) & all(A_set %in% 1:nrow(Z)))
   stopifnot(is.numeric(min_variation) & min_variation > 0)
 
+
   # call main function
   proxy_BCA_NoChecks(Z = Z, D = D, Y = Y,
                           A_set = A_set,
-                          learner = get.learner_regr(learner),
+                          learner = get.learner_regr(make.mlr3.environment(learner)), # must be mlr3 object
                           min_variation = min_variation)
 
 } # END FUN
@@ -233,7 +256,7 @@ proxy_BCA_NoChecks <- function(Z, D, Y,
 #' @param Z A numeric design matrix that holds the covariates in its columns.
 #' @param D A binary vector of treatment assignment. Value one denotes assignment to the treatment group and value zero assignment to the control group.
 #' @param Y A numeric vector containing the response variable.
-#' @param A_set a numerical vector of indices of observations in the auxiliary sample. The
+#' @param A_set A numerical vector of the indices of the observations in the auxiliary sample.
 #' @param learner A string specifying the machine learner for the estimation. Either \code{'elastic_net'}, \code{'random_forest'}, \code{'tree'}, or a custom learner specified with \code{mlr3} syntax. In the latter case, do \emph{not} specify in the \code{mlr3} syntax specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 100)'} for a random forest learner with 100 trees. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.
 #' @param proxy_BCA A vector of proxy estimates of the baseline conditional average, BCA, \eqn{E[Y | D=0, Z]}. If \code{NULL}, these will be estimated separately.
 #' @param min_variation Minimum variation of the predictions before random noise with distribution \eqn{N(0, var(Y)/20)} is added. Default is \code{1e-05}.
@@ -246,9 +269,26 @@ proxy_BCA_NoChecks <- function(Z, D, Y,
 #'   }
 #'
 #' @references
-#' Chernozhukov, V., Demirer, M., Duflo, E., and Fernández-Val, I. (2021). Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments. \href{https://arxiv.org/abs/1712.04802}{\emph{arXiv preprint arXiv:1712.04802}}.
+#' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 #'
-#' \code{\link{proxy_BCA}}
+#' @seealso \code{\link{proxy_BCA}}
+#'
+#' @examples
+#' if(require("ranger")){
+#' ## generate data
+#' set.seed(1)
+#' n  <- 200                                  # number of observations
+#' p  <- 5                                    # number of covariates
+#' D  <- rbinom(n, 1, 0.5)                    # random treatment assignment
+#' Z  <- matrix(runif(n*p), n, p)             # design matrix
+#' Y0 <- as.numeric(Z %*% rexp(p) + rnorm(n)) # potential outcome without treatment
+#' Y1 <- 2 + Y0                               # potential outcome under treatment
+#' Y  <- ifelse(D == 1, Y1, Y0)               # observed outcome
+#' A_set <- sample(1:n, size = n/2)           # auxiliary set
+#'
+#' ## CATE predictions via random forest
+#' proxy_CATE(Z, D, Y, A_set, learner = "mlr3::lrn('ranger', num.trees = 30)")
+#' }
 #'
 #' @export
 proxy_CATE <- function(Z, D, Y,
@@ -269,7 +309,7 @@ proxy_CATE <- function(Z, D, Y,
   # run main function
   proxy_CATE_NoChecks(Z = Z, D = D, Y = Y,
                       A_set = A_set,
-                      learner = get.learner_regr(learner), # must be mlr3 object
+                      learner = get.learner_regr(make.mlr3.environment(learner)), # must be mlr3 object
                       proxy_BCA = proxy_BCA,
                       min_variation = min_variation)
 
@@ -282,7 +322,7 @@ proxy_CATE <- function(Z, D, Y,
 #' @noRd
 proxy_CATE_NoChecks <- function(Z, D, Y,
                                 A_set,
-                                learner = "random_forest",
+                                learner, # must be mlr3 object
                                 proxy_BCA = NULL,
                                 min_variation = 1e-05){
 

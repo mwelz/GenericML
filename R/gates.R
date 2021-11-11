@@ -9,9 +9,9 @@
 #' @param proxy_CATE A numeric vector of proxy conditional average treatment effect (CATE) estimates. We recommend to use the estimates of a \code{\link{proxy_CATE}} object.
 #' @param membership A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be of type \code{\link{quantile_group}}. Typically, the grouping is based on CATE estimates, which are for instance returned by \code{proxy_CATE}.
 #' @param HT Logical. If \code{TRUE}, a Horvitz-Thompson (HT) transformation is applied (BLP2 in the paper). Default is \code{FALSE}.
-#' @param X1_control Specifies the design matrix \eqn{X_1} in the regression. See the documentation of \code{\link{setup_X1}} for details.
-#' @param vcov_control Specifies the covariance matrix estimator. See the documentation of \code{\link{setup_vcov}} for details.
-#' @param diff Specifies the generic targets of GATES. See the documentation of \code{\link{setup_diff}} for details.
+#' @param X1_control Specifies the design matrix \eqn{X_1} in the regression. Must be an instance of \code{\link{setup_X1}}. See the documentation of \code{\link{setup_X1}} for details.
+#' @param vcov_control Specifies the covariance matrix estimator. Must be an instance of \code{\link{setup_vcov}}. See the documentation of \code{\link{setup_vcov}} for details.
+#' @param diff Specifies the generic targets of GATES. Must be an instance of \code{\link{setup_diff}}. See the documentation of \code{\link{setup_diff}} for details.
 #' @param significance_level Significance level. Default is 0.05.
 #'
 #' @return
@@ -23,11 +23,10 @@
 #'   }
 #'
 #' @references
-#' Chernozhukov, V., Demirer, M., Duflo, E., and Fernández-Val, I. (2021). Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments. \href{https://arxiv.org/abs/1712.04802}{\emph{arXiv preprint arXiv:1712.04802}}.
+#' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 #'
 #' @examples
 #' ## generate data
-#' library(GenericML)
 #' set.seed(1)
 #' n  <- 200                                # number of observations
 #' p  <- 5                                  # number of covariates
@@ -84,8 +83,8 @@ GATES <- function(Y, D,
                  proxy_CATE          = proxy_CATE,
                  membership          = membership,
                  X1_control          = X1_control,
-                 vcov_control        = vcov_control,
                  diff                = diff,
+                 vcov_control        = vcov_control,
                  significance_level  = significance_level)
 
 } # FUN
@@ -99,8 +98,8 @@ GATES_NoChecks <- function(D, Y,
                            membership,
                            HT                  = FALSE,
                            X1_control          = setup_X1(),
-                           vcov_control        = setup_vcov(),
                            diff                = setup_diff(),
+                           vcov_control        = setup_vcov(),
                            significance_level  = 0.05){
 
   # fit model according to strategy 1 or 2 in the paper
@@ -111,8 +110,8 @@ GATES_NoChecks <- function(D, Y,
                       proxy_CATE          = proxy_CATE,
                       membership          = membership,
                       X1_control          = X1_control,
-                      vcov_control        = vcov_control,
                       diff                = diff,
+                      vcov_control        = vcov_control,
                       significance_level  = significance_level))
 
 } # FUN
@@ -123,9 +122,9 @@ GATES.classic <- function(D, Y,
                           propensity_scores,
                           proxy_BCA, proxy_CATE,
                           membership,
-                          X1_control       = setup_X1(),
-                          vcov_control       = setup_vcov(),
+                          X1_control         = setup_X1(),
                           diff               = setup_diff(),
+                          vcov_control       = setup_vcov(),
                           significance_level = 0.05){
 
   # make the group membership a binary matrix
@@ -177,9 +176,9 @@ GATES.HT <- function(D, Y,
                      propensity_scores,
                      proxy_BCA, proxy_CATE,
                      membership,
-                     X1_control       = setup_X1(),
-                     vcov_control       = setup_vcov(),
+                     X1_control         = setup_X1(),
                      diff               = setup_diff(),
+                     vcov_control       = setup_vcov(),
                      significance_level = 0.05){
 
   # make the group membership a binary matrix

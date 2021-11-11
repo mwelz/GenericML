@@ -13,7 +13,7 @@ proxy_BCA(Z, D, Y, A_set, learner, min_variation = 1e-05)
 
 \item{Y}{A numeric vector containing the response variable.}
 
-\item{A_set}{a numerical vector of indices of observations in the auxiliary sample. The}
+\item{A_set}{A numerical vector of the indices of the observations in the auxiliary sample.}
 
 \item{learner}{A string specifying the machine learner for the estimation. Either \code{'elastic_net'}, \code{'random_forest'}, \code{'tree'}, or a custom learner specified with \code{mlr3} syntax. In the latter case, do \emph{not} specify in the \code{mlr3} syntax specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 100)'} for a random forest learner with 100 trees. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.}
 
@@ -29,8 +29,26 @@ An object of class \code{proxy_BCA}, consisting of the following components:
 \description{
 Proxy estimation of the Baseline Conditional Average (BCA), defined by \eqn{E[Y | D=0, Z]}. Estimation is done on the auxiliary sample, while BCA predictions are made for all observations.
 }
+\examples{
+if(require("ranger")){
+## generate data
+set.seed(1)
+n  <- 200                                  # number of observations
+p  <- 5                                    # number of covariates
+D  <- rbinom(n, 1, 0.5)                    # random treatment assignment
+Z  <- matrix(runif(n*p), n, p)             # design matrix
+Y0 <- as.numeric(Z \%*\% rexp(p) + rnorm(n)) # potential outcome without treatment
+Y1 <- 2 + Y0                               # potential outcome under treatment
+Y  <- ifelse(D == 1, Y1, Y0)               # observed outcome
+A_set <- sample(1:n, size = n/2)           # auxiliary set
+
+## BCA predictions via random forest
+proxy_BCA(Z, D, Y, A_set, learner = "mlr3::lrn('ranger', num.trees = 30)")
+}
+
+}
 \references{
-Chernozhukov, V., Demirer, M., Duflo, E., and Fernández-Val, I. (2021). Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments. \href{https://arxiv.org/abs/1712.04802}{\emph{arXiv preprint arXiv:1712.04802}}.
+Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 }
 \seealso{
 \code{\link{proxy_CATE}}

@@ -7,7 +7,7 @@
 print.GenericML <- function(x, ...){
 
   cat("GenericML object with the following specifications:\n")
-  cat("\t* Propensity Score learner:", x$arguments$learner_propensity_score, "\n")
+  cat("\t* Propensity score learner:", x$arguments$learner_propensity_score, "\n")
   cat("\t* Generic ML learners:", paste(x$arguments$learners_GenericML, collapse = ", "), "\n")
   cat("\t* S =", x$arguments$num_splits, "splits are used\n")
   cat("\t*", ifelse(x$arguments$HT, "A", "No"), "HT transformation is used\n")

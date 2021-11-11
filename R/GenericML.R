@@ -11,11 +11,11 @@
 #' @param Z_CLAN A numeric matrix holding variables on which classification analysis (CLAN) shall be performed. CLAN will be performed on each column of the matrix. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.
 #' @param HT Logical. If \code{TRUE}, a Horvitz-Thompson (HT) transformation is applied in the BLP and GATES regressions. Default is \code{FALSE}.
 #' @param quantile_cutoffs The cutoff points of the quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.
-#' @param X1_BLP Specifies the design matrix \eqn{X_1} in the BLP regression. See the documentation of \code{\link{setup_X1}} for details.
+#' @param X1_BLP Specifies the design matrix \eqn{X_1} in the BLP regression. Must be an instance of \code{\link{setup_X1}}. See the documentation of \code{\link{setup_X1}} for details.
 #' @param X1_GATES Same as \code{X1_BLP}, just for the GATES regression.
-#' @param diff_GATES Specifies the generic targets of GATES. See the documentation of \code{\link{setup_diff}} for details.
+#' @param diff_GATES Specifies the generic targets of GATES. Must be an instance of \code{\link{setup_diff}}. See the documentation of \code{\link{setup_diff}} for details.
 #' @param diff_CLAN Same as \code{diff_GATES}, just for the CLAN generic targets.
-#' @param vcov_BLP Specifies the covariance matrix estimator in the BLP regression. See the documentation of \code{\link{setup_vcov}} for details.
+#' @param vcov_BLP Specifies the covariance matrix estimator in the BLP regression. Must be an instance of \code{\link{setup_vcov}}. See the documentation of \code{\link{setup_vcov}} for details.
 #' @param vcov_GATES Same as \code{vcov_BLP}, just for the GATES regression.
 #' @param equal_variances_CLAN Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.
 #' @param prop_main Proportion of samples that shall be in main set. Default is 0.5.
@@ -41,9 +41,10 @@
 #' @note In an earlier development version, Lucas Kitzmueller alerted us to several minor bugs and proposed fixes. Many thanks to him!
 #'
 #' @references
-#' Chernozhukov, V., Demirer, M., Duflo, E., and Fernández-Val, I. (2021). Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments. \href{https://arxiv.org/abs/1712.04802}{\emph{arXiv preprint arXiv:1712.04802}}.
+#' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 #'
-#' @seealso \code{\link[=plot.GenericML]{plot}},
+#' @seealso
+#' \code{\link[=plot.GenericML]{plot}},
 #' \code{\link[=print.GenericML]{print}},
 #' \code{\link{get_BLP}},
 #' \code{\link{get_GATES}},
@@ -53,6 +54,25 @@
 #' \code{\link{setup_vcov}},
 #' \code{\link{GenericML_single}}
 #'
+#' @examples
+#' if (require("glmnet") && require("ranger")) {
+#'
+#' ## generate data
+#' set.seed(1)
+#' n  <- 200                                  # number of observations
+#' p  <- 5                                    # number of covariates
+#' D  <- rbinom(n, 1, 0.5)                    # random treatment assignment
+#' Z  <- matrix(runif(n*p), n, p)             # design matrix
+#' Y0 <- as.numeric(Z %*% rexp(p) + rnorm(n)) # potential outcome without treatment
+#' Y1 <- 2 + Y0                               # potential outcome under treatment
+#' Y  <- ifelse(D == 1, Y1, Y0)               # observed outcome
+#'
+#' ## specify learners
+#' learners <- c("elastic_net", "mlr3::lrn('ranger', num.trees = 30)")
+#'
+#' ## perform generic ML inference
+#' GenericML(Z, D, Y, learners, num_splits = 10, parallel = FALSE)
+#' }
 #'
 #' @export
 GenericML <- function(Z, D, Y,

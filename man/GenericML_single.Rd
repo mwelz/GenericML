@@ -47,15 +47,15 @@ GenericML_single(
 
 \item{quantile_cutoffs}{The cutoff points of quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.}
 
-\item{X1_BLP}{Specifies the design matrix \eqn{X_1} in the BLP regression. See the documentation of \code{\link{setup_X1}} for details.}
+\item{X1_BLP}{Specifies the design matrix \eqn{X_1} in the BLP regression. Must be an instance of \code{\link{setup_X1}}. See the documentation of \code{\link{setup_X1}} for details.}
 
 \item{X1_GATES}{Same as \code{X1_BLP}, just for the the GATES regression.}
 
-\item{diff_GATES}{Specifies the generic targets of GATES. See the documentation of \code{\link{setup_diff}} for details.}
+\item{diff_GATES}{Specifies the generic targets of GATES. Must be an instance of \code{\link{setup_diff}}. See the documentation of \code{\link{setup_diff}} for details.}
 
 \item{diff_CLAN}{Same as \code{diff_GATES}, just for the CLAN generic targets.}
 
-\item{vcov_BLP}{Specifies the covariance matrix estimator in the BLP regression. See the documentation of \code{\link{setup_vcov}} for details.}
+\item{vcov_BLP}{Specifies the covariance matrix estimator in the BLP regression. Must be an instance of \code{\link{setup_vcov}}. See the documentation of \code{\link{setup_vcov}} for details.}
 
 \item{vcov_GATES}{Same as \code{vcov_BLP}, just for the GATES regression.}
 

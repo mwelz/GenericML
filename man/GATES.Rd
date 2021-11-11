@@ -33,11 +33,11 @@ GATES(
 
 \item{HT}{Logical. If \code{TRUE}, a Horvitz-Thompson (HT) transformation is applied (BLP2 in the paper). Default is \code{FALSE}.}
 
-\item{X1_control}{Specifies the design matrix \eqn{X_1} in the regression. See the documentation of \code{\link{setup_X1}} for details.}
+\item{X1_control}{Specifies the design matrix \eqn{X_1} in the regression. Must be an instance of \code{\link{setup_X1}}. See the documentation of \code{\link{setup_X1}} for details.}
 
-\item{vcov_control}{Specifies the covariance matrix estimator. See the documentation of \code{\link{setup_vcov}} for details.}
+\item{vcov_control}{Specifies the covariance matrix estimator. Must be an instance of \code{\link{setup_vcov}}. See the documentation of \code{\link{setup_vcov}} for details.}
 
-\item{diff}{Specifies the generic targets of GATES. See the documentation of \code{\link{setup_diff}} for details.}
+\item{diff}{Specifies the generic targets of GATES. Must be an instance of \code{\link{setup_diff}}. See the documentation of \code{\link{setup_diff}} for details.}
 
 \item{significance_level}{Significance level. Default is 0.05.}
 }
@@ -54,7 +54,6 @@ Performs the linear regression for the Group Average Treatments Effects (GATES) 
 }
 \examples{
 ## generate data
-library(GenericML)
 set.seed(1)
 n  <- 200                                # number of observations
 p  <- 5                                  # number of covariates
@@ -70,7 +69,7 @@ GATES(Y, D, propensity_scores, proxy_BCA, proxy_CATE, membership)
 
 }
 \references{
-Chernozhukov, V., Demirer, M., Duflo, E., and Fernández-Val, I. (2021). Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments. \href{https://arxiv.org/abs/1712.04802}{\emph{arXiv preprint arXiv:1712.04802}}.
+Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 }
 \seealso{
 \code{\link{setup_X1}},

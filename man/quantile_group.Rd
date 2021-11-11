@@ -7,12 +7,12 @@
 quantile_group(x, cutoffs = c(0.25, 0.5, 0.75))
 }
 \arguments{
-\item{x}{The vector to be partitioned}
+\item{x}{The vector to be partitioned.}
 
 \item{cutoffs}{The quantile cutoffs for the partition. Default are the quartiles: \code{c(0.25, 0.5, 0.75)}.}
 }
 \value{
-A logical matrix indicating group membership
+An object of type \code{quantile_group}, which is a logical matrix indicating group membership.
 }
 \description{
 Partitions a vector into quantile groups and returns a logical matrix indicating group membership.

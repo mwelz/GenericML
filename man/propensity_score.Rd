@@ -25,17 +25,22 @@ Estimates the propensity scores \eqn{Pr[D = 1 | Z]} for binary treatment assignm
 }
 \examples{
 ## generate data
-library(GenericML)
 set.seed(1)
 n  <- 200                        # number of observations
 p  <- 5                          # number of covariates
 D  <- rbinom(n, 1, 0.5)          # random treatment assignment
 Z  <- matrix(runif(n*p), n, p)   # design matrix
 
-## estimate propensity scores
-propensity_score(Z, D)
+## estimate propensity scores via mean(D)...
+propensity_score(Z, D, estimator = "constant")
+
+## ... and via random forest
+if(require("ranger")){
+  propensity_score(Z, D,
+   estimator = 'mlr3::lrn("ranger", num.trees = 20)')
+}
 
 }
 \references{
-Rosenbaum, P.R. and Rubin, D.B. (1983). The Central Role of the Propensity Score in Observational Studies for Causal Effects. \emph{Biometrika}, 70(1):41--55. \url{https://doi.org/10.1093/biomet/70.1.41}.
+Rosenbaum P.R., Rubin D.B. (1983). \dQuote{The Central Role of the Propensity Score in Observational Studies for Causal Effects.} \emph{Biometrika}, \bold{70}(1), 41--55. \doi{10.1093/biomet/70.1.41}.
 }

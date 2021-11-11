@@ -50,15 +50,15 @@ GenericML(
 
 \item{quantile_cutoffs}{The cutoff points of the quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.}
 
-\item{X1_BLP}{Specifies the design matrix \eqn{X_1} in the BLP regression. See the documentation of \code{\link{setup_X1}} for details.}
+\item{X1_BLP}{Specifies the design matrix \eqn{X_1} in the BLP regression. Must be an instance of \code{\link{setup_X1}}. See the documentation of \code{\link{setup_X1}} for details.}
 
 \item{X1_GATES}{Same as \code{X1_BLP}, just for the GATES regression.}
 
-\item{diff_GATES}{Specifies the generic targets of GATES. See the documentation of \code{\link{setup_diff}} for details.}
+\item{diff_GATES}{Specifies the generic targets of GATES. Must be an instance of \code{\link{setup_diff}}. See the documentation of \code{\link{setup_diff}} for details.}
 
 \item{diff_CLAN}{Same as \code{diff_GATES}, just for the CLAN generic targets.}
 
-\item{vcov_BLP}{Specifies the covariance matrix estimator in the BLP regression. See the documentation of \code{\link{setup_vcov}} for details.}
+\item{vcov_BLP}{Specifies the covariance matrix estimator in the BLP regression. Must be an instance of \code{\link{setup_vcov}}. See the documentation of \code{\link{setup_vcov}} for details.}
 
 \item{vcov_GATES}{Same as \code{vcov_BLP}, just for the GATES regression.}
 
@@ -97,8 +97,29 @@ Performs generic machine learning inference on heterogeneous treatment effects a
 \note{
 In an earlier development version, Lucas Kitzmueller alerted us to several minor bugs and proposed fixes. Many thanks to him!
 }
+\examples{
+if (require("glmnet") && require("ranger")) {
+
+## generate data
+set.seed(1)
+n  <- 200                                  # number of observations
+p  <- 5                                    # number of covariates
+D  <- rbinom(n, 1, 0.5)                    # random treatment assignment
+Z  <- matrix(runif(n*p), n, p)             # design matrix
+Y0 <- as.numeric(Z \%*\% rexp(p) + rnorm(n)) # potential outcome without treatment
+Y1 <- 2 + Y0                               # potential outcome under treatment
+Y  <- ifelse(D == 1, Y1, Y0)               # observed outcome
+
+## specify learners
+learners <- c("elastic_net", "mlr3::lrn('ranger', num.trees = 30)")
+
+## perform generic ML inference
+GenericML(Z, D, Y, learners, num_splits = 10, parallel = FALSE)
+}
+
+}
 \references{
-Chernozhukov, V., Demirer, M., Duflo, E., and Fernández-Val, I. (2021). Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments. \href{https://arxiv.org/abs/1712.04802}{\emph{arXiv preprint arXiv:1712.04802}}.
+Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 }
 \seealso{
 \code{\link[=plot.GenericML]{plot}},

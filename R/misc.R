@@ -87,11 +87,11 @@ quantile_group <- function(x,
 #' @param Z_CLAN A matrix of variables that shall be considered for the CLAN. Each column represents a variable for which CLAN shall be performed. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.
 #' @param HT Logical. If \code{TRUE}, a HT transformation is applied in the BLP and GATES regressions. Default is \code{FALSE}.
 #' @param quantile_cutoffs The cutoff points of quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.
-#' @param X1_BLP Specifies the design matrix \eqn{X_1} in the BLP regression. See the documentation of \code{\link{setup_X1}} for details.
+#' @param X1_BLP Specifies the design matrix \eqn{X_1} in the BLP regression. Must be an instance of \code{\link{setup_X1}}. See the documentation of \code{\link{setup_X1}} for details.
 #' @param X1_GATES Same as \code{X1_BLP}, just for the the GATES regression.
-#' @param diff_GATES Specifies the generic targets of GATES. See the documentation of \code{\link{setup_diff}} for details.
+#' @param diff_GATES Specifies the generic targets of GATES. Must be an instance of \code{\link{setup_diff}}. See the documentation of \code{\link{setup_diff}} for details.
 #' @param diff_CLAN Same as \code{diff_GATES}, just for the CLAN generic targets.
-#' @param vcov_BLP Specifies the covariance matrix estimator in the BLP regression. See the documentation of \code{\link{setup_vcov}} for details.
+#' @param vcov_BLP Specifies the covariance matrix estimator in the BLP regression. Must be an instance of \code{\link{setup_vcov}}. See the documentation of \code{\link{setup_vcov}} for details.
 #' @param vcov_GATES Same as \code{vcov_BLP}, just for the GATES regression.
 #' @param equal_variances_CLAN Logical. If \code{TRUE}, the the two within-group variances of the differences between the CLAN generic targets are assumed to be equal. Default is \code{FALSE}.
 #' @param significance_level Significance level for VEIN. Default is 0.05.

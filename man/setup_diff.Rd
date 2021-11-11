@@ -2,7 +2,7 @@
 % Please edit documentation in R/initializers.R
 \name{setup_diff}
 \alias{setup_diff}
-\title{Setup function for the arguments \code{diff_GATES} and \code{diff_CLAN} in the \code{\link{GenericML}} function.}
+\title{Setup function for \code{diff} arguments}
 \usage{
 setup_diff(subtract_from = "most", subtracted = 1)
 }
@@ -11,6 +11,43 @@ setup_diff(subtract_from = "most", subtracted = 1)
 
 \item{subtracted}{Vector indicating the groups to be subtracted from the group specified in \code{subtract_from}. If there are \eqn{K} group, \code{subtracted} should be a subset of \eqn{{1,2,...,K}}.}
 }
+\value{
+An object of class \code{setup_diff}, consisting of the following components:
+\describe{
+\item{\code{subtract_from}}{A character equal to \code{"most"} or \code{"least"}.}
+\item{\code{subtracted}}{A numeric vector of group indices.}
+}
+See the description above for details.
+}
 \description{
-Returns a list with two elements called \code{subtract_from} and \code{subtracted}. The first element (\code{subtract_from}) denotes what shall be the base group to subtract from in the generic targets of interest (GATES or CLAN); either \code{"most"} or \code{"least"}. The second element (\code{subtracted}) are the groups to be subtracted from \code{subtract_from}, which is a subset of \eqn{{1,2,...,K}}, where \eqn{K} equals the number of groups. The number of groups should be consistent with the number of groups induced by the argument \code{quantile_cutoffs}.
+Returns a list with two components, called \code{subtract_from} and \code{subtracted}. The first element (\code{subtract_from}) denotes what shall be the base group to subtract from in the generic targets of interest (GATES or CLAN); either \code{"most"} or \code{"least"}. The second element (\code{subtracted}) are the groups to be subtracted from \code{subtract_from}, which is a subset of \eqn{{1,2,...,K}}, where \eqn{K} equals the number of groups. The number of groups should be consistent with the number of groups induced by the argument \code{quantile_cutoffs}, which is the cardinality of \code{quantile_cutoffs}, plus one.
+}
+\details{
+The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}} and \code{\link{GenericML_single}} (arguments \code{diff_GATES}, \code{diff_CLAN}), as well as \code{\link{GATES}} and \code{\link{CLAN}} (argument \code{diff}).
+}
+\examples{
+# Specify quantile cutoffs. There will be K=4 groups.
+quantile_cutoffs <- c(0.25, 0.5, 0.75)
+
+# Have group difference GK-G1 as generic targets in GATES and CLAN
+# Gx is the x-th group
+setup_diff(subtract_from = "most", subtracted = 1)
+
+# Have group differences GK-G1, GK-G2, GK-G3 as generic targets in GATES and CLAN
+setup_diff(subtract_from = "most", subtracted = c(1,2,3))
+
+# Have group differences G3-G1, G2-G1 as generic targets in GATES and CLAN
+setup_diff(subtract_from = "least", subtracted = c(3,2))
+
+}
+\references{
+Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
+}
+\seealso{
+\code{\link{GenericML}},
+\code{\link{GenericML_single}},
+\code{\link{CLAN}},
+\code{\link{GATES}},
+\code{\link{setup_X1}},
+\code{\link{setup_vcov}}
 }

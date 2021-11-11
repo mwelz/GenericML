@@ -149,8 +149,6 @@ get_clan.3d.ls <- function(num.learners, learners.names, num.generic_targets.cla
 #' See the description above for details.
 #'
 #' @examples
-#' library(GenericML)
-#'
 #' # Specify quantile cutoffs. There will be K=4 groups.
 #' quantile_cutoffs <- c(0.25, 0.5, 0.75)
 #'
@@ -213,6 +211,29 @@ setup_diff <- function(subtract_from = "most",
 #'
 #' Zeileis A. (2006). \dQuote{Object-Oriented Computation of Sandwich Estimators.} \emph{Journal of Statistical Software}, \bold{16}(9), 1--16. \doi{10.18637/jss.v016.i09}
 #'
+#' @seealso
+#' \code{\link{GenericML}},
+#' \code{\link{GenericML_single}},
+#' \code{\link{BLP}},
+#' \code{\link{GATES}},
+#' \code{\link{setup_X1}},
+#' \code{\link{setup_diff}}
+#'
+#' @examples
+#' # use standard homoskedastic OLS covariance matrix estimate
+#' setup_vcov(estimator = "vcovHC", arguments = list(type = "const"))
+#'
+#' # use White's heteroskedasticity-robust estimator
+#' setup_vcov(estimator = "vcovHC", arguments = list(type = "H0"))
+#'
+#' if (require("sandwich")){
+#'
+#' # use HAC-robust estimator with prewhitening and Andrews' (Econometrica, 1991) weights
+#' # since weightsAndrews() is a function in sandwich, require this package
+#' setup_vcov(estimator = "vcovHAC", arguments = list(prewhite = TRUE, weights = weightsAndrews))
+#'
+#' }
+#'
 #' @import sandwich
 #'
 #' @export
@@ -231,23 +252,68 @@ setup_vcov <- function(estimator = "vcovHC",
 
 
 
-#' Setup function controlling the variables that shall be used in the matrix \eqn{X_1} in the BLP or GATES regression.
+#' Setup function controlling the matrix \eqn{X_1} in the BLP or GATES regression
 #'
-#' Returns a list with three elements. The first element of the list, \code{funs_Z}, controls which functions of matrix \code{Z} are used as regressors. The second element, \code{covariates}, is an optional matrix of custom covariates that shall be included in \eqn{X_1}. The third element, \code{fixed_effects}, controls the inclusion of fixed effects.
+#' Returns a list with three elements. The first element of the list, \code{funs_Z}, controls which functions of matrix \code{Z} are used as regressors in \eqn{X_1}. The second element, \code{covariates}, is an optional matrix of custom covariates that shall be included in \eqn{X_1}. The third element, \code{fixed_effects}, controls the inclusion of fixed effects.
 #'
-#' @param funs_Z Character string controlling the functions of \code{Z} to be included in \eqn{X_1}. Subset of \code{c("S", "B", "p")}, where \code{"p"} corresponds to the propensity scores, \code{"B"} to the proxy baseline estimates, and \code{"S"} to the proxy CATE estimates. Default is \code{"B"}.
-#' @param covariates Optional matrix containing additional covariates to be included in \eqn{X_1}. Default is \code{NULL}.
-#' @param fixed_effects vector of integers that indicates cluster membership of the observations: For each cluster, a fixed effect will be added. Default is \code{NULL} for no fixed effects.
+#' @details
+#' The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}} and \code{\link{GenericML_single}} (arguments \code{X1_BLP}, \code{X1_GATES}), as well as \code{\link{BLP}} and \code{\link{GATES}} (argument \code{X1_control}).
+#'
+#' @param funs_Z Character vector controlling the functions of \code{Z} to be included in \eqn{X_1}. Subset of \code{c("S", "B", "p")}, where \code{"p"} corresponds to the propensity scores, \code{"B"} to the proxy baseline estimates, and \code{"S"} to the proxy CATE estimates. Default is \code{"B"}.
+#' @param covariates Optional numeric matrix containing additional covariates to be included in \eqn{X_1}. Default is \code{NULL}.
+#' @param fixed_effects Numeric vector of integers that indicates cluster membership of the observations: For each cluster, a fixed effect will be added. Default is \code{NULL} for no fixed effects.
+#'
+#' @return
+#' An object of class \code{setup_X1}, consisting of the following components:
+#' \describe{
+#'   \item{\code{funs_Z}}{A character vector, being a subset of \code{c("S", "B", "p")}.}
+#'   \item{\code{covariates}}{Either \code{NULL} or a numeric matrix.}
+#'   \item{\code{fixed_effects}}{Either \code{NULL} or an integer vector indicating cluster membership.}
+#'   }
+#' See the description above for details.
+#'
+#' @references
+#' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
+#'
+#' @seealso
+#' \code{\link{GenericML}},
+#' \code{\link{GenericML_single}},
+#' \code{\link{BLP}},
+#' \code{\link{GATES}},
+#' \code{\link{setup_vcov}},
+#' \code{\link{setup_diff}}
+#'
+#' @examples
+#' set.seed(1)
+#' n <- 100 # sample size
+#' p <- 5   # number of covariates
+#' covariates <- matrix(runif(n*p), n, p) # sample matrix of covariates
+#'
+#' # let there be three clusters; assign membership randomly
+#' fixed_effects <- sample(c(1,2,3), size = n, replace = TRUE)
+#'
+#' # use BCA estimates in matrix X1
+#' setup_X1(funs_Z = "B", covariates = NULL, fixed_effects = NULL)
+#'
+#' # use BCA and propensity score estimates in matrix X1
+#' # uses uniform covariates and fixed effects
+#' setup_X1(funs_Z = c("B", "p"), covariates = covariates, fixed_effects = NULL)
 #'
 #' @export
 setup_X1 <- function(funs_Z = c("B"),
                      covariates = NULL,
                      fixed_effects = NULL){
 
+  if(is.null(fixed_effects)){
+    temp <- NULL
+  } else{
+    temp <- as.integer(fixed_effects)
+  }
+
   structure(
     list(funs_Z = funs_Z,
          covariates = covariates,
-         fixed_effects = fixed_effects),
+         fixed_effects = temp),
     class = "setup_X1")
 
 } # FUN

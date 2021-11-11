@@ -2,17 +2,57 @@
 % Please edit documentation in R/initializers.R
 \name{setup_X1}
 \alias{setup_X1}
-\title{Setup function controlling the variables that shall be used in the matrix \eqn{X_1} in the BLP or GATES regression.}
+\title{Setup function controlling the matrix \eqn{X_1} in the BLP or GATES regression}
 \usage{
 setup_X1(funs_Z = c("B"), covariates = NULL, fixed_effects = NULL)
 }
 \arguments{
-\item{funs_Z}{Character string controlling the functions of \code{Z} to be included in \eqn{X_1}. Subset of \code{c("S", "B", "p")}, where \code{"p"} corresponds to the propensity scores, \code{"B"} to the proxy baseline estimates, and \code{"S"} to the proxy CATE estimates. Default is \code{"B"}.}
+\item{funs_Z}{Character vector controlling the functions of \code{Z} to be included in \eqn{X_1}. Subset of \code{c("S", "B", "p")}, where \code{"p"} corresponds to the propensity scores, \code{"B"} to the proxy baseline estimates, and \code{"S"} to the proxy CATE estimates. Default is \code{"B"}.}
 
-\item{covariates}{Optional matrix containing additional covariates to be included in \eqn{X_1}. Default is \code{NULL}.}
+\item{covariates}{Optional numeric matrix containing additional covariates to be included in \eqn{X_1}. Default is \code{NULL}.}
 
-\item{fixed_effects}{vector of integers that indicates cluster membership of the observations: For each cluster, a fixed effect will be added. Default is \code{NULL} for no fixed effects.}
+\item{fixed_effects}{Numeric vector of integers that indicates cluster membership of the observations: For each cluster, a fixed effect will be added. Default is \code{NULL} for no fixed effects.}
+}
+\value{
+An object of class \code{setup_X1}, consisting of the following components:
+\describe{
+\item{\code{funs_Z}}{A character vector, being a subset of \code{c("S", "B", "p")}.}
+\item{\code{covariates}}{Either \code{NULL} or a numeric matrix.}
+\item{\code{fixed_effects}}{Either \code{NULL} or an integer vector indicating cluster membership.}
+}
+See the description above for details.
 }
 \description{
-Returns a list with three elements. The first element of the list, \code{funs_Z}, controls which functions of matrix \code{Z} are used as regressors. The second element, \code{covariates}, is an optional matrix of custom covariates that shall be included in \eqn{X_1}. The third element, \code{fixed_effects}, controls the inclusion of fixed effects.
+Returns a list with three elements. The first element of the list, \code{funs_Z}, controls which functions of matrix \code{Z} are used as regressors in \eqn{X_1}. The second element, \code{covariates}, is an optional matrix of custom covariates that shall be included in \eqn{X_1}. The third element, \code{fixed_effects}, controls the inclusion of fixed effects.
+}
+\details{
+The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}} and \code{\link{GenericML_single}} (arguments \code{X1_BLP}, \code{X1_GATES}), as well as \code{\link{BLP}} and \code{\link{GATES}} (argument \code{X1_control}).
+}
+\examples{
+set.seed(1)
+n <- 100 # sample size
+p <- 5   # number of covariates
+covariates <- matrix(runif(n*p), n, p) # sample matrix of covariates
+
+# let there be three clusters; assign membership randomly
+fixed_effects <- sample(c(1,2,3), size = n, replace = TRUE)
+
+# use BCA estimates in matrix X1
+setup_X1(funs_Z = "B", covariates = NULL, fixed_effects = NULL)
+
+# use BCA and propensity score estimates in matrix X1
+# uses uniform covariates and fixed effects
+setup_X1(funs_Z = c("B", "p"), covariates = covariates, fixed_effects = NULL)
+
+}
+\references{
+Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
+}
+\seealso{
+\code{\link{GenericML}},
+\code{\link{GenericML_single}},
+\code{\link{BLP}},
+\code{\link{GATES}},
+\code{\link{setup_vcov}},
+\code{\link{setup_diff}}
 }
