@@ -28,6 +28,8 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
+URL: https://github.com/mwelz/GenericML/
+BugReports: https://github.com/mwelz/GenericML/issues/
 Depends: 
     ggplot2, mlr3, mlr3learners
 Imports: 
@@ -36,3 +38,6 @@ Imports:
     splitstackshape,
     stats,
     parallel
+Suggests: 
+    glmnet, 
+    ranger
