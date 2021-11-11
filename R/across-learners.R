@@ -109,7 +109,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
 
   # initialize
   if(store_splits) splits.mat <- matrix(NA_character_, N, num_splits,
-                                        dimnames = c(NULL, paste0("split_", 1:num_splits)))
+                                        dimnames = list(NULL, paste0("split_", 1:num_splits)))
 
   # initialize
   generic_targets <- initializer.for.splits(Z = Z, Z_CLAN = Z_CLAN,
