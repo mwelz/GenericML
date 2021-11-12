@@ -1,11 +1,36 @@
-# GenericML: An R package for generic machine learning inference on heterogeneous treatment effects in randomized experiments
-Highly parallelized and customizable `R` implementation of [Generic Machine Learning (Chernozhukov, V., Demirer, M., Duflo, E., &amp; Fernández-Val, I., 2021)](https://arxiv.org/abs/1712.04802) using the `mlr3` framework. We intend to extend this implementation to a fully-fledged `R` package for the CRAN. Please note that this implementation is still work in progress and has not yet been thoroughly tested, so we cannot yet guarantee correctness. If you find a bug or have wishes for additional functionalities, please open an issue or let us know via email.
+# GenericML: Generic machine learning inference on heterogeneous treatment effects in randomized experiments
+To cite \code{GenericML} in publications, please use:
+
+Welz M., Alfons, M., Demirer, M. and Chernozhukov, V. (2021). `GenericML`: An `R` package for
+generic machine learning inference on heterogeneous treatment effects in randomized experiments. *GitHub
+repository*. URL: https://github.com/mwelz/GenericML.
+
+
+## Summary
+Highly parallelized and customizable, object-oriented  `R` implementation of [Generic Machine Learning (Chernozhukov, V., Demirer, M., Duflo, E., &amp; Fernández-Val, I., 2020)](https://arxiv.org/abs/1712.04802) using the [`mlr3`](https://github.com/mlr-org/mlr3) framework. We intend to extend this implementation to a fully-fledged `R` package for the CRAN. Please note that this implementation is still work in progress and has not yet been thoroughly tested, so we cannot yet guarantee correctness nor stability. 
 
 ## Installation
+To install the latest (possibly unstable) development version from GitHub, you can pull this repository and install it from the `R` command line via
 ```
-# install.packages("devtools")
+install.packages("devtools")
 devtools::install_github("mwelz/GenericML")
 ```
+If you already have package devtools installed, you can skip the first line.
+
+## Community guidelines
+
+### Report issues and request features
+
+If you experience any bugs or issues or if you have any suggestions for additional features, please submit an issue via the *Issues* tab of this repository. Please have a look at existing issues first to see if your problem for feature request has already been discussed.
+
+### Contribute to the package
+
+If you want to contribute to the package, you can fork this repository and create a pull request after implementing the desired functionality.
+
+### Ask for help
+
+If you need help using the package, or if you are interested in collaborations related to this project, please get in touch with the [package maintainer](https://mwelz.github.io/).
+
 
 ## Example
 We generate `n=5000` samples that adhere to a simple linear data generating process. We emulate a randomized experiment. There is no treatment effect heterogeneity since the treatment effect is constant at value two. Hence, Generic ML should not indicate the existence of treatment effect heterogeneity.
@@ -150,7 +175,9 @@ plot(genML, type = "CLAN", CLAN_variable = "z1")
 
 ```
 
-## TODO
+## TODO list
+Here we list desirable functionalities that we hope to implement in future releases.
+
 - [ ] Add optional monotonization of the confidence bounds;
 - [ ] Make stratified sampling an argument;
 - [ ] Implement print, plot, predict, summary methods for instances of proxy_CATE, proxy_BCA, BLP, GATES, propensity_score;

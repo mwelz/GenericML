@@ -40,4 +40,5 @@ Imports:
     parallel
 Suggests: 
     glmnet, 
-    ranger
+    ranger,
+    e1071

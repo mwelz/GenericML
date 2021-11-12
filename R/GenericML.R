@@ -146,9 +146,40 @@ GenericML <- function(Z, D, Y,
 
 
   ### step 1: compute propensity scores ----
-  propensity_scores.obj <- propensity_score_NoChecks(
-    Z = Z, D = D, estimator = learner_propensity_score)
-  propensity_scores     <- propensity_scores.obj$estimates
+  if(is.numeric(learner_propensity_score)){
+
+    ## use user-specified propensity scores
+    propensity_scores     <- learner_propensity_score
+    propensity_scores.obj <- NULL
+
+    # input checks
+    InputChecks_equal.length2(propensity_scores, Y)
+    if(any(propensity_scores <= 0 | propensity_scores >= 1)){
+      stop("User-supplied propensity scores in must be contained in the open interval (0,1)")
+    }
+
+  } else{
+
+    ## estimate propensity scores
+    propensity_scores.obj <-
+      propensity_score_NoChecks(
+        Z = Z, D = D, estimator = learner_propensity_score)
+
+    propensity_scores     <- propensity_scores.obj$estimates
+
+  } # IF
+
+
+  # check if data is from a randomized experiment
+  if(any(propensity_scores > 0.65 | propensity_scores < 0.35)){
+    warning(paste0("Some propensity scores are outside the ",
+                   "interval [0.35, 0.65]. In a randomized experiment, we would ",
+                   "expect all propensity scores to be equal to roughly 0.5. ",
+                   "The theory of the paper ",
+                   "is only valid for randomized experiments. Are ",
+                   "you sure your data is from a randomomized experiment ",
+                   "and the estimator of the scores has been chosen appropriately?"))
+  } # IF
 
 
   ### step 2: for each ML method, do the generic ML analysis ----
