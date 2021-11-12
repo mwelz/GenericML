@@ -153,8 +153,8 @@ plot(genML, type = "CLAN", CLAN_variable = "z1")
 ## TODO
 - [ ] Add optional monotonization of the confidence bounds;
 - [ ] Make stratified sampling an argument;
-- [x] Write accessor functions;
-- [x] Make user interface homogeneous and double-check documentation for consistency;
+- [ ] Implement print, plot, predict, summary methods for instances of proxy_CATE, proxy_BCA, BLP, GATES, propensity_score;
+- [ ] return proxy_BCA object in proxy_CATE output;
 - [ ] Release beta on CRAN.
 
 ## Authors
