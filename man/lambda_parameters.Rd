@@ -2,22 +2,47 @@
 % Please edit documentation in R/misc.R
 \name{lambda_parameters}
 \alias{lambda_parameters}
-\title{Returns the two lambda parameters that are used to find the best ML method.}
+\title{Estimate the two lambda parameters}
 \usage{
 lambda_parameters(BLP, GATES, proxy_CATE, membership)
 }
 \arguments{
-\item{BLP}{An instance of the class \code{BLP}.}
+\item{BLP}{An instance of \code{\link{BLP}}.}
 
-\item{GATES}{An instance of the class \code{GATES}.}
+\item{GATES}{An instance of \code{\link{GATES}}.}
 
 \item{proxy_CATE}{Proxy estimates of the CATE.}
 
-\item{membership}{A logical matrix that indicates the group membership of each observation. Needs to be an instance of \code{\link{quantile_group}}.}
+\item{membership}{A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be of type \code{\link{quantile_group}}. Typically, the grouping is based on CATE estimates, which are for instance returned by \code{proxy_CATE}.}
 }
 \value{
-A list containing the parameters \code{lambda} and \code{lambda.bar}.
+A list containing the estimates of \eqn{\Lambda} and \eqn{\bar{\Lambda}}, denoted \code{lambda} and \code{lambda.bar}, respectively.
 }
 \description{
-Returns the two lambda parameters that are used to find the best ML method.
+Estimates the lambda parameters \eqn{\Lambda} and \eqn{\bar{\Lambda}} whose medians are used to find the best ML method.
+}
+\examples{
+## generate data
+set.seed(1)
+n  <- 200                                # number of observations
+p  <- 5                                  # number of covariates
+D  <- rbinom(n, 1, 0.5)                  # random treatment assignment
+Y  <- runif(n)                           # outcome variable
+propensity_scores <- rep(0.5, n)         # propensity scores
+proxy_BCA         <- runif(n)            # proxy BCA estimates
+proxy_CATE        <- runif(n)            # proxy CATE estimates
+membership <- quantile_group(proxy_CATE) # group membership
+
+## perform BLP
+BLP <- BLP(Y, D, propensity_scores, proxy_BCA, proxy_CATE)
+
+## perform GATES
+GATES <- GATES(Y, D, propensity_scores, proxy_BCA, proxy_CATE, membership)
+
+## get estimates of the lambda parameters
+lambda_parameters(BLP, GATES, proxy_CATE, membership)
+
+}
+\references{
+Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 }

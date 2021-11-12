@@ -1,11 +1,19 @@
-
-#' Find lower and upper median of a vector.
+#' Calculate lower and upper median
 #'
-#' See Comment 4.2 in the paper.
+#' Calculates the lower and and median of a vector as proposed in Comment 4.2 in the paper.
 #'
-#' @param x A numeric vector whose medians we are interested in.
+#' @param x A numeric vector.
 #'
-#' @return A list with the upper and lower median and the Med statistic.
+#' @return
+#' A list with the upper and lower median and the Med statistic (which is their mean).
+#'
+#' @references
+#' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
+#'
+#' @examples
+#' set.seed(1)
+#' x <- runif(100)
+#' Med(x)
 #'
 #' @export
 Med <- function(x){
@@ -31,23 +39,30 @@ Med <- function(x){
 
 
 
-#' Partition a vector into groups based on its quantiles.
+#' Partition a vector into quantile groups
 #'
 #' Partitions a vector into quantile groups and returns a logical matrix indicating group membership.
 #'
-#' @param x The vector to be partitioned.
-#' @param cutoffs The quantile cutoffs for the partition. Default are the quartiles: \code{c(0.25, 0.5, 0.75)}.
+#' @param x A numeric vector to be partitioned.
+#' @param cutoffs A numeric vector denoting the quantile cutoffs for the partition. Default are the quartiles: \code{c(0.25, 0.5, 0.75)}.
 #'
 #' @return
 #' An object of type \code{quantile_group}, which is a logical matrix indicating group membership.
 #'
+#' @examples
+#' set.seed(1)
+#' x <- runif(100)
+#' cutoffs <- c(0.25, 0.5, 0.75)
+#' quantile_group(x, cutoffs)
+#'
 #' @export
 quantile_group <- function(x,
                            cutoffs = c(0.25, 0.5, 0.75)){
-  # cutoffs are the quantile cutoffs (like c(0.25, 0.5, 0.75))
-  # get quatiles
+
+  # get quantiles
   q         <- stats::quantile(x, cutoffs)
   q         <- c(-Inf, q, Inf)
+
   # check if breaks are unique: if x exhibits low variation, there might be empty quantile bins, which can cause an error in the cut() function. In this case, we add random noise to x to induce variation. NB: this bug has been spotted and fixed by Lucas Kitzmueller. All credits for this fix go to him!
   if(length(unique(q)) != length(q)){
     # specify standard deviation of the noise (x may have zero variation)
@@ -57,6 +72,7 @@ quantile_group <- function(x,
     q <- stats::quantile(x, cutoffs)
     q <- c(-Inf, q, Inf)
   } # IF
+
   groups    <- as.character(cut(x, breaks = q, include.lowest = TRUE, right = FALSE, dig.lab = 3))
   group.nam <- unique(groups)
   group.nam <- group.nam[order(
@@ -73,31 +89,65 @@ quantile_group <- function(x,
 
 
 
-#' Performs generic ML for a given learning technique and a given split of the data.
+#' Single iteration of the GenericML algorithm
 #'
-#' Can be seen as a single iteration of Algorithm 1 in the paper.
+#' Performs generic ML inference for a single learning technique and a given split of the data. Can be seen as a single iteration of Algorithm 1 in the paper.
 #'
-#' @param Z A matrix of the covariates.
-#' @param D A binary vector of treatment assignment.
-#' @param Y The response vector.
-#' @param learner A string specifying the machine learner to be used for estimating the BCA and CATE. Either \code{'elastic_net'}, \code{'random_forest'}, or \code{'tree'}. Can alternatively be specified by using \code{mlr3} syntax \emph{without} specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.
-#' @param propensity_scores A numeric vector of propensity scores.
+#' @param Z A numeric design matrix that holds the covariates in its columns.
+#' @param D A binary vector of treatment assignment. Value one denotes assignment to the treatment group and value zero assignment to the control group.
+#' @param Y A numeric vector containing the response variable.
+#' @param learner A character specifying the machine learner to be used for estimating the baseline conditional average (BCA) and conditional average treatment effect (CATE). Either \code{'elastic_net'}, \code{'random_forest'}, \code{'tree'}, or a custom learner specified with \code{mlr3} syntax. In the latter case, do \emph{not} specify in the \code{mlr3} syntax specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 100)'} for a random forest learner with 100 trees. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.
+#' @param propensity_scores A numeric vector of propensity score estimates.
 #' @param M_set a numerical vector of indices of observations in the main sample.
 #' @param A_set a numerical vector of indices of observations in the auxiliary sample. Default is complementary set to \code{M_set}.
-#' @param Z_CLAN A matrix of variables that shall be considered for the CLAN. Each column represents a variable for which CLAN shall be performed. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.
-#' @param HT Logical. If \code{TRUE}, a HT transformation is applied in the BLP and GATES regressions. Default is \code{FALSE}.
-#' @param quantile_cutoffs The cutoff points of quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.
+#' @param Z_CLAN A numeric matrix holding variables on which classification analysis (CLAN) shall be performed. CLAN will be performed on each column of the matrix. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.
+#' @param HT Logical. If \code{TRUE}, a Horvitz-Thompson (HT) transformation is applied in the BLP and GATES regressions. Default is \code{FALSE}.
+#' @param quantile_cutoffs The cutoff points of the quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.
 #' @param X1_BLP Specifies the design matrix \eqn{X_1} in the BLP regression. Must be an instance of \code{\link{setup_X1}}. See the documentation of \code{\link{setup_X1}} for details.
-#' @param X1_GATES Same as \code{X1_BLP}, just for the the GATES regression.
+#' @param X1_GATES Same as \code{X1_BLP}, just for the GATES regression.
 #' @param diff_GATES Specifies the generic targets of GATES. Must be an instance of \code{\link{setup_diff}}. See the documentation of \code{\link{setup_diff}} for details.
 #' @param diff_CLAN Same as \code{diff_GATES}, just for the CLAN generic targets.
 #' @param vcov_BLP Specifies the covariance matrix estimator in the BLP regression. Must be an instance of \code{\link{setup_vcov}}. See the documentation of \code{\link{setup_vcov}} for details.
 #' @param vcov_GATES Same as \code{vcov_BLP}, just for the GATES regression.
-#' @param equal_variances_CLAN Logical. If \code{TRUE}, the the two within-group variances of the differences between the CLAN generic targets are assumed to be equal. Default is \code{FALSE}.
+#' @param equal_variances_CLAN Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.
 #' @param significance_level Significance level for VEIN. Default is 0.05.
-#' @param min_variation Minimum variation of the predictions before random noise with distribution \eqn{N(0, var(Y)/20)} is added. Default is \code{1e-05}.
+#' @param min_variation Specifies a threshold for the minimum variation of the BCA/CATE predictions. If the variation of a BCA/CATE prediction falls below this threshold, random noise with distribution \eqn{N(0, var(Y)/20)} is added to it. Default is \code{1e-05}.
 #'
-#' @return a list with instances of the classes \code{BLP}, \code{GATES}, \code{CLAN}, \code{proxy_BCA}, and \code{proxy_CATE}. In addition, the lambda parameters for finding the best learner are returned.
+#' @return
+#' A list with the following components:
+#' \describe{
+#' \item{\code{BLP}}{An instance of \code{\link{BLP}}.}
+#' \item{\code{GATES}}{An instance of \code{\link{GATES}}.}
+#' \item{\code{CLAN}}{An instance of \code{\link{CLAN}}.}
+#' \item{\code{proxy_BCA}}{An instance of \code{\link{proxy_BCA}}.}
+#' \item{\code{proxy_CATE}}{An instance of \code{\link{proxy_CATE}}.}
+#' \item{\code{best}}{Estimates of the \eqn{\Lambda} parameters for finding the best learner. returned by \code{\link{lambda_parameters}}.}
+#' }
+#'
+#' @references
+#' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
+#'
+#' @seealso
+#' \code{\link{GenericML}}
+#'
+#' @examples
+#' if(require("ranger")){
+#' ## generate data
+#' set.seed(1)
+#' n  <- 200                        # number of observations
+#' p  <- 5                          # number of covariates
+#' Z  <- matrix(runif(n*p), n, p)   # design matrix
+#' D  <- rbinom(n, 1, 0.5)          # random treatment assignment
+#' Y  <- runif(n)                   # outcome variable
+#' propensity_scores <- rep(0.5, n) # propensity scores
+#' M_set <- sample(1:n, size = n/2) # main set
+#'
+#' ## specify learner
+#' learner <- "mlr3::lrn('ranger', num.trees = 30)"
+#'
+#' ## run single GenericML iteration
+#' GenericML_single(Z, D, Y, learner, propensity_scores, M_set)
+#' }
 #'
 #' @export
 GenericML_single <- function(Z, D, Y,
@@ -119,18 +169,30 @@ GenericML_single <- function(Z, D, Y,
                              min_variation        = 1e-05){
 
   # input checks
+  stopifnot(is.numeric(propensity_scores))
   InputChecks_D(D)
   InputChecks_Y(Y)
   InputChecks_Z(Z)
   InputChecks_equal.length3(D, Y, Z)
+  InputChecks_equal.length2(Y, propensity_scores)
   InputChecks_X1(X1_BLP, length(Y))
   InputChecks_X1(X1_GATES, length(Y))
   InputChecks_vcov.control(vcov_BLP)
   InputChecks_vcov.control(vcov_GATES)
   InputChecks_diff(diff_GATES, K = length(quantile_cutoffs) + 1)
   InputChecks_diff(diff_CLAN, K = length(quantile_cutoffs) + 1)
+  stopifnot(is.numeric(A_set) & is.numeric(M_set))
+  stopifnot(is.character(learner))
+  stopifnot(length(learner) == 1)
+  stopifnot(is.numeric(quantile_cutoffs))
+  stopifnot(is.logical(equal_variances_CLAN))
+  stopifnot(is.logical(HT))
+  stopifnot(is.numeric(significance_level))
+  stopifnot(is.numeric(min_variation) & min_variation > 0)
 
   if(is.null(Z_CLAN)) Z_CLAN <- Z # if no input provided, set it equal to Z
+
+  # render the learner an mlr3 environment
   learner <- get.learner_regr(make.mlr3.environment(learner, regr = TRUE))
 
 
@@ -262,7 +324,7 @@ GenericML_single_NoChecks <-
                 GATES          = gates.obj,
                 CLAN           = clan.obj,
                 proxy_CATE     = proxy_CATE.obj,
-                proxy_BCA = proxy_BCA.obj,
+                proxy_BCA      = proxy_BCA.obj,
                 best           = best.obj
     ))
 
@@ -270,14 +332,41 @@ GenericML_single_NoChecks <-
 
 
 
-#' Returns the two lambda parameters that are used to find the best ML method.
+#' Estimate the two lambda parameters
 #'
-#' @param BLP An instance of the class \code{BLP}.
-#' @param GATES An instance of the class \code{GATES}.
+#' Estimates the lambda parameters \eqn{\Lambda} and \eqn{\bar{\Lambda}} whose medians are used to find the best ML method.
+#'
+#' @param BLP An instance of \code{\link{BLP}}.
+#' @param GATES An instance of \code{\link{GATES}}.
 #' @param proxy_CATE Proxy estimates of the CATE.
-#' @param membership A logical matrix that indicates the group membership of each observation. Needs to be an instance of \code{\link{quantile_group}}.
+#' @param membership A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be of type \code{\link{quantile_group}}. Typically, the grouping is based on CATE estimates, which are for instance returned by \code{proxy_CATE}.
 #'
-#' @return A list containing the parameters \code{lambda} and \code{lambda.bar}.
+#' @return
+#' A list containing the estimates of \eqn{\Lambda} and \eqn{\bar{\Lambda}}, denoted \code{lambda} and \code{lambda.bar}, respectively.
+#'
+#' @references
+#' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
+#'
+#' @examples
+#' ## generate data
+#' set.seed(1)
+#' n  <- 200                                # number of observations
+#' p  <- 5                                  # number of covariates
+#' D  <- rbinom(n, 1, 0.5)                  # random treatment assignment
+#' Y  <- runif(n)                           # outcome variable
+#' propensity_scores <- rep(0.5, n)         # propensity scores
+#' proxy_BCA         <- runif(n)            # proxy BCA estimates
+#' proxy_CATE        <- runif(n)            # proxy CATE estimates
+#' membership <- quantile_group(proxy_CATE) # group membership
+#'
+#' ## perform BLP
+#' BLP <- BLP(Y, D, propensity_scores, proxy_BCA, proxy_CATE)
+#'
+#' ## perform GATES
+#' GATES <- GATES(Y, D, propensity_scores, proxy_BCA, proxy_CATE, membership)
+#'
+#' ## get estimates of the lambda parameters
+#' lambda_parameters(BLP, GATES, proxy_CATE, membership)
 #'
 #' @export
 lambda_parameters <- function(BLP,

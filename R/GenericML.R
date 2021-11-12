@@ -70,8 +70,23 @@
 #' ## specify learners
 #' learners <- c("elastic_net", "mlr3::lrn('ranger', num.trees = 30)")
 #'
+#' ## specify quantile cutoffs (the 4 quartile groups here)
+#' quantile_cutoffs <- c(0.25, 0.5, 0.75)
+#'
+#' ## specify the differenced generic targets of GATES and CLAN
+#' # use G4-G1, G4-G2, G4-G3 as differenced generic targets in GATES
+#' diff_GATES <- setup_diff(subtract_from = "most",
+#'                         subtracted = c(1,2,3))
+#' # use G1-G3, G1-G2 as differenced generic targets in CLAN
+#' diff_CLAN  <- setup_diff(subtract_from = "least",
+#'                          subtracted = c(3,2))
+#'
 #' ## perform generic ML inference
-#' GenericML(Z, D, Y, learners, num_splits = 10, parallel = FALSE)
+#' GenericML(Z, D, Y, learners, num_splits = 10,
+#'           quantile_cutoffs = quantile_cutoffs,
+#'           diff_GATES = diff_GATES,
+#'           diff_CLAN = diff_CLAN,
+#'           parallel = FALSE)
 #' }
 #'
 #' @export
@@ -116,6 +131,7 @@ GenericML <- function(Z, D, Y,
   stopifnot(is.numeric(significance_level))
   stopifnot(is.numeric(prop_main))
   stopifnot(is.numeric(min_variation) & min_variation > 0)
+  stopifnot(is.character(learners_GenericML))
 
 
   if(parallel & !TrueIfUnix()){

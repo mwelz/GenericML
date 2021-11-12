@@ -1,7 +1,33 @@
-#' prints information on an instance of \code{\link{GenericML}}.
+#' Print method for a \code{GenericML} object
+#'
+#' Prints key results of the analyses conducted in \code{\link{GenericML}}.
 #'
 #' @param x An instance of \code{\link{GenericML}}.
-#' @param ... additional arguments to be passed
+#' @param ... Additional arguments to be passed down.
+#'
+#' @examples
+#' if(require("glmnet")){
+#'
+#' ## generate data
+#' set.seed(1)
+#' n  <- 200                                  # number of observations
+#' p  <- 5                                    # number of covariates
+#' D  <- rbinom(n, 1, 0.5)                    # random treatment assignment
+#' Z  <- matrix(runif(n*p), n, p)             # design matrix
+#' Y0 <- as.numeric(Z %*% rexp(p) + rnorm(n)) # potential outcome without treatment
+#' Y1 <- 2 + Y0                               # potential outcome under treatment
+#' Y  <- ifelse(D == 1, Y1, Y0)               # observed outcome
+#'
+#' ## specify learners
+#' learners <- c("elastic_net")
+#'
+#' ## perform generic ML inference
+#' x <- GenericML(Z, D, Y, learners, num_splits = 10,
+#'                parallel = FALSE)
+#'
+#' ## print
+#' print(x)
+#' }
 #'
 #' @export
 print.GenericML <- function(x, ...){

@@ -132,13 +132,13 @@ get_clan.3d.ls <- function(num.learners, learners.names, num.generic_targets.cla
 
 #' Setup function for \code{diff} arguments
 #'
-#' Returns a list with two components, called \code{subtract_from} and \code{subtracted}. The first element (\code{subtract_from}) denotes what shall be the base group to subtract from in the generic targets of interest (GATES or CLAN); either \code{"most"} or \code{"least"}. The second element (\code{subtracted}) are the groups to be subtracted from \code{subtract_from}, which is a subset of \eqn{{1,2,...,K}}, where \eqn{K} equals the number of groups. The number of groups should be consistent with the number of groups induced by the argument \code{quantile_cutoffs}, which is the cardinality of \code{quantile_cutoffs}, plus one.
+#' This setup function controls how differences of generic target parameters are taken. Returns a list with two components, called \code{subtract_from} and \code{subtracted}. The first element (\code{subtract_from}) denotes what shall be the base group to subtract from in the generic targets of interest (GATES or CLAN); either \code{"most"} or \code{"least"}. The second element (\code{subtracted}) are the groups to be subtracted from \code{subtract_from}, which is a subset of \eqn{{1,2,...,K}}, where \eqn{K} equals the number of groups. The number of groups should be consistent with the number of groups induced by the argument \code{quantile_cutoffs}, which is the cardinality of \code{quantile_cutoffs}, plus one.
 #'
 #' @details
 #' The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}} and \code{\link{GenericML_single}} (arguments \code{diff_GATES}, \code{diff_CLAN}), as well as \code{\link{GATES}} and \code{\link{CLAN}} (argument \code{diff}).
 #'
 #' @param subtract_from String indicating the base group to subtract from, either \code{"most"} (default) or \code{"least"}. The most affected group corresponds to the \eqn{K}-th group in the paper (there are \eqn{K} groups). The least affected group corresponds to the first group.
-#' @param subtracted Vector indicating the groups to be subtracted from the group specified in \code{subtract_from}. If there are \eqn{K} group, \code{subtracted} should be a subset of \eqn{{1,2,...,K}}.
+#' @param subtracted Vector indicating the groups to be subtracted from the group specified in \code{subtract_from}. If there are \eqn{K} groups, \code{subtracted} should be a subset of \eqn{{1,2,...,K}}. Be careful to not specify a zero difference: If \code{subtract_from = "most"}, subtracting group K results in a zero difference. Same if \code{subtract_from = "least"} and we subtract group 1.
 #'
 #' @return
 #' An object of class \code{setup_diff}, consisting of the following components:
@@ -149,17 +149,17 @@ get_clan.3d.ls <- function(num.learners, learners.names, num.generic_targets.cla
 #' See the description above for details.
 #'
 #' @examples
-#' # Specify quantile cutoffs. There will be K=4 groups.
+#' ## specify quantile cutoffs (the 4 quartile groups here)
 #' quantile_cutoffs <- c(0.25, 0.5, 0.75)
 #'
-#' # Have group difference GK-G1 as generic targets in GATES and CLAN
-#' # Gx is the x-th group
+#' ## Use group difference GK-G1 as generic targets in GATES and CLAN
+#' ## Gx is the x-th group
 #' setup_diff(subtract_from = "most", subtracted = 1)
 #'
-#' # Have group differences GK-G1, GK-G2, GK-G3 as generic targets in GATES and CLAN
+#' ## Use GK-G1, GK-G2, GK-G3 as differenced generic targets
 #' setup_diff(subtract_from = "most", subtracted = c(1,2,3))
 #'
-#' # Have group differences G3-G1, G2-G1 as generic targets in GATES and CLAN
+#' ## Use G1-G2, G1-G3 as differenced generic targets
 #' setup_diff(subtract_from = "least", subtracted = c(3,2))
 #'
 #' @references

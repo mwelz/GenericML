@@ -1,28 +1,83 @@
-#' Makes plots for generic ML
+#' Plot method for a \code{GenericML} object
+#'
+#' Visualizes the estimates of the generic targets of interest: plots the point estimates as well as the corresponding confidence bounds. The generic targets of interest can be (subsets of) the parameters of the BLP, GATES, or CLAN analysis.
 #'
 #' @param x An instance of \code{\link{GenericML}}.
-#' @param learner The learner whose results are to be returned. Default is \code{"best"} for the best learner as measured by the lambda parameters.
-#' @param type The analysis to be plotted. Either \code{"GATES"}, \code{"BLP"}, or \code{"CLAN"}. Default is \code{"GATES"}.
-#' @param CLAN_variable Name of CLAN variable to be plotted. Only applicable if \code{type = "CLAN"}.
-#' @param groups Character vector for the groups to be plotted for GATES and CLAN. Default is \code{"all"} for all groups. If there are \eqn{K} groups, this variable is a subset of \code{c("G1", "G2",...,"GK", "GK-G1", "GK-G2",...)}, but this set depends on the choices of the arguments \code{"diff_GATES"} and \code{"diff_CLAN"} of the \code{\link{GenericML}} function that generated the instance \code{x}.
+#' @param type The analysis whose parameters shall be plotted. Either \code{"GATES"}, \code{"BLP"}, or \code{"CLAN"}. Default is \code{"GATES"}.
+#' @param learner The learner whose results are to be returned. Default is \code{"best"} for the best learner as measured by the \eqn{Lambda} parameters.
+#' @param CLAN_variable Name of the CLAN variable to be plotted. Only applicable if \code{type = "CLAN"}.
+#' @param groups Character vector indicating the per-group parameter estimates that shall be plotted in GATES and CLAN analyses. Default is \code{"all"} for all parameters. If there are \eqn{K} groups, this variable is a subset of \code{c("G1", "G2",...,"GK", "G1-G2", "G1-G2",..., "G1-GK", "GK-G1", "GK-G2",...)}, where Gk denotes the k-th group. Note that this set depends on the choices of the arguments \code{"diff_GATES"} and \code{"diff_CLAN"} of the \code{\link{GenericML}} object.
 #' @param limits The limits of the y-axis of the plot.
 #' @param title The title of the plot.
-#' @param ... Additional arguments.
+#' @param ... Additional arguments to be passed down.
+#'
+#' @return
+#' An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}).
+#'
+#' @seealso
+#' \code{\link{GenericML}},
+#' \code{\link{get_BLP}},
+#' \code{\link{get_GATES}},
+#' \code{\link{get_CLAN}},
+#' \code{\link{setup_diff}}
 #'
 #' @import ggplot2
 #'
+#' @examples
+#' if(require("glmnet")) {
+#'
+#' ## generate data
+#' set.seed(1)
+#' n  <- 200                                  # number of observations
+#' p  <- 5                                    # number of covariates
+#' D  <- rbinom(n, 1, 0.5)                    # random treatment assignment
+#' Z  <- matrix(runif(n*p), n, p)             # design matrix
+#' Y0 <- as.numeric(Z %*% rexp(p) + rnorm(n)) # potential outcome without treatment
+#' Y1 <- 2 + Y0                               # potential outcome under treatment
+#' Y  <- ifelse(D == 1, Y1, Y0)               # observed outcome
+#'
+#' ## name the columns of Z
+#' colnames(Z) <- paste0("V", 1:p)
+#'
+#' ## specify learners
+#' learners <- c("elastic_net")
+#'
+#' ## specify quantile cutoffs (the 4 quartile groups here)
+#' quantile_cutoffs <- c(0.25, 0.5, 0.75)
+#'
+#' ## specify the differenced generic targets of GATES and CLAN
+#' diff_GATES <- setup_diff(subtract_from = "most",
+#'                          subtracted = c(1,2,3))
+#' diff_CLAN  <- setup_diff(subtract_from = "least",
+#'                          subtracted = c(3,2))
+#'
+#' ## perform generic ML inference
+#' x <- GenericML(Z, D, Y, learners, num_splits = 10,
+#'                quantile_cutoffs = quantile_cutoffs,
+#'                diff_GATES = diff_GATES,
+#'                diff_CLAN = diff_CLAN,
+#'                parallel = FALSE)
+#'
+#' ## plot BLP parameters
+#' plot(x, type = "BLP")
+#'
+#' ## plot GATES parameters "G1", "G4", "G4-G1"
+#' plot(x, type = "GATES", groups = c("G1", "G4", "G4-G1"))
+#'
+#' ## plot CLAN parameters "G1", "G2", "G2-G1" of variable "V1":
+#' plot(x, type = "CLAN", CLAN_variable = "V1",
+#'      groups = c("G1", "G2", "G1-G3"))
+#' }
+#'
 #' @export
 plot.GenericML <- function(x,
-                           learner = "best",
                            type = "GATES",
+                           learner = "best",
                            CLAN_variable = NULL,
                            groups = "all",
                            limits = NULL,
                            title = NULL,
                            ...){
-
-  # for better readability
-  GenericML.obj <- x
 
   # specify the title
   if(is.null(title)){
@@ -39,7 +94,7 @@ plot.GenericML <- function(x,
   if(type == "CLAN"){
 
     if(is.null(CLAN_variable)) stop("No CLAN variable specified")
-    if(!CLAN_variable %in% names(GenericML.obj$VEIN$best_learners$CLAN)) stop("This variable was not used for CLAN.")
+    if(!CLAN_variable %in% names(x$VEIN$best_learners$CLAN)) stop("This variable was not used for CLAN.")
 
   } # IF
 
@@ -47,32 +102,32 @@ plot.GenericML <- function(x,
 
   if(learner == "best" & type != "CLAN"){
 
-    data <- GenericML.obj$VEIN$best_learners[[type]]
+    data <- x$VEIN$best_learners[[type]]
 
 
   } else if(learner == "best" & type == "CLAN"){
 
-    data <- GenericML.obj$VEIN$best_learners[[type]][[CLAN_variable]]
+    data <- x$VEIN$best_learners[[type]][[CLAN_variable]]
 
-  } else if(!(learner %in% GenericML.obj$arguments$learners_GenericML)){
+  } else if(!(learner %in% x$arguments$learners_GenericML)){
 
     stop("This learner is not used in the generic ML procedure.")
 
   } else if(learner != "best" & type == "CLAN" ){
 
-    data <- GenericML.obj$VEIN$all_learners[[type]][[learner]][[CLAN_variable]]
+    data <- x$VEIN$all_learners[[type]][[learner]][[CLAN_variable]]
 
   } else{
 
-    data <- GenericML.obj$VEIN$all_learners[[type]][[learner]]
+    data <- x$VEIN$all_learners[[type]][[learner]]
 
   } # IF
 
 
   if(learner == "best"){
-    data.blp <- GenericML.obj$VEIN$best_learners$BLP
+    data.blp <- x$VEIN$best_learners$BLP
   } else{
-    data.blp <- GenericML.obj$VEIN$all_learners$BLP[[learner]]
+    data.blp <- x$VEIN$all_learners$BLP[[learner]]
   } # IF
 
 
@@ -89,7 +144,7 @@ plot.GenericML <- function(x,
   } # IF
 
   # adjusted confidence level
-  confidence.level <- 1 - 2 * GenericML.obj$arguments$significance_level
+  confidence.level <- 1 - 2 * x$arguments$significance_level
 
 
   ## 1.1 make plot for GATES or CLAN ----

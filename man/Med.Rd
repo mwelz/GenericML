@@ -2,16 +2,25 @@
 % Please edit documentation in R/misc.R
 \name{Med}
 \alias{Med}
-\title{Find lower and upper median of a vector.}
+\title{Calculate lower and upper median}
 \usage{
 Med(x)
 }
 \arguments{
-\item{x}{A numeric vector whose medians we are interested in.}
+\item{x}{A numeric vector.}
 }
 \value{
-A list with the upper and lower median and the Med statistic.
+A list with the upper and lower median and the Med statistic (which is their mean).
 }
 \description{
-See Comment 4.2 in the paper.
+Calculates the lower and and median of a vector as proposed in Comment 4.2 in the paper.
+}
+\examples{
+set.seed(1)
+x <- runif(100)
+Med(x)
+
+}
+\references{
+Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 }

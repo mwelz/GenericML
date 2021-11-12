@@ -2,7 +2,7 @@
 % Please edit documentation in R/misc.R
 \name{GenericML_single}
 \alias{GenericML_single}
-\title{Performs generic ML for a given learning technique and a given split of the data.}
+\title{Single iteration of the GenericML algorithm}
 \usage{
 GenericML_single(
   Z,
@@ -27,29 +27,29 @@ GenericML_single(
 )
 }
 \arguments{
-\item{Z}{A matrix of the covariates.}
+\item{Z}{A numeric design matrix that holds the covariates in its columns.}
 
-\item{D}{A binary vector of treatment assignment.}
+\item{D}{A binary vector of treatment assignment. Value one denotes assignment to the treatment group and value zero assignment to the control group.}
 
-\item{Y}{The response vector.}
+\item{Y}{A numeric vector containing the response variable.}
 
-\item{learner}{A string specifying the machine learner to be used for estimating the BCA and CATE. Either \code{'elastic_net'}, \code{'random_forest'}, or \code{'tree'}. Can alternatively be specified by using \code{mlr3} syntax \emph{without} specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.}
+\item{learner}{A character specifying the machine learner to be used for estimating the baseline conditional average (BCA) and conditional average treatment effect (CATE). Either \code{'elastic_net'}, \code{'random_forest'}, \code{'tree'}, or a custom learner specified with \code{mlr3} syntax. In the latter case, do \emph{not} specify in the \code{mlr3} syntax specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 100)'} for a random forest learner with 100 trees. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.}
 
-\item{propensity_scores}{A numeric vector of propensity scores.}
+\item{propensity_scores}{A numeric vector of propensity score estimates.}
 
 \item{M_set}{a numerical vector of indices of observations in the main sample.}
 
 \item{A_set}{a numerical vector of indices of observations in the auxiliary sample. Default is complementary set to \code{M_set}.}
 
-\item{Z_CLAN}{A matrix of variables that shall be considered for the CLAN. Each column represents a variable for which CLAN shall be performed. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.}
+\item{Z_CLAN}{A numeric matrix holding variables on which classification analysis (CLAN) shall be performed. CLAN will be performed on each column of the matrix. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.}
 
-\item{HT}{Logical. If \code{TRUE}, a HT transformation is applied in the BLP and GATES regressions. Default is \code{FALSE}.}
+\item{HT}{Logical. If \code{TRUE}, a Horvitz-Thompson (HT) transformation is applied in the BLP and GATES regressions. Default is \code{FALSE}.}
 
-\item{quantile_cutoffs}{The cutoff points of quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.}
+\item{quantile_cutoffs}{The cutoff points of the quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.}
 
 \item{X1_BLP}{Specifies the design matrix \eqn{X_1} in the BLP regression. Must be an instance of \code{\link{setup_X1}}. See the documentation of \code{\link{setup_X1}} for details.}
 
-\item{X1_GATES}{Same as \code{X1_BLP}, just for the the GATES regression.}
+\item{X1_GATES}{Same as \code{X1_BLP}, just for the GATES regression.}
 
 \item{diff_GATES}{Specifies the generic targets of GATES. Must be an instance of \code{\link{setup_diff}}. See the documentation of \code{\link{setup_diff}} for details.}
 
@@ -59,15 +59,49 @@ GenericML_single(
 
 \item{vcov_GATES}{Same as \code{vcov_BLP}, just for the GATES regression.}
 
-\item{equal_variances_CLAN}{Logical. If \code{TRUE}, the the two within-group variances of the differences between the CLAN generic targets are assumed to be equal. Default is \code{FALSE}.}
+\item{equal_variances_CLAN}{Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.}
 
 \item{significance_level}{Significance level for VEIN. Default is 0.05.}
 
-\item{min_variation}{Minimum variation of the predictions before random noise with distribution \eqn{N(0, var(Y)/20)} is added. Default is \code{1e-05}.}
+\item{min_variation}{Specifies a threshold for the minimum variation of the BCA/CATE predictions. If the variation of a BCA/CATE prediction falls below this threshold, random noise with distribution \eqn{N(0, var(Y)/20)} is added to it. Default is \code{1e-05}.}
 }
 \value{
-a list with instances of the classes \code{BLP}, \code{GATES}, \code{CLAN}, \code{proxy_BCA}, and \code{proxy_CATE}. In addition, the lambda parameters for finding the best learner are returned.
+A list with the following components:
+\describe{
+\item{\code{BLP}}{An instance of \code{\link{BLP}}.}
+\item{\code{GATES}}{An instance of \code{\link{GATES}}.}
+\item{\code{CLAN}}{An instance of \code{\link{CLAN}}.}
+\item{\code{proxy_BCA}}{An instance of \code{\link{proxy_BCA}}.}
+\item{\code{proxy_CATE}}{An instance of \code{\link{proxy_CATE}}.}
+\item{\code{best}}{Estimates of the \eqn{\Lambda} parameters for finding the best learner. returned by \code{\link{lambda_parameters}}.}
+}
 }
 \description{
-Can be seen as a single iteration of Algorithm 1 in the paper.
+Performs generic ML inference for a single learning technique and a given split of the data. Can be seen as a single iteration of Algorithm 1 in the paper.
+}
+\examples{
+if(require("ranger")){
+## generate data
+set.seed(1)
+n  <- 200                        # number of observations
+p  <- 5                          # number of covariates
+Z  <- matrix(runif(n*p), n, p)   # design matrix
+D  <- rbinom(n, 1, 0.5)          # random treatment assignment
+Y  <- runif(n)                   # outcome variable
+propensity_scores <- rep(0.5, n) # propensity scores
+M_set <- sample(1:n, size = n/2) # main set
+
+## specify learner
+learner <- "mlr3::lrn('ranger', num.trees = 30)"
+
+## run single GenericML iteration
+GenericML_single(Z, D, Y, learner, propensity_scores, M_set)
+}
+
+}
+\references{
+Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
+}
+\seealso{
+\code{\link{GenericML}}
 }
