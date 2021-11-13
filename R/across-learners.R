@@ -11,7 +11,7 @@ generic.ml.across.learners <- function(Z, D, Y,
                                        vcov_BLP             = setup_vcov(),
                                        vcov_GATES           = setup_vcov(),
                                        equal_variances_CLAN = FALSE,
-                                       prop_main            = 0.5,
+                                       prop_aux             = 0.5,
                                        quantile_cutoffs     = c(0.25, 0.5, 0.75),
                                        diff_GATES           = setup_diff(),
                                        diff_CLAN            = setup_diff(),
@@ -39,7 +39,7 @@ generic.ml.across.learners <- function(Z, D, Y,
                       vcov_BLP                   = vcov_BLP,
                       vcov_GATES                 = vcov_GATES,
                       equal_variances_CLAN       = equal_variances_CLAN,
-                      prop_main                  = prop_main,
+                      prop_aux                   = prop_aux,
                       quantile_cutoffs           = quantile_cutoffs,
                       diff_GATES                 = diff_GATES,
                       diff_CLAN                  = diff_CLAN,
@@ -66,7 +66,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
                                               vcov_BLP             = setup_vcov(),
                                               vcov_GATES           = setup_vcov(),
                                               equal_variances_CLAN = FALSE,
-                                              prop_main            = 0.5,
+                                              prop_aux             = 0.5,
                                               quantile_cutoffs     = c(0.25, 0.5, 0.75),
                                               diff_GATES           = setup_diff(),
                                               diff_CLAN            = setup_diff(),
@@ -101,8 +101,8 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
   num.vars.in.Z_CLAN <- ncol(Z_CLAN)
   genericML.by.split <- list()
   N     <- length(Y)
-  N.set <- 1:N
-  prop  <- floor(prop_main * N)
+  N_set <- 1:N
+  prop  <- floor(prop_aux * N)
 
   # set variable names fo CLAN
   if(is.null(colnames(Z_CLAN))) colnames(Z_CLAN) <- paste0("V", 1:num.vars.in.Z_CLAN)
@@ -122,9 +122,9 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
   for(s in 1:num_splits){
 
     # perform sample splitting into main set and auxiliary set
-    M_set <- sort(sample(x = N.set, size = prop, replace = FALSE),
-                  decreasing = FALSE)
-    A_set <- setdiff(N.set, M_set)
+    split.ls <- sample_split(D = D, N = N, N_set = N_set, prop = prop)
+    M_set    <- split.ls$M_set
+    A_set    <- split.ls$A_set
 
     if(store_splits){
 
@@ -196,7 +196,7 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
                                               vcov_BLP             = setup_vcov(),
                                               vcov_GATES           = setup_vcov(),
                                               equal_variances_CLAN = FALSE,
-                                              prop_main            = 0.5,
+                                              prop_aux             = 0.5,
                                               quantile_cutoffs     = c(0.25, 0.5, 0.75),
                                               diff_GATES           = setup_diff(),
                                               diff_CLAN            = setup_diff(),
@@ -232,9 +232,9 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
   num.generic_targets.gates <- K + length(diff_GATES$subtracted)
   num.generic_targets.clan <- K + length(diff_CLAN$subtracted)
   N     <- length(Y)
-  N.set <- 1:N
+  N_set <- 1:N
   num.learners <- length(learners)
-  prop <- floor(prop_main * N)
+  prop <- floor(prop_aux * N)
 
   # set variable names fo CLAN
   if(is.null(colnames(Z_CLAN))) colnames(Z_CLAN) <- paste0("V", 1:num.vars.in.Z_CLAN)
@@ -258,9 +258,9 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
 
 
     # perform sample splitting into main set and auxiliary set
-    M_set <- sort(sample(x = N.set, size = prop, replace = FALSE),
-                  decreasing = FALSE)
-    A_set <- setdiff(N.set, M_set)
+    split.ls <- sample_split(D = D, N = N, N_set = N_set, prop = prop)
+    M_set    <- split.ls$M_set
+    A_set    <- split.ls$A_set
 
     if(store_splits){
 

@@ -128,7 +128,7 @@ propensity_score_mlr3 <- function(Z, D, learner = "random_forest"){
 
 #' Baseline Conditional Average
 #'
-#' Proxy estimation of the Baseline Conditional Average (BCA), defined by \eqn{E[Y | D=0, Z]}. Estimation is done on the auxiliary sample, while BCA predictions are made for all observations.
+#' Proxy estimation of the Baseline Conditional Average (BCA), defined by \eqn{E[Y | D=0, Z]}. Estimation is done on the auxiliary sample, but BCA predictions are made for all observations.
 #'
 #' @param Z A numeric design matrix that holds the covariates in its columns.
 #' @param D A binary vector of treatment assignment. Value one denotes assignment to the treatment group and value zero assignment to the control group.
@@ -238,7 +238,7 @@ proxy_BCA_NoChecks <- function(Z, D, Y,
 
 #' Conditional Average Treatment Effect
 #'
-#' Proxy estimation of the Conditional Average Treatment Effect (CATE), defined by \eqn{E[Y | D=1, Z] - E[Y | D=0, Z]}. Estimation is done on the auxiliary sample, while CATE predictions are made for all observations.
+#' Proxy estimation of the Conditional Average Treatment Effect (CATE), defined by \eqn{E[Y | D=1, Z] - E[Y | D=0, Z]}. Estimation is done on the auxiliary sample, but CATE predictions are made for all observations.
 #'
 #' @param Z A numeric design matrix that holds the covariates in its columns.
 #' @param D A binary vector of treatment assignment. Value one denotes assignment to the treatment group and value zero assignment to the control group.
