@@ -29,7 +29,7 @@ An object of class \code{proxy_CATE}, consisting of the following components:
 }
 }
 \description{
-Proxy estimation of the Conditional Average Treatment Effect (CATE), defined by \eqn{E[Y | D=1, Z] - E[Y | D=0, Z]}. Estimation is done on the auxiliary sample, while CATE predictions are made for all observations.
+Proxy estimation of the Conditional Average Treatment Effect (CATE), defined by \eqn{E[Y | D=1, Z] - E[Y | D=0, Z]}. Estimation is done on the auxiliary sample, but CATE predictions are made for all observations.
 }
 \examples{
 if(require("ranger")){

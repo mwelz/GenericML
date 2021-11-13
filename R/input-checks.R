@@ -31,9 +31,9 @@ InputChecks_equal.length2 <- function(x, y){
 InputChecks_D <- function(D){
 
   # input checks
+  if(any(is.na(D))) stop("D contains missing values", call. = FALSE)
   if(!(is.numeric(D) & is.vector(D))) stop("D must be a numeric vector", call. = FALSE)
   if((!all(c(0, 1) %in% unique(D))) | (length(unique(D)) != 2)) stop("Treatment assignment D is not binary", call. = FALSE)
-  if(any(is.na(D))) stop("D contains missing values", call. = FALSE)
 
 } # FUN
 
@@ -41,8 +41,8 @@ InputChecks_D <- function(D){
 InputChecks_Y <- function(Y){
 
   # input checks
-  if(!(is.numeric(Y) & is.vector(Y))) stop("Y must be a numeric vector", call. = FALSE)
   if(any(is.na(Y))) stop("Y contains missing values", call. = FALSE)
+  if(!(is.numeric(Y) & is.vector(Y))) stop("Y must be a numeric vector", call. = FALSE)
 
 } # FUN
 
@@ -50,8 +50,8 @@ InputChecks_Y <- function(Y){
 InputChecks_Z <- function(Z){
 
   # input checks
-  if(!(is.numeric(Z) & is.matrix(Z))) stop("Z must be a numeric matrix. Did you supply a data frame?", call. = FALSE)
   if(any(is.na(Z))) stop("Z contains missing values", call. = FALSE)
+  if(!(is.numeric(Z) & is.matrix(Z))) stop("Z must be a numeric matrix. Did you supply a data frame?", call. = FALSE)
 
 } # FUN
 
@@ -61,8 +61,8 @@ InputChecks_Z_CLAN <- function(Z_CLAN){
   if(!is.null(Z_CLAN)){
 
     # input checks
-    if(!(is.numeric(Z_CLAN) & is.matrix(Z_CLAN))) stop("Z_CLAN must be a numeric matrix. Did you supply a data frame?", call. = FALSE)
     if(any(is.na(Z_CLAN))) stop("Z_CLAN contains missing values", call. = FALSE)
+    if(!(is.numeric(Z_CLAN) & is.matrix(Z_CLAN))) stop("Z_CLAN must be a numeric matrix or NULL. Did you supply a data frame?", call. = FALSE)
 
   } # IF
 

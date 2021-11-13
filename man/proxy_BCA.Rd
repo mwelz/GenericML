@@ -27,7 +27,7 @@ An object of class \code{proxy_BCA}, consisting of the following components:
 }
 }
 \description{
-Proxy estimation of the Baseline Conditional Average (BCA), defined by \eqn{E[Y | D=0, Z]}. Estimation is done on the auxiliary sample, while BCA predictions are made for all observations.
+Proxy estimation of the Baseline Conditional Average (BCA), defined by \eqn{E[Y | D=0, Z]}. Estimation is done on the auxiliary sample, but BCA predictions are made for all observations.
 }
 \examples{
 if(require("ranger")){

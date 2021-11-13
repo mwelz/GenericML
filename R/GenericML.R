@@ -134,6 +134,13 @@ GenericML <- function(Z, D, Y,
   stopifnot(is.numeric(min_variation) & min_variation > 0)
   stopifnot(is.character(learners_GenericML))
 
+  # if no input provided, set Z_CLAN equal to Z
+  if(is.null(Z_CLAN)) Z_CLAN <- Z
+  InputChecks_equal.length2(Z, Z_CLAN)
+
+  # set variable names for CLAN
+  if(is.null(colnames(Z_CLAN))) colnames(Z_CLAN) <- paste0("V", 1:ncol(Z_CLAN))
+
 
   if(parallel & !TrueIfUnix()){
     message("Parallelization is currently only supported on Unix systems (you are using Windows). Therefore, no parallelization will be employed", call. = FALSE)

@@ -21,7 +21,7 @@ GenericML(
   vcov_BLP = setup_vcov(),
   vcov_GATES = setup_vcov(),
   equal_variances_CLAN = FALSE,
-  prop_main = 0.5,
+  prop_aux = 0.5,
   significance_level = 0.05,
   min_variation = 1e-05,
   parallel = TrueIfUnix(),
@@ -64,7 +64,7 @@ GenericML(
 
 \item{equal_variances_CLAN}{Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.}
 
-\item{prop_main}{Proportion of samples that shall be in main set. Default is 0.5.}
+\item{prop_aux}{Proportion of samples that shall be in the auxiliary set. Default is 0.5. The number of samples in the auxiliary set will be equal to \code{floor(prop_aux * length(Y))}. If the data set is large, you can save computing time by choosing \code{prop_aux} to be smaller than 0.5.}
 
 \item{significance_level}{Significance level for VEIN. Default is 0.05.}
 

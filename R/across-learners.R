@@ -4,7 +4,7 @@ generic.ml.across.learners <- function(Z, D, Y,
                                        learners, # need to be mlr3 objects!
                                        learners.names,
                                        num_splits           = 100,
-                                       Z_CLAN               = NULL,
+                                       Z_CLAN               = Z,
                                        X1_BLP               = setup_X1(),
                                        X1_GATES             = setup_X1(),
                                        HT                   = FALSE,
@@ -59,7 +59,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
                                               learners, # need to be mlr3 objects!
                                               learners.names,
                                               num_splits           = 100,
-                                              Z_CLAN               = NULL,
+                                              Z_CLAN               = Z,
                                               X1_BLP               = setup_X1(),
                                               X1_GATES             = setup_X1(),
                                               HT                   = FALSE,
@@ -77,9 +77,6 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
                                               store_learners       = FALSE,
                                               store_splits         = FALSE){
 
-
-  # if no input provided, set Z_CLAN it equal to Z
-  if(is.null(Z_CLAN)) Z_CLAN <- Z
 
   # set seed
   if(is.null(seed)){
@@ -104,8 +101,6 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
   N_set <- 1:N
   prop  <- floor(prop_aux * N)
 
-  # set variable names fo CLAN
-  if(is.null(colnames(Z_CLAN))) colnames(Z_CLAN) <- paste0("V", 1:num.vars.in.Z_CLAN)
 
   # initialize
   if(store_splits) splits.mat <- matrix(NA_character_, N, num_splits,
@@ -189,7 +184,7 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
                                               learners, # need to be mlr3 objects!
                                               learners.names,
                                               num_splits           = 100,
-                                              Z_CLAN               = NULL,
+                                              Z_CLAN               = Z,
                                               X1_BLP               = setup_X1(),
                                               X1_GATES             = setup_X1(),
                                               HT                   = FALSE,
@@ -207,8 +202,6 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
                                               store_learners       = FALSE,
                                               store_splits         = FALSE){
 
-  # if no input provided, set Z_CLAN it equal to Z
-  if(is.null(Z_CLAN)) Z_CLAN <- Z
 
   # set seed
   if(is.null(seed)){
@@ -235,9 +228,6 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
   N_set <- 1:N
   num.learners <- length(learners)
   prop <- floor(prop_aux * N)
-
-  # set variable names fo CLAN
-  if(is.null(colnames(Z_CLAN))) colnames(Z_CLAN) <- paste0("V", 1:num.vars.in.Z_CLAN)
 
 
   # loop over the sample splits
