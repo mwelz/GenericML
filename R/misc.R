@@ -267,12 +267,17 @@ GenericML_single_NoChecks <-
     proxy_CATE_M <- proxy_CATE.obj$estimates$CATE[M_set]
 
     # restrict the X1_controls to M_set
-    X1_BLP_M   <- setup_X1(funs_Z        = X1_BLP$funs_Z,
-                           covariates    = X1_BLP$covariates[M_set,,drop = FALSE],
-                           fixed_effects = X1_BLP$fixed_effects[M_set])
-    X1_GATES_M <- setup_X1(funs_Z        = X1_GATES$funs_Z,
-                           covariates    = X1_GATES$covariates[M_set,,drop = FALSE],
-                           fixed_effects = X1_GATES$fixed_effects[M_set])
+    X1_BLP_M   <-
+      setup_X1_NoChecks(
+       funs_Z        = X1_BLP$funs_Z,
+       covariates    = X1_BLP$covariates[M_set,,drop = FALSE],
+       fixed_effects = X1_BLP$fixed_effects[M_set])
+
+    X1_GATES_M <-
+      setup_X1_NoChecks(
+        funs_Z        = X1_GATES$funs_Z,
+        covariates    = X1_GATES$covariates[M_set,,drop = FALSE],
+        fixed_effects = X1_GATES$fixed_effects[M_set])
 
 
     ### step 1b: estimate BLP parameters ----

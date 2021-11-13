@@ -80,59 +80,24 @@ InputChecks_X1 <- function(X1_control, num.obs){
   } # IF
 
 
-  if(!(is.matrix(X1_control$covariates) | is.null(X1_control$covariates))){
-    stop(paste0(deparse(substitute(X1_control)), "$covariates must be either NULL or a numeric matrix. Did you supply a data frame?"), call. = FALSE)
-  } # IF
-
-
   if(!is.null(X1_control$covariates)){
-    if(!is.numeric(X1_control$covariates)) stop(paste0(deparse(substitute(X1_control)), "$covariates must be a numeric matrix or NULL"), call. = FALSE)
 
-    if(is.matrix(X1_control$covariates)){
-
-      if(nrow(X1_control$covariates) != num.obs){
-        stop(paste0(deparse(substitute(X1_control)), "$covariates must be NULL or a matrix with the number of rows equal to the length of Y"), call. = FALSE)
-      } # IF
-
+    if(nrow(X1_control$covariates) != num.obs){
+      stop(paste0(deparse(substitute(X1_control)),
+                  "$covariates must have the same number of rows as Z"),
+           call. = FALSE)
     } # IF
-
-  } # IF
-
-
-  if(!(is.vector(X1_control$fixed_effects) | is.null(X1_control$fixed_effects))){
-    stop(paste0(deparse(substitute(X1_control)), "$fixed_effects must be either NULL or a numeric vector"), call. = FALSE)
-  } # IF
+  } # IF !NULL
 
 
-  if(is.vector(X1_control$fixed_effects)){
+  if(!is.null(X1_control$fixed_effects)){
 
-    if(!is.numeric(X1_control$fixed_effects)){
-      stop(paste0(deparse(substitute(X1_control)), "$fixed_effects must be numeric"), call. = FALSE)
-    } else{
-
-      if(length(X1_control$fixed_effects) != num.obs){
-        stop(paste0(deparse(substitute(X1_control)), "$fixed_effects must be NULL or of the same length as Y"),
-             call. = FALSE)
-      } # IF
-
-    }# IF
-  } # IF
-
-
-  legalinput <- X1_control$funs_Z %in% c("S", "B", "p")
-
-  if(!all(legalinput)){
-
-    stop(paste0("Entries '",
-                paste(X1_control$funs_Z[!legalinput], collapse = "', '"),
-                "' of ", deparse(substitute(X1_control)),
-                "$funs_Z are not contained in c('S', 'B', 'p')!"), call. = FALSE)
-
-  } # IF
-
-  if(!is.null(X1_control$fixed_effects) & !is.vector(X1_control$fixed_effects)){
-    stop("The fixed effects need to be a vector", call. = FALSE)
-  } # IF
+    if(nrow(X1_control$fixed_effects) != num.obs){
+      stop(paste0(deparse(substitute(X1_control)),
+                  "$fixed_effects must have the same length as Y"),
+           call. = FALSE)
+    } # IF
+  } # IF !NULL
 
 } # FUN
 
@@ -143,12 +108,6 @@ InputChecks_vcov.control <- function(vcov_control){
   if(class(vcov_control) != "setup_vcov"){
     stop(paste0(deparse(substitute(vcov_control))),
                 " must be an instance of setup_vcov()", call. = FALSE)
-  } # IF
-
-
-  if(!vcov_control$estimator %in% c("vcovBS", "vcovCL", "vcovHAC", "vcovHC")){
-    stop(paste0("The element ", deparse(substitute(vcov_control))), "$estimator",
-         " needs to be in c('vcovBS', 'vcovCL', 'vcovHAC', 'vcovHC')", call. = FALSE)
   } # IF
 
 } # FUN
@@ -181,11 +140,11 @@ InputChecks_group.membership <- function(group.membership){
 
   if(is.null(attr(group.membership, which = "type"))) stop(paste0("The object ",
                                                                   deparse(substitute(group.membership)),
-                                                                  " needs to be returned by quantile_group()"))
+                                                                  " must be returned by quantile_group()"))
 
   if(attr(group.membership, which = "type") != "quantile_group") stop(paste0("The object ",
                                                                              deparse(substitute(group.membership)),
-                                                                             " needs to be returned by quantile_group()"))
+                                                                             " must be returned by quantile_group()"))
 
 
 } # FUN
@@ -214,6 +173,17 @@ InputChecks_proxy.estimators <- function(proxy.estimators, baseline = TRUE){
   }
 
 } # FUN
+
+
+InputChecks_num_splits <- function(num_splits){
+  stopifnot(length(num_splits) == 1)
+  stopifnot(num_splits %% 1 == 0)
+  if(num_splits < 2){
+    stop(paste0("num_splits must be equal to at least 2. If you want to run GenericML() for ",
+                "a single split, please use the function GenericML_single()."), call. = FALSE)
+  }
+} # FUN
+
 
 
 # checks if learner is correctly specified. If yes, that learner is returned

@@ -147,6 +147,9 @@ genML <- GenericML(Z = Z, D = D, Y = Y,
                    store_learners = store_learners)
 
 ### 4. Analyze the output ----
+# print
+genML
+
 # the line below returns the medians of the estimated  \Lambda and \bar{\Lambda}
 genML$best$overview
 

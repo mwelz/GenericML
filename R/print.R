@@ -54,5 +54,6 @@ print.GenericML <- function(x, ...){
       " (lambda of ", round(max(x$best$overview[,"lambda"]), 3), ")\n",
       "The best learner for the GATES and CLAN is ", x$best$GATES,
       " (lambda.bar of ", round(max(x$best$overview[,"lambda.bar"]), 3), ")", sep = "")
+  cat("\n")
 
 } # FUN

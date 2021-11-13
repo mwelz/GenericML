@@ -125,14 +125,19 @@ GenericML <- function(Z, D, Y,
   InputChecks_vcov.control(vcov_GATES)
   InputChecks_diff(diff_GATES, K = length(quantile_cutoffs) + 1)
   InputChecks_diff(diff_CLAN, K = length(quantile_cutoffs) + 1)
+  InputChecks_num_splits(num_splits)
   stopifnot(is.numeric(quantile_cutoffs))
+  stopifnot(0 < min(quantile_cutoffs) & max(quantile_cutoffs) < 1)
+  stopifnot(is.logical(HT))
   stopifnot(is.logical(equal_variances_CLAN))
   stopifnot(is.logical(HT))
-  stopifnot(is.numeric(significance_level))
+  stopifnot(is.numeric(significance_level) & length(significance_level) == 1)
+  stopifnot(0.0 < significance_level & significance_level < 0.5)
   stopifnot(is.numeric(prop_aux) & length(prop_aux) == 1)
   stopifnot(0.0 < prop_aux & prop_aux < 1.0)
   stopifnot(is.numeric(min_variation) & min_variation > 0)
   stopifnot(is.character(learners_GenericML))
+  stopifnot(is.character(learner_propensity_score) | is.numeric(learner_propensity_score))
 
   # if no input provided, set Z_CLAN equal to Z
   if(is.null(Z_CLAN)) Z_CLAN <- Z
@@ -169,11 +174,14 @@ GenericML <- function(Z, D, Y,
   } else{
 
     ## estimate propensity scores
+    stopifnot(is.character(learner_propensity_score))
+    stopifnot(length(learner_propensity_score) == 1)
+
     propensity_scores.obj <-
       propensity_score_NoChecks(
         Z = Z, D = D, estimator = learner_propensity_score)
 
-    propensity_scores     <- propensity_scores.obj$estimates
+    propensity_scores <- propensity_scores.obj$estimates
 
   } # IF
 
@@ -186,7 +194,8 @@ GenericML <- function(Z, D, Y,
                    "The theory of the paper ",
                    "is only valid for randomized experiments. Are ",
                    "you sure your data is from a randomomized experiment ",
-                   "and the estimator of the scores has been chosen appropriately?"))
+                   "and the estimator of the scores has been chosen appropriately?"),
+            call. = FALSE)
   } # IF
 
 

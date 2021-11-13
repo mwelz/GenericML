@@ -240,9 +240,17 @@ setup_diff <- function(subtract_from = "most",
 setup_vcov <- function(estimator = "vcovHC",
                        arguments = list(type = "const")){
 
+  # input checks
   stopifnot(is.character(estimator))
   stopifnot(is.list(arguments))
 
+  if(!estimator %in% c("vcovBS", "vcovCL", "vcovHAC", "vcovHC")){
+    stop(paste0("'estimator' needs to be in ",
+         "c('vcovBS', 'vcovCL', 'vcovHAC', 'vcovHC')"), call. = FALSE)
+  } # IF
+
+
+  # return
   structure(
     list(estimator = estimator,
          arguments = arguments),
@@ -303,6 +311,61 @@ setup_vcov <- function(estimator = "vcovHC",
 setup_X1 <- function(funs_Z = c("B"),
                      covariates = NULL,
                      fixed_effects = NULL){
+
+  # input checks
+  legalinput <- funs_Z %in% c("S", "B", "p")
+
+  if(!all(legalinput)){
+
+    stop(paste0("Entries '",
+                paste(funs_Z[!legalinput], collapse = "', '"),
+                "' of ",
+                "funs_Z are not contained in c('S', 'B', 'p').",
+                " The entries must be a subset of this vector."), call. = FALSE)
+
+  } # IF
+
+
+  if(!is.null(covariates)){
+
+    if(!(is.numeric(covariates) & is.matrix(covariates))){
+      stop("If supplied, 'covariates' must be a numeric matrix. Did you supply a data frame?",
+           call. = FALSE)
+    } # IF
+
+    if(any(is.na(covariates))) stop("'covariates' contains missing values", call. = FALSE)
+
+  } # IF !NULL
+
+
+  if(!is.null(fixed_effects)){
+
+    if(!(is.numeric(fixed_effects) & is.matrix(fixed_effects))){
+      stop("If supplied, 'fixed_effects' must be a numeric matrix. Did you supply a data frame?",
+           call. = FALSE)
+    } # IF
+
+    if(any(fixed_effects %% 1 != 0)){
+      stop("All elements in the vector 'fixed_effects' must be integer-valued",
+           call. = FALSE)
+    } # IF
+
+
+  } # IF !NULL
+
+
+  # return
+  setup_X1_NoChecks(funs_Z = funs_Z,
+                    covariates = covariates,
+                    fixed_effects = fixed_effects)
+
+} # FUN
+
+
+# same as above, just without input checks
+setup_X1_NoChecks <- function(funs_Z = c("B"),
+                              covariates = NULL,
+                              fixed_effects = NULL){
 
   if(is.null(fixed_effects)){
     temp <- NULL
