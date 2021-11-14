@@ -340,8 +340,8 @@ setup_X1 <- function(funs_Z = c("B"),
 
   if(!is.null(fixed_effects)){
 
-    if(!(is.numeric(fixed_effects) & is.matrix(fixed_effects))){
-      stop("If supplied, 'fixed_effects' must be a numeric matrix. Did you supply a data frame?",
+    if(!(is.numeric(fixed_effects) & is.vector(fixed_effects))){
+      stop("If supplied, 'fixed_effects' must be a numeric vector",
            call. = FALSE)
     } # IF
 
