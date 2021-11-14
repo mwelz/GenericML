@@ -297,7 +297,7 @@ proxy_CATE <- function(Z, D, Y,
   stopifnot(is.numeric(min_variation) & min_variation > 0)
 
   if(!is.null(proxy_BCA)){
-    stopifnot(is.numeric(proxy_BCA))
+    stopifnot(is.numeric(proxy_BCA) & is.vector(proxy_BCA))
     InputChecks_equal.length2(proxy_BCA, Y)
   } # IF
 

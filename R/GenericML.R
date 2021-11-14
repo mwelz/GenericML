@@ -144,6 +144,12 @@ GenericML <- function(Z, D, Y,
 
   # set variable names for CLAN
   if(is.null(colnames(Z_CLAN))) colnames(Z_CLAN) <- paste0("V", 1:ncol(Z_CLAN))
+  if(any(colnames(Z_CLAN) == "")){
+
+    idx <- which(colnames(Z_CLAN) == "")
+    colnames(Z_CLAN)[idx] <- paste0("V", idx)
+
+  } # IF
 
 
   if(parallel & !TrueIfUnix()){
@@ -167,7 +173,8 @@ GenericML <- function(Z, D, Y,
     # input checks
     InputChecks_equal.length2(propensity_scores, Y)
     if(any(propensity_scores <= 0 | propensity_scores >= 1)){
-      stop("User-supplied propensity scores in must be contained in the open interval (0,1)")
+      stop("User-supplied propensity scores must be contained in the open interval (0,1)",
+           call. = FALSE)
     }
 
   } else{

@@ -229,17 +229,17 @@ InputChecks_propensity_scores <- function(propensity_scores){
             call. = FALSE)
   } # IF
 
-  if(any(propensity_scores > 0.99)){
+  if(any(propensity_scores > 0.95)){
 
-    stop(paste0("Some estimated propensity scores are higher than 0.99, ",
+    stop(paste0("Some estimated propensity scores are higher than 0.95, ",
                 " which is not sufficiently bounded away from one.",
                 " Are you sure your data is from a randomomized experiment ",
                 "and the estimator of the scores has been chosen appropriately?"))
   } # IF
 
-  if(any(propensity_scores < 0.01)){
+  if(any(propensity_scores < 0.05)){
 
-    stop(paste0("Some estimated propensity scores are lower than 0.01, ",
+    stop(paste0("Some estimated propensity scores are lower than 0.05, ",
                 " which is not sufficiently bounded away from zero.",
                 " Are you sure your data is from a randomomized experiment ",
                 "and the estimator of the scores has been chosen appropriately?"))
@@ -250,7 +250,7 @@ InputChecks_propensity_scores <- function(propensity_scores){
 
 InputChecks_index_set <- function(set, num_obs){
 
-  stopifnot(is.numeric(set))
+  stopifnot(is.numeric(set) & is.vector(set))
 
   if(any(set %% 1 != 0)){
     stop("The indices in the index set must be index-valued")

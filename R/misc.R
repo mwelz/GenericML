@@ -223,6 +223,12 @@ GenericML_single <- function(Z, D, Y,
 
   # set variable names for CLAN
   if(is.null(colnames(Z_CLAN))) colnames(Z_CLAN) <- paste0("V", 1:ncol(Z_CLAN))
+  if(any(colnames(Z_CLAN) == "")){
+
+    idx <- which(colnames(Z_CLAN) == "")
+    colnames(Z_CLAN)[idx] <- paste0("V", idx)
+
+  } # IF
 
   # render the learner an mlr3 environment
   learner <- get.learner_regr(make.mlr3.environment(learner, regr = TRUE))
