@@ -7,7 +7,7 @@ repository*. URL: https://github.com/mwelz/GenericML.
 
 
 ## Summary
-Highly parallelized and customizable, object-oriented  `R` implementation of [Generic Machine Learning (Chernozhukov, V., Demirer, M., Duflo, E., &amp; Fernández-Val, I., 2020)](https://arxiv.org/abs/1712.04802), using the [`mlr3`](https://github.com/mlr-org/mlr3) framework. We intend to extend this implementation to a fully-fledged `R` package for the CRAN. Please note that this implementation is still work in progress and has not yet been thoroughly tested, so we cannot yet guarantee correctness or stability. 
+Highly customizable and parallelized, object-oriented  `R` implementation of [Generic Machine Learning (Chernozhukov, V., Demirer, M., Duflo, E., &amp; Fernández-Val, I., 2020)](https://arxiv.org/abs/1712.04802), using the [`mlr3`](https://github.com/mlr-org/mlr3) framework. We intend to extend this implementation to a fully-fledged `R` package for the CRAN. Please note that this implementation is still work in progress and has not yet been thoroughly tested, so we cannot yet guarantee correctness or stability. 
 
 ## Installation
 To install the latest (possibly unstable) development version from GitHub, you can pull this repository and install it from the `R` command line via

@@ -64,11 +64,14 @@ BLP <- function(Y, D,
   InputChecks_equal.length2(proxy_BCA, Y)
   InputChecks_vcov.control(vcov_control)
   InputChecks_X1(X1_control, length(Y))
-  stopifnot(is.numeric(propensity_scores))
   stopifnot(is.numeric(proxy_BCA))
   stopifnot(is.numeric(proxy_CATE))
   stopifnot(is.logical(HT))
-  stopifnot(is.numeric(significance_level))
+  stopifnot(is.numeric(significance_level) & length(significance_level) == 1)
+  stopifnot(0.0 < significance_level & significance_level < 0.5)
+  stopifnot(is.numeric(propensity_scores))
+  InputChecks_equal.length2(Y, propensity_scores)
+  InputChecks_propensity_scores(propensity_scores)
 
   # fit model according to strategy 1 or 2 in the paper
   BLP_NoChecks(D = D, Y = Y,

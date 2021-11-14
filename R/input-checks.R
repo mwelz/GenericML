@@ -215,6 +215,62 @@ get.learner_regr <- function(learner){
 } # FUN
 
 
+InputChecks_propensity_scores <- function(propensity_scores){
+
+  # check if data is from a randomized experiment
+  if(any(propensity_scores > 0.65 | propensity_scores < 0.35)){
+    warning(paste0("Some propensity scores are outside the ",
+                   "interval [0.35, 0.65]. In a randomized experiment, we would ",
+                   "expect all propensity scores to be equal to roughly 0.5. ",
+                   "The theory of the paper ",
+                   "is only valid for randomized experiments. Are ",
+                   "you sure your data is from a randomomized experiment ",
+                   "and the estimator of the scores has been chosen appropriately?"),
+            call. = FALSE)
+  } # IF
+
+  if(any(propensity_scores > 0.99)){
+
+    stop(paste0("Some estimated propensity scores are higher than 0.99, ",
+                " which is not sufficiently bounded away from one.",
+                " Are you sure your data is from a randomomized experiment ",
+                "and the estimator of the scores has been chosen appropriately?"))
+  } # IF
+
+  if(any(propensity_scores < 0.01)){
+
+    stop(paste0("Some estimated propensity scores are lower than 0.01, ",
+                " which is not sufficiently bounded away from zero.",
+                " Are you sure your data is from a randomomized experiment ",
+                "and the estimator of the scores has been chosen appropriately?"))
+  } # IF
+
+} # FUN
+
+
+InputChecks_index_set <- function(set, num_obs){
+
+  stopifnot(is.numeric(set))
+
+  if(any(set %% 1 != 0)){
+    stop("The indices in the index set must be index-valued")
+  }
+
+  if(min(set) < 0){
+    stop("The indices in the index set must be strictly positive")
+  }
+
+  if(max(set) > num_obs){
+    stop("The largest index in the index set cannot be larger than the number of observations")
+  }
+
+  if(any(duplicated(set))){
+    stop("All indices in the index set must be unique")
+  }
+
+} # FUN
+
+
 #' A function that returns \code{TRUE} if your OS is a Unix system and \code{FALSE} otherwise.
 #'
 #' @export

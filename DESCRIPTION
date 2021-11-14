@@ -39,6 +39,9 @@ Imports:
     stats,
     parallel
 Suggests: 
-    glmnet, 
+    glmnet,
     ranger,
-    e1071
+    rpart,
+    e1071,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

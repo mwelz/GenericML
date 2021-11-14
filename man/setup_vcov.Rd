@@ -7,9 +7,9 @@
 setup_vcov(estimator = "vcovHC", arguments = list(type = "const"))
 }
 \arguments{
-\item{estimator}{String specifying a covariance matrix estimator in the \href{https://cran.r-project.org/web/packages/sandwich/}{sandwich}. Default is \code{"vcovHC"}. Recommended estimators are \code{"vcovBS"}, \code{"vcovCL"}, \code{"vcovHAC"}, and \code{"vcovHC"}.}
+\item{estimator}{Character specifying a covariance matrix estimator in the \href{https://cran.r-project.org/web/packages/sandwich/}{sandwich} package. Default is \code{"vcovHC"}. Supported estimators are \code{"vcovBS"}, \code{"vcovCL"}, \code{"vcovHAC"}, and \code{"vcovHC"}.}
 
-\item{arguments}{A list of arguments that are to be passed to the function in the sandwich package that is specified in \code{estimator}. Default is \code{list(type = "const")}, which specifies the homoskedastic ordinary least squares covariance matrix estimate.}
+\item{arguments}{A list of arguments that are to be passed to the function in the sandwich package that is specified in \code{estimator}. Default is \code{list(type = "const")}, which specifies the homoskedastic ordinary least squares covariance matrix estimator.}
 }
 \value{
 An object of class \code{setup_vcov}, consisting of the following components:

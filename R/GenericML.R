@@ -7,7 +7,7 @@
 #' @param Y A numeric vector containing the response variable.
 #' @param learners_GenericML A character vector specifying the machine learners to be used for estimating the baseline conditional average (BCA) and conditional average treatment effect (CATE). Either \code{'elastic_net'}, \code{'random_forest'}, \code{'tree'}, or a custom learner specified with \code{mlr3} syntax. In the latter case, do \emph{not} specify in the \code{mlr3} syntax specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 100)'} for a random forest learner with 100 trees. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.
 #' @param learner_propensity_score The estimator of the propensity scores. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. In the latter case, the string must either be equal to \code{'constant'} (estimates the propensity scores by \code{mean(D)}), \code{'elastic_net'}, \code{'random_forest'}, \code{'tree'}, or \code{mlr3} syntax. Note that in case of \code{mlr3} syntax, do \emph{not} specify if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 100)'} for a random forest learner with 100 trees. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.
-#' @param num_splits Number of sample splits. Default is 100.
+#' @param num_splits Number of sample splits. Default is 100. Must be larger than one. If you want to run \code{GenericML} on a single split, please use \code{\link{GenericML_single}}.
 #' @param Z_CLAN A numeric matrix holding variables on which classification analysis (CLAN) shall be performed. CLAN will be performed on each column of the matrix. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.
 #' @param HT Logical. If \code{TRUE}, a Horvitz-Thompson (HT) transformation is applied in the BLP and GATES regressions. Default is \code{FALSE}.
 #' @param quantile_cutoffs The cutoff points of the quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.
@@ -128,7 +128,6 @@ GenericML <- function(Z, D, Y,
   InputChecks_num_splits(num_splits)
   stopifnot(is.numeric(quantile_cutoffs))
   stopifnot(0 < min(quantile_cutoffs) & max(quantile_cutoffs) < 1)
-  stopifnot(is.logical(HT))
   stopifnot(is.logical(equal_variances_CLAN))
   stopifnot(is.logical(HT))
   stopifnot(is.numeric(significance_level) & length(significance_level) == 1)
@@ -185,18 +184,8 @@ GenericML <- function(Z, D, Y,
 
   } # IF
 
-
-  # check if data is from a randomized experiment
-  if(any(propensity_scores > 0.65 | propensity_scores < 0.35)){
-    warning(paste0("Some propensity scores are outside the ",
-                   "interval [0.35, 0.65]. In a randomized experiment, we would ",
-                   "expect all propensity scores to be equal to roughly 0.5. ",
-                   "The theory of the paper ",
-                   "is only valid for randomized experiments. Are ",
-                   "you sure your data is from a randomomized experiment ",
-                   "and the estimator of the scores has been chosen appropriately?"),
-            call. = FALSE)
-  } # IF
+  # check validity of the propensity scores
+  InputChecks_propensity_scores(propensity_scores)
 
 
   ### step 2: for each ML method, do the generic ML analysis ----

@@ -65,16 +65,18 @@ GATES <- function(Y, D,
   InputChecks_Y(Y)
   InputChecks_equal.length2(D, Y)
   InputChecks_equal.length3(propensity_scores, proxy_BCA, proxy_CATE)
+  stopifnot(is.numeric(propensity_scores))
   InputChecks_equal.length2(Y, propensity_scores)
+  InputChecks_propensity_scores(propensity_scores)
   InputChecks_X1(X1_control, length(Y))
   InputChecks_vcov.control(vcov_control)
   InputChecks_diff(diff, K = ncol(membership))
   InputChecks_group.membership(membership)
-  stopifnot(is.numeric(propensity_scores))
   stopifnot(is.numeric(proxy_BCA))
   stopifnot(is.numeric(proxy_CATE))
   stopifnot(is.logical(HT))
-  stopifnot(is.numeric(significance_level))
+  stopifnot(is.numeric(significance_level) & length(significance_level) == 1)
+  stopifnot(0.0 < significance_level & significance_level < 0.5)
 
   # fit model according to strategy 1 or 2 in the paper
   GATES_NoChecks(D = D, Y = Y,

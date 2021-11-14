@@ -40,11 +40,12 @@ CLAN <- function(Z_CLAN,
                  significance_level = 0.05){
 
   # input checks
-  stopifnot(is.numeric(Z_CLAN) & is.matrix(Z_CLAN))
-  stopifnot(is.numeric(significance_level))
+  InputChecks_Z_CLAN(Z_CLAN)
+  InputChecks_equal.length2(Z_CLAN, membership)
+  stopifnot(is.numeric(significance_level) & length(significance_level) == 1)
+  stopifnot(0.0 < significance_level & significance_level < 0.5)
   stopifnot(is.logical(equal_variances))
   InputChecks_group.membership(membership)
-  InputChecks_equal.length2(Z_CLAN, membership)
   InputChecks_diff(diff, K = ncol(membership))
 
   # assign variable names if there are none

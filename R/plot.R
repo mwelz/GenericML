@@ -79,6 +79,10 @@ plot.GenericML <- function(x,
                            title = NULL,
                            ...){
 
+  if(class(x) != "GenericML"){
+    stop("The object 'x' must be an instance of GenericML()")
+  }
+
   # specify the title
   if(is.null(title)){
 

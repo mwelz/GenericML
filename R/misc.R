@@ -59,6 +59,23 @@ Med <- function(x){
 quantile_group <- function(x,
                            cutoffs = c(0.25, 0.5, 0.75)){
 
+
+  # input checks
+  stopifnot(is.numeric(x))
+  stopifnot(is.numeric(cutoffs))
+  stopifnot(0 < min(cutoffs) & max(cutoffs) < 1)
+
+  # return
+  quantile_group_NoChecks(x = x, cutoffs = cutoffs)
+
+
+} # FUN
+
+
+# same as above, just w/o input checks
+quantile_group_NoChecks <- function(x = x,
+                                    cutoffs = cutoffs){
+
   # get quantiles
   q         <- stats::quantile(x, cutoffs)
   q         <- c(-Inf, q, Inf)
@@ -85,8 +102,8 @@ quantile_group <- function(x,
 
   # return
   return(structure(group.mat, type = "quantile_group"))
-} # FUN
 
+} # FUN
 
 
 #' Single iteration of the GenericML algorithm
@@ -169,26 +186,36 @@ GenericML_single <- function(Z, D, Y,
                              min_variation        = 1e-05){
 
   # input checks
-  stopifnot(is.numeric(propensity_scores))
   InputChecks_D(D)
   InputChecks_Y(Y)
   InputChecks_Z(Z)
+  InputChecks_Z_CLAN(Z_CLAN)
   InputChecks_equal.length3(D, Y, Z)
-  InputChecks_equal.length2(Y, propensity_scores)
-  InputChecks_X1(X1_BLP, length(Y))
-  InputChecks_X1(X1_GATES, length(Y))
+  N <- length(Y)
+  stopifnot(is.character(learner))
+  stopifnot(length(learner) == 1)
+  InputChecks_index_set(A_set, N)
+  InputChecks_index_set(M_set, N)
+  InputChecks_X1(X1_BLP, N)
+  InputChecks_X1(X1_GATES, N)
   InputChecks_vcov.control(vcov_BLP)
   InputChecks_vcov.control(vcov_GATES)
   InputChecks_diff(diff_GATES, K = length(quantile_cutoffs) + 1)
   InputChecks_diff(diff_CLAN, K = length(quantile_cutoffs) + 1)
-  stopifnot(is.numeric(A_set) & is.numeric(M_set))
-  stopifnot(is.character(learner))
-  stopifnot(length(learner) == 1)
   stopifnot(is.numeric(quantile_cutoffs))
+  stopifnot(0 < min(quantile_cutoffs) & max(quantile_cutoffs) < 1)
   stopifnot(is.logical(equal_variances_CLAN))
   stopifnot(is.logical(HT))
-  stopifnot(is.numeric(significance_level))
+  stopifnot(is.numeric(significance_level) & length(significance_level) == 1)
+  stopifnot(0.0 < significance_level & significance_level < 0.5)
   stopifnot(is.numeric(min_variation) & min_variation > 0)
+  stopifnot(is.character(learner))
+  stopifnot(length(learner) == 1)
+  stopifnot(is.numeric(propensity_scores))
+  InputChecks_equal.length2(Y, propensity_scores)
+  InputChecks_propensity_scores(propensity_scores)
+
+
 
   # if no input provided, set Z_CLAN equal to Z
   if(is.null(Z_CLAN)) Z_CLAN <- Z
@@ -296,8 +323,8 @@ GenericML_single_NoChecks <-
 
     ### step 1c: estimate GATES parameters by OLS ----
     # group the proxy estimators for the CATE in the main sample by quantiles
-    membership_M <- quantile_group(proxy_CATE_M,
-                                   cutoffs = quantile_cutoffs)
+    membership_M <- quantile_group_NoChecks(proxy_CATE_M,
+                                            cutoffs = quantile_cutoffs)
 
     # estimate GATES
     gates.obj <- GATES_NoChecks(
@@ -395,7 +422,10 @@ lambda_parameters <- function(BLP,
   InputChecks_equal.length2(proxy_CATE, membership)
   temp <- GATES$coefficients
   gates.coefs <- temp[startsWith(rownames(temp), "gamma."), "Estimate"]
-  stopifnot(ncol(membership) == gates.coefs)
+
+  if(ncol(membership) != length(gates.coefs)){
+    stop("The number of columns of 'membership' must be equal to the number of GATES gamma coefficients")
+  }
 
   # return
   lambda_parameters_NoChecks(BLP = BLP,

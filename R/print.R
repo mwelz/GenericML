@@ -32,6 +32,10 @@
 #' @export
 print.GenericML <- function(x, ...){
 
+  if(class(x) != "GenericML"){
+    stop("The object 'x' must be an instance of GenericML()")
+  }
+
   if(is.numeric(x$arguments$learner_propensity_score)){
     prop.lrn <- "user-supplied"
   } else{

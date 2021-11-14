@@ -177,8 +177,9 @@ proxy_BCA <- function(Z, D, Y,
   InputChecks_Y(Y)
   InputChecks_Z(Z)
   InputChecks_equal.length3(D, Y ,Z)
+  stopifnot(is.character(learner))
   stopifnot(length(learner) == 1)
-  stopifnot(is.numeric(A_set) & all(A_set %in% 1:nrow(Z)))
+  InputChecks_index_set(A_set, nrow(Z))
   stopifnot(is.numeric(min_variation) & min_variation > 0)
 
 
@@ -284,14 +285,21 @@ proxy_CATE <- function(Z, D, Y,
                        proxy_BCA = NULL,
                        min_variation = 1e-05){
 
+
   # input checks
   InputChecks_D(D)
   InputChecks_Y(Y)
   InputChecks_Z(Z)
   InputChecks_equal.length3(D, Y ,Z)
+  stopifnot(is.character(learner))
   stopifnot(length(learner) == 1)
-  stopifnot(is.numeric(A_set) & all(A_set %in% 1:nrow(Z)))
+  InputChecks_index_set(A_set, nrow(Z))
   stopifnot(is.numeric(min_variation) & min_variation > 0)
+
+  if(!is.null(proxy_BCA)){
+    stopifnot(is.numeric(proxy_BCA))
+    InputChecks_equal.length2(proxy_BCA, Y)
+  } # IF
 
   # run main function
   proxy_CATE_NoChecks(Z = Z, D = D, Y = Y,
