@@ -195,8 +195,8 @@ setup_diff <- function(subtract_from = "most",
 #' @details
 #' The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}} and \code{\link{GenericML_single}} (arguments \code{vcov_BLP}, \code{vcov_GATES}), as well as \code{\link{BLP}} and \code{\link{GATES}} (argument \code{vcov_control}).
 #'
-#' @param estimator String specifying a covariance matrix estimator in the \href{https://cran.r-project.org/web/packages/sandwich/}{sandwich}. Default is \code{"vcovHC"}. Recommended estimators are \code{"vcovBS"}, \code{"vcovCL"}, \code{"vcovHAC"}, and \code{"vcovHC"}.
-#' @param arguments A list of arguments that are to be passed to the function in the sandwich package that is specified in \code{estimator}. Default is \code{list(type = "const")}, which specifies the homoskedastic ordinary least squares covariance matrix estimate.
+#' @param estimator Character specifying a covariance matrix estimator in the \href{https://cran.r-project.org/web/packages/sandwich/}{sandwich} package. Default is \code{"vcovHC"}. Supported estimators are \code{"vcovBS"}, \code{"vcovCL"}, \code{"vcovHAC"}, and \code{"vcovHC"}.
+#' @param arguments A list of arguments that are to be passed to the function in the sandwich package that is specified in \code{estimator}. Default is \code{list(type = "const")}, which specifies the homoskedastic ordinary least squares covariance matrix estimator.
 #'
 #' @return
 #' An object of class \code{setup_vcov}, consisting of the following components:
@@ -242,6 +242,7 @@ setup_vcov <- function(estimator = "vcovHC",
 
   # input checks
   stopifnot(is.character(estimator))
+  stopifnot(length(estimator) == 1)
   stopifnot(is.list(arguments))
 
   if(!estimator %in% c("vcovBS", "vcovCL", "vcovHAC", "vcovHC")){

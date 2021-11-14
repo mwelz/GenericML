@@ -92,7 +92,7 @@ InputChecks_X1 <- function(X1_control, num.obs){
 
   if(!is.null(X1_control$fixed_effects)){
 
-    if(nrow(X1_control$fixed_effects) != num.obs){
+    if(length(X1_control$fixed_effects) != num.obs){
       stop(paste0(deparse(substitute(X1_control)),
                   "$fixed_effects must have the same length as Y"),
            call. = FALSE)

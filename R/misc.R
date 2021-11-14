@@ -324,10 +324,10 @@ GenericML_single_NoChecks <-
 
 
     ### step 1e: get parameters over which we maximize to find the "best" ML method ----
-    best.obj <- lambda_parameters(BLP        = blp.obj,
-                                  GATES      = gates.obj,
-                                  proxy_CATE = proxy_CATE_M,
-                                  membership = membership_M)
+    best.obj <- lambda_parameters_NoChecks(BLP        = blp.obj,
+                                           GATES      = gates.obj,
+                                           proxy_CATE = proxy_CATE_M,
+                                           membership = membership_M)
 
     ### organize output in a list ----
     return(list(BLP            = blp.obj,
@@ -384,13 +384,41 @@ lambda_parameters <- function(BLP,
                               proxy_CATE,
                               membership){
 
+  if(class(BLP) != "BLP"){
+    stop("The BLP object must be an instance of BLP()")
+  }
+  if(class(GATES) != "GATES"){
+    stop("The GATES object must be an instance of GATES()")
+  }
+  InputChecks_group.membership(membership)
+  stopifnot(is.numeric(proxy_CATE))
+  InputChecks_equal.length2(proxy_CATE, membership)
+  temp <- GATES$coefficients
+  gates.coefs <- temp[startsWith(rownames(temp), "gamma."), "Estimate"]
+  stopifnot(ncol(membership) == gates.coefs)
+
+  # return
+  lambda_parameters_NoChecks(BLP = BLP,
+                             GATES = GATES,
+                             proxy_CATE = proxy_CATE,
+                             membership = membership)
+
+} # END FUN
+
+
+# same as above, but w/o input checks
+lambda_parameters_NoChecks <- function(BLP,
+                                       GATES,
+                                       proxy_CATE,
+                                       membership){
+
   temp <- GATES$coefficients
   gates.coefs <- temp[startsWith(rownames(temp), "gamma."), "Estimate"]
 
   return(list(lambda = BLP$coefficients["beta.2", "Estimate"]^2 * stats::var(proxy_CATE),
               lambda.bar = as.numeric(colMeans(membership) %*%  gates.coefs^2)))
 
-} # END FUN
+} # FUN
 
 
 #' performs stratified sampling
