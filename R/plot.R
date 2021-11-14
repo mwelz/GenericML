@@ -133,13 +133,13 @@ plot.GenericML <- function(x,
 
   if(is.null(limits) & type != "BLP"){
 
-    limits <- c(min(c(data[, "CB lower"], data.blp["beta.1", "CB lower"])),
-                max(c(data[, "CB upper"], data.blp["beta.1", "CB upper"])))
+    limits <- c(min(c(0, data[, "CB lower"], data.blp["beta.1", "CB lower"])),
+                max(c(0, data[, "CB upper"], data.blp["beta.1", "CB upper"])))
 
   } else if(is.null(limits) & type == "BLP"){
 
-    limits <- c(min(data[, "CB lower"]),
-                max(data[, "CB upper"]))
+    limits <- c(min(c(0, data[, "CB lower"])),
+                max(c(0, data[, "CB upper"])))
 
   } # IF
 
@@ -155,8 +155,10 @@ plot.GenericML <- function(x,
 
     if(type == "GATES"){
       group.nam <- gsub("gamma.", "G", rownames(data))
+      ylab      <- "Treatment Effect"
     } else{
       group.nam <- gsub("delta.", "G", rownames(data))
+      ylab      <- paste0("Value of '", CLAN_variable, "'")
     } # IF
 
     # create data frame for ggplot
@@ -201,7 +203,7 @@ plot.GenericML <- function(x,
       geom_errorbar(mapping = aes(ymin = ci.lower,
                                   ymax = ci.upper)) +
       theme_light() +
-      ylab("Treatment Effect") +
+      ylab(ylab) +
       xlab("Group by HTE Score") +
       scale_colour_manual(values = c("red","blue", "black")) +
       theme(legend.title = element_blank(),
