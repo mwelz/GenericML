@@ -190,18 +190,18 @@ setup_diff <- function(subtract_from = "most",
 
 #' Setup function for \code{vcov_control} arguments
 #'
-#' Returns a list with two elements called \code{estimator} and \code{arguments}. The element \code{estimator} is a string specifying the covariance matrix estimator to be used in the linear regression regression of interest and needs to be a covariance estimator function in the \href{https://cran.r-project.org/web/packages/sandwich/}{sandwich} package. The second element, \code{arguments}, is a list of arguments that shall be passed to the function specified in the first element, \code{estimator}.
+#' Returns a list with two elements called \code{estimator} and \code{arguments}. The element \code{estimator} is a string specifying the covariance matrix estimator to be used in the linear regression regression of interest and needs to be a covariance estimator function in the \href{https://CRAN.R-project.org/package=sandwich}{sandwich} package. The second element, \code{arguments}, is a list of arguments that shall be passed to the function specified in the first element, \code{estimator}.
 #'
 #' @details
 #' The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}} and \code{\link{GenericML_single}} (arguments \code{vcov_BLP}, \code{vcov_GATES}), as well as \code{\link{BLP}} and \code{\link{GATES}} (argument \code{vcov_control}).
 #'
-#' @param estimator Character specifying a covariance matrix estimator in the \href{https://cran.r-project.org/web/packages/sandwich/}{sandwich} package. Default is \code{"vcovHC"}. Supported estimators are \code{"vcovBS"}, \code{"vcovCL"}, \code{"vcovHAC"}, and \code{"vcovHC"}.
+#' @param estimator Character specifying a covariance matrix estimator in the \href{https://CRAN.R-project.org/package=sandwich}{sandwich} package. Default is \code{"vcovHC"}. Supported estimators are \code{"vcovBS"}, \code{"vcovCL"}, \code{"vcovHAC"}, and \code{"vcovHC"}.
 #' @param arguments A list of arguments that are to be passed to the function in the sandwich package that is specified in \code{estimator}. Default is \code{list(type = "const")}, which specifies the homoskedastic ordinary least squares covariance matrix estimator.
 #'
 #' @return
 #' An object of class \code{setup_vcov}, consisting of the following components:
 #' \describe{
-#'   \item{\code{estimator}}{A character equal to covariance estimation function names in the \href{https://cran.r-project.org/web/packages/sandwich/}{sandwich} package.}
+#'   \item{\code{estimator}}{A character equal to covariance estimation function names in the \href{https://CRAN.R-project.org/package=sandwich}{sandwich} package.}
 #'   \item{\code{arguments}}{A list of arguments that shall be passed to the function specified in the \code{estimator} argument.}
 #'   }
 #' See the description above for details.

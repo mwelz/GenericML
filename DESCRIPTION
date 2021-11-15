@@ -20,7 +20,7 @@ Authors@R:
              family = "Chernozhukov",
              role = "aut",
              email = "vchern@mit.edu")) 
-Author: Max Welz [aut, cre], Andreas Alfons [aut], Mert Demirer [aut], Victor Chernozhukov [aut]
+Author: Max Welz [aut, cre] (<https://orcid.org/0000-0003-2945-1860>), Andreas Alfons [aut] (<https://orcid.org/0000-0002-2513-3788>), Mert Demirer [aut], Victor Chernozhukov [aut]
 Maintainer: Max Welz <welz@ese.eur.nl>           
 Description: R implementation of Generic Machine Learning Inference (Chernozhukov, Demirer, Duflo and Fernández-Val, 2020).
 License: GPL (>= 3)
