@@ -43,4 +43,6 @@ if(require("e1071")){
 }
 \references{
 Rosenbaum P.R., Rubin D.B. (1983). \dQuote{The Central Role of the Propensity Score in Observational Studies for Causal Effects.} \emph{Biometrika}, \bold{70}(1), 41--55. \doi{10.1093/biomet/70.1.41}.
+
+Lang M., Binder M., Richter J., Schratz P., Pfisterer F., Coors S., Au Q., Casalicchio G., Kotthoff L., Bischl B. (2019). \dQuote{mlr3: A Modern Object-Oriented Machine Learning Framework in R.} \emph{Journal of Open Source Software}, \bold{4}(44), 1903. \doi{10.21105/joss.01903}.
 }
