@@ -66,7 +66,6 @@ if (require("glmnet") && require("ranger") && require("e1071")) {
     D  <- rbinom(n, 1, 0.5)         # random treatment assignment
     Z  <- matrix(runif(n*p), n, p)  # design matrix
     colnames(Z) <- paste0("z", 1:p) # column names
-    ATE <- 2                        # average treatment effect
     Y0 <- as.numeric(Z %*% rexp(p)) # potential outcome without treatment
     HTE <- 2 * Z[,1] + ifelse(Z[,2] >= 0.5, 1, -1) # HTE
     ATE <- mean(HTE)                # ATE
