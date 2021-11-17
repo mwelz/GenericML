@@ -1,9 +1,11 @@
 # GenericML: Generic machine learning inference on heterogeneous treatment effects in randomized experiments
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![R-CMD-check](https://github.com/mwelz/GenericML/workflows/R-CMD-check/badge.svg)](https://github.com/mwelz/GenericML/actions)
+
 To cite `GenericML` in publications, please use:
 
-Welz M., Alfons, A., Demirer, M. and Chernozhukov, V. (2021). `GenericML`: An `R` package for
-generic machine learning inference on heterogeneous treatment effects in randomized experiments. *GitHub
-repository*. URL: https://github.com/mwelz/GenericML.
+> Welz M., Alfons, A., Demirer, M. and Chernozhukov, V. (2021). `GenericML`: An `R` package for generic machine learning inference on heterogeneous treatment effects in randomized experiments. *GitHub repository*. URL: https://github.com/mwelz/GenericML.
 
 
 ## Summary
@@ -115,14 +117,14 @@ store_learners <- TRUE
 
 # parallelization options (currently only supported on Unix systems)
 parallel  <- TRUE
-num_cores <- parallel::detectCores() # maximum number
+num_cores <- 4      # 4 cores
 seed      <- 123456
 # Note that the number of cores influences the random number stream. Thus, different choices of `num_cores` may lead to different results.
 
 
 
 ### 3. Run the GenericML() functions with these arguments ----
-# runtime: ~30 seconds with R version 4.1.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 21.10. Returns a GenericML object.
+# runtime: ~40 seconds with R version 4.1.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 21.10. Returns a GenericML object.
 genML <- GenericML(Z = Z, D = D, Y = Y,
                    learner_propensity_score = learner_propensity_score,
                    learners_GenericML = learners_GenericML,
@@ -147,33 +149,58 @@ genML <- GenericML(Z = Z, D = D, Y = Y,
                    store_learners = store_learners)
 
 ### 4. Analyze the output ----
-# print
+## print
 genML
 
-# the line below returns the medians of the estimated  \Lambda and \bar{\Lambda}
+## the line below returns the medians of the estimated  \Lambda and \bar{\Lambda}
 genML$best$overview
+#                                            lambda lambda.bar
+# lasso                                0.0005021887   3.987549
+# mlr3::lrn('ranger', num.trees = 100) 0.0013285598   4.001061
+# mlr3::lrn('svm')                     0.0018907318   3.971723
 
 # Get best learner for BLP
 genML$best$BLP
+# "mlr3::lrn('svm')"
 
 # Get best learner for GATES and CLAN (this is the same learner)
 genML$best$GATES
 genML$best$CLAN
+# "mlr3::lrn('ranger', num.trees = 100)"
 
 
 # VEIN of BLP
 get_BLP(genML, plot = FALSE)
 plot(genML, type = "BLP") # plot.GenericML() method
-# No indication of treatment effect heterogeneity; see beta.2 coefficient
+#          Estimate   CB lower  CB upper  Pr(>|z|)
+# beta.1 1.99004701  1.8941399 2.0865846 0.0000000
+# beta.2 0.02008194 -0.1357274 0.1825625 0.7671611
+# No indication of treatment effect heterogeneity: beta.2 not significant
 
 # VEIN of GATES
 get_GATES(genML, plot = FALSE)
 plot(genML, type = "GATES")
+#                     Estimate   CB lower  CB upper     Pr(>|z|)
+# gamma.1          2.013269584  1.7774793 2.2399200 1.388830e-64
+# gamma.2          2.002905317  1.7706349 2.2371161 1.216255e-64
+# gamma.3          1.975673043  1.7440607 2.2055316 2.102408e-63
+# gamma.4          2.008811821  1.7730794 2.2371024 2.416696e-65
+# gamma.5          2.000329884  1.7709185 2.2291943 3.506243e-64
+# gamma.5-gamma.1 -0.005870186 -0.3363183 0.3232286 9.728257e-01
+# gamma.5-gamma.2  0.009202547 -0.3147502 0.3384705 9.265794e-01
 # No indication of heterogeneity
 
 # VEIN of CLAN for variable 'z1'
 get_CLAN(genML, variable = "z1", plot = FALSE)
 plot(genML, type = "CLAN", CLAN_variable = "z1")
+#                     Estimate    CB lower   CB upper  Pr(>|z|)
+# delta.1          0.011382749 -0.08329323 0.11017988 0.7173005
+# delta.2          0.053358133 -0.03292408 0.14113387 0.2174559
+# delta.3          0.030516397 -0.05514932 0.11618211 0.4565903
+# delta.4          0.005796215 -0.07860407 0.08920595 0.8869233
+# delta.5         -0.062963144 -0.14805291 0.02390041 0.1533801
+# delta.5-delta.1 -0.071003538 -0.19923253 0.05932083 0.2888714
+# delta.5-delta.2 -0.099037187 -0.22257883 0.02314453 0.1116662
 # No indication of heterogeneity
 
 ```
