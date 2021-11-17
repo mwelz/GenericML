@@ -35,9 +35,10 @@ Y  <- ifelse(D == 1, Y1, Y0)               # observed outcome
 colnames(Z) <- paste0("V", 1:p)
 
 ## specify learners
-learners <- c("elastic_net", "mlr3::lrn('ranger', num.trees = 30)")
+learners <- c("lasso", "mlr3::lrn('ranger', num.trees = 30)")
 
 ## perform generic ML inference
+# small number of splits to keep computation time low
 x <- GenericML(Z, D, Y, learners, num_splits = 10,
                parallel = FALSE)
 

@@ -19,9 +19,10 @@
 #' Y  <- ifelse(D == 1, Y1, Y0)               # observed outcome
 #'
 #' ## specify learners
-#' learners <- c("elastic_net")
+#' learners <- c("lasso")
 #'
 #' ## perform generic ML inference
+#' # small number of splits to keep computation time low
 #' x <- GenericML(Z, D, Y, learners, num_splits = 10,
 #'                parallel = FALSE)
 #'

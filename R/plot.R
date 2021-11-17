@@ -40,7 +40,7 @@
 #' colnames(Z) <- paste0("V", 1:p)
 #'
 #' ## specify learners
-#' learners <- c("elastic_net")
+#' learners <- c("lasso")
 #'
 #' ## specify quantile cutoffs (the 4 quartile groups here)
 #' quantile_cutoffs <- c(0.25, 0.5, 0.75)
@@ -52,6 +52,7 @@
 #'                          subtracted = c(3,2))
 #'
 #' ## perform generic ML inference
+#' # small number of splits to keep computation time low
 #' x <- GenericML(Z, D, Y, learners, num_splits = 10,
 #'                quantile_cutoffs = quantile_cutoffs,
 #'                diff_GATES = diff_GATES,

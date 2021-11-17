@@ -192,9 +192,9 @@ get.learner_regr <- function(learner){
   # specify the machine learner
   if(is.environment(learner)){
     learner <- learner
-  } else if(learner == "elastic_net"){
+  } else if(learner == "lasso"){
 
-    learner <- mlr3::lrn("regr.cv_glmnet", s = "lambda.min")
+    learner <- mlr3::lrn("regr.cv_glmnet", s = "lambda.min", alpha = 1)
 
   } else if(learner == "random_forest"){
 
@@ -206,7 +206,7 @@ get.learner_regr <- function(learner){
 
   } else{
 
-    stop("Invalid argument for 'learner'. Needs to be either 'elastic_net', 'random_forest', 'tree', or an mlr3 object")
+    stop("Invalid argument for 'learner'. Needs to be either 'lasso', 'random_forest', 'tree', or an mlr3 object")
 
   } # END IF
 

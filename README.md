@@ -70,8 +70,8 @@ quantile_cutoffs <- c(0.2, 0.4, 0.6, 0.8) # 20%, 40%, 60%, 80% quantiles
 # specify the learner of the propensity score (non-penalized logistic regression here). Propensity scores can also directly be supplied.
 learner_propensity_score <- "mlr3::lrn('glmnet', lambda = 0, alpha = 1)"
 
-# specify the considered learners of the BCA and the CATE (here: elastic net, random forest, and SVM)
-learners_GenericML <- c("elastic_net", "mlr3::lrn('ranger', num.trees = 100)", "mlr3::lrn('svm')")
+# specify the considered learners of the BCA and the CATE (here: lasso, random forest, and SVM)
+learners_GenericML <- c("lasso", "mlr3::lrn('ranger', num.trees = 100)", "mlr3::lrn('svm')")
 
 # specify the data that shall be used for the CLAN
 # here, we use all variables of Z and uniformly distributed random noise

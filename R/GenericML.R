@@ -5,8 +5,8 @@
 #' @param Z A numeric design matrix that holds the covariates in its columns.
 #' @param D A binary vector of treatment assignment. Value one denotes assignment to the treatment group and value zero assignment to the control group.
 #' @param Y A numeric vector containing the response variable.
-#' @param learners_GenericML A character vector specifying the machine learners to be used for estimating the baseline conditional average (BCA) and conditional average treatment effect (CATE). Either \code{'elastic_net'}, \code{'random_forest'}, \code{'tree'}, or a custom learner specified with \code{mlr3} syntax. In the latter case, do \emph{not} specify in the \code{mlr3} syntax specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 100)'} for a random forest learner with 100 trees. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.
-#' @param learner_propensity_score The estimator of the propensity scores. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. In the latter case, the string must either be equal to \code{'constant'} (estimates the propensity scores by \code{mean(D)}), \code{'elastic_net'}, \code{'random_forest'}, \code{'tree'}, or \code{mlr3} syntax. Note that in case of \code{mlr3} syntax, do \emph{not} specify if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 100)'} for a random forest learner with 100 trees. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.
+#' @param learners_GenericML A character vector specifying the machine learners to be used for estimating the baseline conditional average (BCA) and conditional average treatment effect (CATE). Either \code{'lasso'}, \code{'random_forest'}, \code{'tree'}, or a custom learner specified with \code{mlr3} syntax. In the latter case, do \emph{not} specify in the \code{mlr3} syntax specification if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 100)'} for a random forest learner with 100 trees. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.
+#' @param learner_propensity_score The estimator of the propensity scores. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. In the latter case, the string must either be equal to \code{'constant'} (estimates the propensity scores by \code{mean(D)}), \code{'lasso'}, \code{'random_forest'}, \code{'tree'}, or \code{mlr3} syntax. Note that in case of \code{mlr3} syntax, do \emph{not} specify if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 100)'} for a random forest learner with 100 trees. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.
 #' @param num_splits Number of sample splits. Default is 100. Must be larger than one. If you want to run \code{GenericML} on a single split, please use \code{\link{GenericML_single}}.
 #' @param Z_CLAN A numeric matrix holding variables on which classification analysis (CLAN) shall be performed. CLAN will be performed on each column of the matrix. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.
 #' @param HT Logical. If \code{TRUE}, a Horvitz-Thompson (HT) transformation is applied in the BLP and GATES regressions. Default is \code{FALSE}.
@@ -37,6 +37,10 @@
 #'   \item{\code{splits}}{Only nonempty if \code{store_splits = TRUE}. Contains a character matrix of dimension \code{length(Y)} by \code{num_splits}. Contains the group membership (main or auxiliary) of each observation (rows) in each split (columns). \code{"M"} denotes the main set, \code{"A"} the auxiliary set.}
 #'   \item{\code{arguments}}{A list of all arguments used in the function call.}
 #'   }
+#'
+#' @details
+#' The specifications \code{lasso}, \code{random_forest}, and \code{tree} in \code{learners_GenericML} and \code{learner_propensity_score} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{lasso} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{random_forest} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{tree} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}.
+#'
 #'
 #' @note In an earlier development version, Lucas Kitzmueller alerted us to several minor bugs and proposed fixes. Many thanks to him!
 #'
@@ -69,8 +73,11 @@
 #' Y1 <- 2 + Y0                               # potential outcome under treatment
 #' Y  <- ifelse(D == 1, Y1, Y0)               # observed outcome
 #'
+#' ## column names of Z
+#' colnames(Z) <- paste0("V", 1:p)
+#'
 #' ## specify learners
-#' learners <- c("elastic_net", "mlr3::lrn('ranger', num.trees = 30)")
+#' learners <- c("lasso", "mlr3::lrn('ranger', num.trees = 30)")
 #'
 #' ## specify quantile cutoffs (the 4 quartile groups here)
 #' quantile_cutoffs <- c(0.25, 0.5, 0.75)
@@ -84,11 +91,22 @@
 #'                          subtracted = c(3,2))
 #'
 #' ## perform generic ML inference
-#' GenericML(Z, D, Y, learners, num_splits = 10,
-#'           quantile_cutoffs = quantile_cutoffs,
-#'           diff_GATES = diff_GATES,
-#'           diff_CLAN = diff_CLAN,
-#'           parallel = FALSE)
+#' # small number of splits to keep computation time low
+#' x <- GenericML(Z, D, Y, learners, num_splits = 10,
+#'                quantile_cutoffs = quantile_cutoffs,
+#'                diff_GATES = diff_GATES,
+#'                diff_CLAN = diff_CLAN,
+#'                parallel = FALSE)
+#'
+#' ## access BLP generic targets for best learner and make plot
+#' get_BLP(x, plot = TRUE)
+#'
+#' ## access GATES generic targets for best learner and make plot
+#' get_GATES(x, plot = TRUE)
+#'
+#' ## access CLAN generic targets for "V1" & best learner and make plot
+#' get_CLAN(x, variable = "V1", plot = TRUE)
+#'
 #' }
 #'
 #' @export

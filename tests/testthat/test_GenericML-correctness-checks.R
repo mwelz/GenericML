@@ -25,7 +25,7 @@ if (require("glmnet") && require("ranger") && require("e1071")) {
     sig_level <- 0.05               # significance level
 
     # specify learners
-    learners <- c("elastic_net",
+    learners <- c("lasso",
                   "mlr3::lrn('ranger', num.trees = 100)",
                   "mlr3::lrn('svm')")
 
@@ -75,7 +75,7 @@ if (require("glmnet") && require("ranger") && require("e1071")) {
 
 
     # specify learners
-    learners <- c("elastic_net",
+    learners <- c("lasso",
                   "mlr3::lrn('ranger', num.trees = 100)",
                   "mlr3::lrn('svm')")
 

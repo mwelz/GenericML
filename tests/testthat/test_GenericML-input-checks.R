@@ -15,7 +15,7 @@ Y0 <- as.numeric(Z %*% rexp(p) + rnorm(n)) # potential outcome without treatment
 Y1 <- 2 + Y0                               # potential outcome under treatment
 Y  <- ifelse(D == 1, Y1, Y0)               # observed outcome
 Z_CLAN <- Z                                # data for CLAN
-learners <- "elastic_net"                  # specify learner
+learners <- "lasso"                  # specify learner
 
 
 
@@ -81,7 +81,7 @@ test_that("Errors in machine learner specification", {
   # propensity score learner
   expect_error(GenericML(Z, D, Y, learners, learner_propensity_score = environment()))
   expect_error(GenericML(Z, D, Y, learners,
-                         learner_propensity_score = c("elastic_net", "random_forest"))) # multiple learners not allowed
+                         learner_propensity_score = c("lasso", "random_forest"))) # multiple learners not allowed
   expect_error(GenericML(Z, D, Y, learners, learner_propensity_score = c(1,2,3)),
                "propensity_scores, Y need to have an equal number of observations")
   expect_error(GenericML(Z, D, Y, learners, learner_propensity_score = "foo"))
@@ -94,7 +94,7 @@ test_that("Errors in machine learner specification", {
 
   # no error with correct specification (skip for computational reasons)
   # expect_error(GenericML(Z, D, Y, num_splits = 2, parallel = FALSE,
-  #                       learners_GenericML = c("tree", "elastic_net", "random_forest")), NA)
+  #                       learners_GenericML = c("tree", "lasso", "random_forest")), NA)
 
 }) # TEST
 
