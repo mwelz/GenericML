@@ -88,7 +88,7 @@ An object of class \code{GenericML}. On this object, we recommend to use the acc
 \item{\code{propensity_scores}}{The propensity score estimates as well as the \code{mlr3} objects used to estimate them (if \code{mlr3} was used for estimation).}
 \item{\code{GenericML_single}}{Only nonempty if \code{store_learners = TRUE}. Contains all intermediate results of each learners for each split. That is, for a given learner (first level of the list) and split (second level),  objects of classes \code{\link{BLP}}, \code{\link{GATES}}, \code{\link{CLAN}}, \code{\link{proxy_BCA}}, \code{\link{proxy_CATE}} as well as the \eqn{\Lambda} criteria (\code{"best"})) are listed, which were computed with the given learner and split.}
 \item{\code{splits}}{Only nonempty if \code{store_splits = TRUE}. Contains a character matrix of dimension \code{length(Y)} by \code{num_splits}. Contains the group membership (main or auxiliary) of each observation (rows) in each split (columns). \code{"M"} denotes the main set, \code{"A"} the auxiliary set.}
-\item{\code{arguments}}{A list of all arguments used in the function call.}
+\item{\code{arguments}}{A list of arguments used in the function call.}
 }
 }
 \description{
