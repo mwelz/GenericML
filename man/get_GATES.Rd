@@ -14,7 +14,7 @@ get_GATES(x, learner = "best", plot = TRUE)
 \item{plot}{Logical. If \code{TRUE} (default), a plot is printed.}
 }
 \value{
-A numeric matrix of GATES generic target estimates. Furthermore, prints a plot if \code{plot = TRUE}.
+A numeric matrix of GATES generic target estimates which contains information on point estimates, confidence bounds, and (adjusted) p-values. Furthermore, prints a plot if \code{plot = TRUE}.
 }
 \description{
 Accessor function for the GATES generic target estimates

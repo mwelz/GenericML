@@ -4,7 +4,7 @@
 #' @param learner A character string of the learner whose BLP generic target estimates shall be accessed. Default is \code{"best"} for the best learner for BLP.
 #' @param plot Logical. If \code{TRUE} (default), a plot is printed.
 #'
-#' @return A numeric matrix of BLP generic target estimates. Furthermore, prints a plot if \code{plot = TRUE}.
+#' @return A numeric matrix of BLP generic target estimates which contains information on point estimates, confidence bounds, and (adjusted) p-values. Furthermore, prints a plot if \code{plot = TRUE}.
 #'
 #' @examples
 #' if(require("glmnet") && require("ranger")){
@@ -62,7 +62,7 @@ get_BLP <- function(x, learner = "best", plot = TRUE){
 
   if(learner == "best"){
 
-    out <- x$VEIN$best_learners$BLP
+    temp <- x$VEIN$best_learners$BLP
 
   } else{
 
@@ -72,9 +72,16 @@ get_BLP <- function(x, learner = "best", plot = TRUE){
 
     } # IF
 
-    out <- x$VEIN$all_learners$BLP[[learner]]
+    temp <- x$VEIN$all_learners$BLP[[learner]]
 
   } # IF
+
+  # only print the minimum of the two probabilities as p-value
+  pval <- pmin(temp[, "Pr(<z) adjusted"], temp[, "Pr(>z) adjusted"])
+  out  <- cbind(temp[, c("Estimate", "CB lower", "CB upper")],
+                pval)
+  colnames(out)[4] <- "Pr(>|z|)"
+
 
   if(plot) print(plot.GenericML(x = x, learner = learner, type = "BLP"))
 
@@ -91,7 +98,7 @@ get_BLP <- function(x, learner = "best", plot = TRUE){
 #' @param learner A character string of the learner whose GATES generic target estimates shall be accessed. Default is \code{"best"} for the best learner for GATES.
 #' @param plot Logical. If \code{TRUE} (default), a plot is printed.
 #'
-#' @return A numeric matrix of GATES generic target estimates. Furthermore, prints a plot if \code{plot = TRUE}.
+#' @return A numeric matrix of GATES generic target estimates which contains information on point estimates, confidence bounds, and (adjusted) p-values. Furthermore, prints a plot if \code{plot = TRUE}.
 #'
 #' @examples
 #' if(require("glmnet") && require("ranger")){
@@ -149,7 +156,7 @@ get_GATES <- function(x, learner = "best", plot = TRUE){
 
   if(learner == "best"){
 
-    out <- x$VEIN$best_learners$GATES
+    temp <- x$VEIN$best_learners$GATES
 
   } else{
 
@@ -159,9 +166,15 @@ get_GATES <- function(x, learner = "best", plot = TRUE){
 
     } # IF
 
-    out <- x$VEIN$all_learners$GATES[[learner]]
+    temp <- x$VEIN$all_learners$GATES[[learner]]
 
   } # IF
+
+  # only print the minimum of the two probabilities as p-value
+  pval <- pmin(temp[, "Pr(<z) adjusted"], temp[, "Pr(>z) adjusted"])
+  out  <- cbind(temp[, c("Estimate", "CB lower", "CB upper")],
+                pval)
+  colnames(out)[4] <- "Pr(>|z|)"
 
   if(plot) print(plot.GenericML(x = x, learner = learner, type = "GATES"))
 
@@ -177,7 +190,7 @@ get_GATES <- function(x, learner = "best", plot = TRUE){
 #' @param learner A character string of the learner whose CLAN generic target estimates shall be accessed. Default is \code{"best"} for the best learner for CLAN
 #' @param plot Logical. If \code{TRUE} (default), a plot is printed.
 #'
-#' @return A numeric matrix of CLAN generic target estimates. Furthermore, prints a plot if \code{plot = TRUE}.
+#' @return A numeric matrix of CLAN generic target estimates which contains information on point estimates, confidence bounds, and (adjusted) p-values. Furthermore, prints a plot if \code{plot = TRUE}.
 #'
 #' @examples
 #' if(require("glmnet") && require("ranger")){
@@ -241,7 +254,7 @@ get_CLAN <- function(x, variable, learner = "best", plot = TRUE){
 
   if(learner == "best"){
 
-    out <- x$VEIN$best_learners$CLAN[[variable]]
+    temp <- x$VEIN$best_learners$CLAN[[variable]]
 
   } else{
 
@@ -251,9 +264,15 @@ get_CLAN <- function(x, variable, learner = "best", plot = TRUE){
 
     } # IF
 
-    out <- x$VEIN$all_learners$CLAN[[learner]][[variable]]
+    temp <- x$VEIN$all_learners$CLAN[[learner]][[variable]]
 
   } # IF
+
+  # only print the minimum of the two probabilities as p-value
+  pval <- pmin(temp[, "Pr(<z) adjusted"], temp[, "Pr(>z) adjusted"])
+  out  <- cbind(temp[, c("Estimate", "CB lower", "CB upper")],
+                pval)
+  colnames(out)[4] <- "Pr(>|z|)"
 
   if(plot) print(plot(x = x, learner = learner, type = "CLAN", CLAN_variable = variable))
 

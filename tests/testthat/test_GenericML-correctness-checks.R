@@ -39,16 +39,16 @@ if (require("glmnet") && require("ranger") && require("e1071")) {
     expect_true(beta1_cb[1] <= ATE & ATE <= beta1_cb[2])
 
     # there is no heterogeneity, so beta.2 shouldn't be significant
-    expect_true(!min(get_BLP(x, plot = FALSE)["beta.2", c(4,5)]) <= sig_level)
+    expect_true(!(get_BLP(x, plot = FALSE)["beta.2", 4] <= sig_level))
 
     # there is no heterogeneity, so we expect no GATES group difference to be significant
-    gates_diff_pvals <- apply(get_GATES(x, plot = FALSE)[5:7, 4:5], 1, min)
+    gates_diff_pvals <- get_GATES(x, plot = FALSE)[5:7, 4]
     expect_true(all(gates_diff_pvals > sig_level))
 
     # there is no heterogeneity, so we expect no CLAN group difference to be significant
-    clan_1_diff_pvals <- apply(get_CLAN(x, plot = FALSE, variable = "z1")[5:7, 4:5], 1, min)
-    clan_2_diff_pvals <- apply(get_CLAN(x, plot = FALSE, variable = "z2")[5:7, 4:5], 1, min)
-    clan_3_diff_pvals <- apply(get_CLAN(x, plot = FALSE, variable = "z3")[5:7, 4:5], 1, min)
+    clan_1_diff_pvals <- get_CLAN(x, plot = FALSE, variable = "z1")[5:7, 4]
+    clan_2_diff_pvals <- get_CLAN(x, plot = FALSE, variable = "z2")[5:7, 4]
+    clan_3_diff_pvals <- get_CLAN(x, plot = FALSE, variable = "z3")[5:7, 4]
     expect_true(all(clan_1_diff_pvals > sig_level))
     expect_true(all(clan_2_diff_pvals > sig_level))
     expect_true(all(clan_3_diff_pvals > sig_level))
@@ -89,10 +89,10 @@ if (require("glmnet") && require("ranger") && require("e1071")) {
     expect_true(beta1_cb[1] <= ATE & ATE <= beta1_cb[2])
 
     # there is heterogeneity, so beta.2 should be significant
-    expect_true(min(get_BLP(x, plot = FALSE)["beta.2", c(4,5)]) <= sig_level)
+    expect_true(get_BLP(x, plot = FALSE)["beta.2", 4] < sig_level)
 
     # there is heterogeneity, so we expect all GATES group differences to be significant
-    gates_diff_pvals <- apply(get_GATES(x, plot = FALSE)[5:7, 4:5], 1, min)
+    gates_diff_pvals <- get_GATES(x, plot = FALSE)[5:7, 4]
     expect_true(all(gates_diff_pvals < sig_level))
 
 
