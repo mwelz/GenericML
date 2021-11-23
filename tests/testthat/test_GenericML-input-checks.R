@@ -22,25 +22,25 @@ learners <- "lasso"                  # specify learner
 ## 1. illegal data type of Z, D, Y, Z_CLAN ----
 test_that("Errors if incorrect data type of Z, D, Y, Z_CLAN", {
 
-  expect_error(GenericML(data.frame(Z), D, Y, learners),
+  expect_error(GenericML(data.frame(Z), D, Y, learners, parallel = FALSE),
                "Z must be a numeric matrix. Did you supply a data frame?")
-  expect_error(GenericML(as.character(Z), D, Y, learners),
+  expect_error(GenericML(as.character(Z), D, Y, learners, parallel = FALSE),
                "Z must be a numeric matrix. Did you supply a data frame?")
-  expect_error(GenericML(Z, D, Y, Z_CLAN = data.frame(Z_CLAN), learners),
+  expect_error(GenericML(Z, D, Y, Z_CLAN = data.frame(Z_CLAN), learners, parallel = FALSE),
                "Z_CLAN must be a numeric matrix or NULL. Did you supply a data frame?")
-  expect_error(GenericML(Z, as.matrix(D), Y, learners),
+  expect_error(GenericML(Z, as.matrix(D), Y, learners, parallel = FALSE),
                "D must be a numeric vector")
   D_nonbinary <- D; D_nonbinary[1] <- 2
-  expect_error(GenericML(Z, D_nonbinary, Y, learners),
+  expect_error(GenericML(Z, D_nonbinary, Y, learners, parallel = FALSE),
                "Treatment assignment D is not binary")
-  expect_error(GenericML(Z, D, as.matrix(Y), learners),
+  expect_error(GenericML(Z, D, as.matrix(Y), learners, parallel = FALSE),
                "Y must be a numeric vector")
 
   # incorrect dimension
-  expect_error(GenericML(Z[-1,], D, Y, learners))
-  expect_error(GenericML(Z, D, Y, learners, Z_CLAN = Z_CLAN[-1,]))
-  expect_error(GenericML(Z, D[-1], Y, learners))
-  expect_error(GenericML(Z, D, Y[-1], learners))
+  expect_error(GenericML(Z[-1,], D, Y, learners, parallel = FALSE))
+  expect_error(GenericML(Z, D, Y, learners, Z_CLAN = Z_CLAN[-1,], parallel = FALSE))
+  expect_error(GenericML(Z, D[-1], Y, learners, parallel = FALSE))
+  expect_error(GenericML(Z, D, Y[-1], learners, parallel = FALSE))
 
 
   # simulate missing values
@@ -51,13 +51,13 @@ test_that("Errors if incorrect data type of Z, D, Y, Z_CLAN", {
   Y_NA <- Y
   Y_NA[1] <- NA_real_
   Z_CLAN_NA <- Z_NA
-  expect_error(GenericML(Z_NA, D, Y, learners),
+  expect_error(GenericML(Z_NA, D, Y, learners, parallel = FALSE),
                "Z contains missing values")
-  expect_error(GenericML(Z, D_NA, Y, learners),
+  expect_error(GenericML(Z, D_NA, Y, learners, parallel = FALSE),
                "D contains missing values")
-  expect_error(GenericML(Z, D, Y_NA, learners),
+  expect_error(GenericML(Z, D, Y_NA, learners, parallel = FALSE),
                "Y contains missing values")
-  expect_error(GenericML(Z, D, Y, Z_CLAN = Z_CLAN_NA, learners),
+  expect_error(GenericML(Z, D, Y, Z_CLAN = Z_CLAN_NA, learners, parallel = FALSE),
                "Z_CLAN contains missing values")
 
 }) # TEST
@@ -68,27 +68,31 @@ test_that("Errors in machine learner specification", {
 
   ## if error message not specified, it is a stopifnot() error
   # GenericML learner
-  expect_error(GenericML(Z, D, Y, learners_GenericML = c(1,2,3)))
-  expect_error(GenericML(Z, D, Y, learners_GenericML = environment()))
-  expect_error(GenericML(Z, D, Y, learners, learners_GenericML = "mlr3::foo"),
+  expect_error(GenericML(Z, D, Y, learners_GenericML = c(1,2,3), parallel = FALSE))
+  expect_error(GenericML(Z, D, Y, learners_GenericML = environment(), parallel = FALSE))
+  expect_error(GenericML(Z, D, Y, learners, parallel = FALSE,
+                         learners_GenericML = "mlr3::foo"),
                "'fooregr.' is not an exported object from 'namespace:mlr3'") # illegal mlr3 syntax
   # illegal mlr3 syntax (type of learning procedure specified)
-  expect_error(GenericML(Z, D, Y,
+  expect_error(GenericML(Z, D, Y, parallel = FALSE,
                          learners_GenericML = "mlr3::lrn('regr.ranger', num.trees = 100)"),
                "Element with key 'regr.regr.ranger' not found in DictionaryLearner!")
 
 
   # propensity score learner
-  expect_error(GenericML(Z, D, Y, learners, learner_propensity_score = environment()))
-  expect_error(GenericML(Z, D, Y, learners,
+  expect_error(GenericML(Z, D, Y, learners, learner_propensity_score = environment(), parallel = FALSE))
+  expect_error(GenericML(Z, D, Y, learners, parallel = FALSE,
                          learner_propensity_score = c("lasso", "random_forest"))) # multiple learners not allowed
-  expect_error(GenericML(Z, D, Y, learners, learner_propensity_score = c(1,2,3)),
+  expect_error(GenericML(Z, D, Y, learners, parallel = FALSE,
+                         learner_propensity_score = c(1,2,3)),
                "propensity_scores, Y need to have an equal number of observations")
-  expect_error(GenericML(Z, D, Y, learners, learner_propensity_score = "foo"))
-  expect_error(GenericML(Z, D, Y, learners, learner_propensity_score = "mlr3::foo"),
+  expect_error(GenericML(Z, D, Y, learners, parallel = FALSE,
+                         learner_propensity_score = "foo"))
+  expect_error(GenericML(Z, D, Y, learners, parallel = FALSE,
+                         learner_propensity_score = "mlr3::foo"),
                "'fooclassif.' is not an exported object from 'namespace:mlr3'") # illegal mlr3 syntax
   # illegal mlr3 syntax (type of learning procedure specified)
-  expect_error(GenericML(Z, D, Y, learners,
+  expect_error(GenericML(Z, D, Y, learners, parallel = FALSE,
                          learner_propensity_score = "mlr3::lrn('classif.ranger', num.trees = 100)"),
                "Element with key 'classif.classif.ranger' not found in DictionaryLearner!")
 
@@ -103,27 +107,28 @@ test_that("Errors in machine learner specification", {
 test_that("Errors in remaining arguments", {
 
   # single splits are not allowed
-  expect_error(GenericML(Z, D, Y, learners, num_splits = 1))
+  expect_error(GenericML(Z, D, Y, learners, num_splits = 1, parallel = FALSE))
 
   # cutoffs must be in (0, 1)
-  expect_error(GenericML(Z, D, Y, learners, quantile_cutoffs = c(0, 2)))
+  expect_error(GenericML(Z, D, Y, learners, parallel = FALSE,
+                         quantile_cutoffs = c(0, 2)))
 
-  expect_error(GenericML(Z, D, Y, learners, X1_BLP = list()),
+  expect_error(GenericML(Z, D, Y, learners, X1_BLP = list(), parallel = FALSE),
                "X1_BLP must be an instance of setup_X1()")
 
-  expect_error(GenericML(Z, D, Y, learners, X1_GATES = list()),
+  expect_error(GenericML(Z, D, Y, learners, X1_GATES = list(), parallel = FALSE),
                "X1_GATES must be an instance of setup_X1()")
 
-  expect_error(GenericML(Z, D, Y, learners, diff_GATES = list()),
+  expect_error(GenericML(Z, D, Y, learners, diff_GATES = list(), parallel = FALSE),
                "diff_GATES must be an instance of setup_diff()")
 
-  expect_error(GenericML(Z, D, Y, learners, diff_CLAN = list()),
+  expect_error(GenericML(Z, D, Y, learners, diff_CLAN = list(), parallel = FALSE),
                "diff_CLAN must be an instance of setup_diff()")
 
-  expect_error(GenericML(Z, D, Y, learners, vcov_BLP = list()),
+  expect_error(GenericML(Z, D, Y, learners, vcov_BLP = list(), parallel = FALSE),
                "vcov_BLP must be an instance of setup_vcov()")
 
-  expect_error(GenericML(Z, D, Y, learners, vcov_GATES = list()),
+  expect_error(GenericML(Z, D, Y, learners, vcov_GATES = list(), parallel = FALSE),
                "vcov_GATES must be an instance of setup_vcov()")
 
   # sanity check: input for the setup functions
@@ -132,38 +137,38 @@ test_that("Errors in remaining arguments", {
 
 
   # illegal input to diff arguments
-  expect_error(GenericML(Z, D, Y, learners, num_splits = 2,
+  expect_error(GenericML(Z, D, Y, learners, num_splits = 2, parallel = FALSE,
                          diff_GATES = setup_diff("most", 4)),
                "The most affected group cannot be subtracted from itself")
 
-  expect_error(GenericML(Z, D, Y, learners, num_splits = 2,
+  expect_error(GenericML(Z, D, Y, learners, num_splits = 2, parallel = FALSE,
                          quantile_cutoffs = c(0.1, 0.2, 0.3, 0.6),
                          diff_GATES = setup_diff("most", 5)),
                "The most affected group cannot be subtracted from itself")
 
-  expect_error(GenericML(Z, D, Y, learners, num_splits = 2,
+  expect_error(GenericML(Z, D, Y, learners, num_splits = 2, parallel = FALSE,
                          diff_GATES = setup_diff("most", 5)))
 
-  expect_error(GenericML(Z, D, Y, learners, num_splits = 2,
+  expect_error(GenericML(Z, D, Y, learners, num_splits = 2, parallel = FALSE,
                          diff_GATES = setup_diff("most", 0)))
 
-  expect_error(GenericML(Z, D, Y, learners, num_splits = 2,
+  expect_error(GenericML(Z, D, Y, learners, num_splits = 2, parallel = FALSE,
                          quantile_cutoffs = c(0.1, 0.2, 0.3, 0.6),
                          diff_GATES = setup_diff("most", 6)))
 
-  expect_error(GenericML(Z, D, Y, learners, num_splits = 2,
+  expect_error(GenericML(Z, D, Y, learners, num_splits = 2, parallel = FALSE,
                          quantile_cutoffs = c(0.1, 0.2, 0.3, 0.6),
                          diff_GATES = setup_diff("least", 6)))
 
-  expect_error(GenericML(Z, D, Y, learners, num_splits = 2,
+  expect_error(GenericML(Z, D, Y, learners, num_splits = 2, parallel = FALSE,
                          quantile_cutoffs = c(0.1, 0.2, 0.3, 0.6),
                          diff_GATES = setup_diff("least", 1)),
                "The least affected group cannot be subtracted from itself")
 
   # illegal input to setup_X1
-  expect_error(GenericML(Z, D, Y, learners, num_splits = 2,
+  expect_error(GenericML(Z, D, Y, learners, num_splits = 2, parallel = FALSE,
                          X1_BLP = setup_X1(covariates = Z[-1,])))
-  expect_error(GenericML(Z, D, Y, learners, num_splits = 2,
+  expect_error(GenericML(Z, D, Y, learners, num_splits = 2, parallel = FALSE,
                          X1_BLP = setup_X1(fixed_effects = rep(1, n-1))))
 
 })
@@ -173,7 +178,7 @@ test_that("Errors in remaining arguments", {
 test_that("function should be able to deal with low-signal input",{
 
   # illegal propensity scores
-  expect_error(GenericML(Z, D, Y, "random_forest",
+  expect_error(GenericML(Z, D, Y, "random_forest", parallel = FALSE,
                          learner_propensity_score = rep(1, n)))
 
   # illegal treatment assignment (throws both warning and error, as it should)
