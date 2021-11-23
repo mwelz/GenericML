@@ -154,64 +154,31 @@ genML
 
 ## the line below returns the medians of the estimated  \Lambda and \bar{\Lambda}
 genML$best$overview
-#                                            lambda lambda.bar
-# lasso                                0.0005021887   3.987549
-# mlr3::lrn('ranger', num.trees = 100) 0.0013285598   4.001061
-# mlr3::lrn('svm')                     0.0018907318   3.971723
 
 # Get best learner for BLP
 genML$best$BLP
-# "mlr3::lrn('svm')"
 
 # Get best learner for GATES and CLAN (this is the same learner)
 genML$best$GATES
 genML$best$CLAN
-# "mlr3::lrn('ranger', num.trees = 100)"
 
 
 # VEIN of BLP
 get_BLP(genML, plot = FALSE)
 plot(genML, type = "BLP") # plot.GenericML() method
-#          Estimate   CB lower  CB upper  Pr(>|z|)
-# beta.1 1.99004701  1.8941399 2.0865846 0.0000000
-# beta.2 0.02008194 -0.1357274 0.1825625 0.7671611
 # No indication of treatment effect heterogeneity: beta.2 not significant
 
 # VEIN of GATES
 get_GATES(genML, plot = FALSE)
 plot(genML, type = "GATES")
-#                     Estimate   CB lower  CB upper     Pr(>|z|)
-# gamma.1          2.013269584  1.7774793 2.2399200 1.388830e-64
-# gamma.2          2.002905317  1.7706349 2.2371161 1.216255e-64
-# gamma.3          1.975673043  1.7440607 2.2055316 2.102408e-63
-# gamma.4          2.008811821  1.7730794 2.2371024 2.416696e-65
-# gamma.5          2.000329884  1.7709185 2.2291943 3.506243e-64
-# gamma.5-gamma.1 -0.005870186 -0.3363183 0.3232286 9.728257e-01
-# gamma.5-gamma.2  0.009202547 -0.3147502 0.3384705 9.265794e-01
 # No indication of heterogeneity
 
 # VEIN of CLAN for variable 'z1'
 get_CLAN(genML, variable = "z1", plot = FALSE)
 plot(genML, type = "CLAN", CLAN_variable = "z1")
-#                     Estimate    CB lower   CB upper  Pr(>|z|)
-# delta.1          0.011382749 -0.08329323 0.11017988 0.7173005
-# delta.2          0.053358133 -0.03292408 0.14113387 0.2174559
-# delta.3          0.030516397 -0.05514932 0.11618211 0.4565903
-# delta.4          0.005796215 -0.07860407 0.08920595 0.8869233
-# delta.5         -0.062963144 -0.14805291 0.02390041 0.1533801
-# delta.5-delta.1 -0.071003538 -0.19923253 0.05932083 0.2888714
-# delta.5-delta.2 -0.099037187 -0.22257883 0.02314453 0.1116662
 # No indication of heterogeneity
 
 ```
-
-## TODO list
-Here we list desirable functionalities that we hope to implement in future releases.
-
-- [ ] Add optional monotonization of the confidence bounds;
-- [ ] Make stratified sampling an argument;
-- [ ] Implement print, plot, predict, summary methods for instances of proxy_CATE, proxy_BCA, BLP, GATES, propensity_score;
-- [ ] return proxy_BCA object in proxy_CATE output.
 
 ## Authors
 Max Welz (welz@ese.eur.nl), Andreas Alfons (alfons@ese.eur.nl), Mert Demirer (mdemirer@mit.edu), and Victor Chernozhukov (vchern@mit.edu).
