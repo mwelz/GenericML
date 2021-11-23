@@ -227,8 +227,8 @@ GenericML <- function(Z, D, Y,
                                X1_BLP                     = X1_BLP,
                                X1_GATES                   = X1_GATES,
                                HT                         = HT,
-                               vcov_BLP                   = vcov_BLP,
-                               vcov_GATES                 = vcov_GATES,
+                               vcov_BLP                   = setup_vcov_align(vcov_BLP),   # align for consistency
+                               vcov_GATES                 = setup_vcov_align(vcov_GATES), # align for consistency
                                equal_variances_CLAN       = equal_variances_CLAN,
                                prop_aux                   = prop_aux,
                                quantile_cutoffs           = quantile_cutoffs,

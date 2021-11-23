@@ -229,7 +229,7 @@ setup_diff <- function(subtract_from = "most",
 #' if (require("sandwich")){
 #'
 #' # use HAC-robust estimator with prewhitening and Andrews' (Econometrica, 1991) weights
-#' # since weightsAndrews() is a function in sandwich, require this package
+#' # since weightsAndrews() is a function in 'sandwich', require this package
 #' setup_vcov(estimator = "vcovHAC", arguments = list(prewhite = TRUE, weights = weightsAndrews))
 #'
 #' }
@@ -245,6 +245,19 @@ setup_vcov <- function(estimator = "vcovHC",
   stopifnot(length(estimator) == 1)
   stopifnot(is.list(arguments))
 
+  # check if optional arguments that will require subsetting later are of correct data type
+  args_nam <- names(arguments)
+
+  if("cluster" %in% args_nam){
+    stopifnot(is.matrix(arguments$cluster) | is.vector(arguments$cluster))
+    stopifnot(is.numeric(arguments$cluster))
+  } else if("order.by" %in% args_nam){
+    stopifnot(is.numeric(arguments$order.by) & is.vector(arguments$order.by))
+  } else if("omega" %in% args_nam){
+    stopifnot(is.numeric(arguments$omega) & is.vector(arguments$omega))
+  } # IF
+
+
   if(!estimator %in% c("vcovBS", "vcovCL", "vcovHAC", "vcovHC")){
     stop(paste0("'estimator' needs to be in ",
          "c('vcovBS', 'vcovCL', 'vcovHAC', 'vcovHC')"), call. = FALSE)
@@ -252,6 +265,19 @@ setup_vcov <- function(estimator = "vcovHC",
 
 
   # return
+  setup_vcov_NoChecks(
+    estimator = estimator,
+    arguments = arguments)
+
+} # FUN
+
+
+#' same as above, just without input checks
+#'
+#' @import sandwich
+#' @noRd
+setup_vcov_NoChecks <- function(estimator = "vcovHC",
+                                arguments = list(type = "const")){
   structure(
     list(estimator = estimator,
          arguments = arguments),
@@ -259,6 +285,36 @@ setup_vcov <- function(estimator = "vcovHC",
 
 } # FUN
 
+
+# helper function that makes a 'setup_vcov' ready for further use
+# x is of class "setup_vcov"
+setup_vcov_align <- function(x){
+
+  # this function simply makes the cluster argument a matrix (important for later use)
+  if(!is.null(x$arguments$cluster)){
+    x$arguments$cluster <- as.matrix(x$arguments$cluster)
+  } # IF
+
+  # recover class
+  structure(x, class = "setup_vcov")
+
+} # FUN
+
+
+# helper function that subsets optional arguments that were passed in setup_vcov()
+# x is of class "setup_vcov"
+setup_vcov_subset <- function(x, idx){
+
+  # subset the (potential) inputs that need subsetting due to sample splits
+  # if an input is NULL, then the corresponding line won't have an effect (naturally)
+  x$arguments$cluster  <- x$arguments$cluster[idx,,drop = FALSE] # matrix, rest are vectors
+  x$arguments$order.by <- x$arguments$order.by[idx]
+  x$arguments$omega    <- x$arguments$omega[idx]
+
+  # recover class
+  structure(x, class = "setup_vcov")
+
+} # FUN
 
 
 #' Setup function controlling the matrix \eqn{X_1} in the BLP or GATES regression

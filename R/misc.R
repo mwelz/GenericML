@@ -317,6 +317,10 @@ GenericML_single_NoChecks <-
         covariates    = X1_GATES$covariates[M_set,,drop = FALSE],
         fixed_effects = X1_GATES$fixed_effects[M_set])
 
+    # restrict the vcov controls to M_set
+    vcov_BLP_M   <- setup_vcov_subset(vcov_BLP, idx = M_set)
+    vcov_GATES_M <- setup_vcov_subset(vcov_GATES, idx = M_set)
+
 
     ### step 1b: estimate BLP parameters ----
     blp.obj <- BLP_NoChecks(
@@ -327,9 +331,8 @@ GenericML_single_NoChecks <-
       proxy_CATE         = proxy_CATE_M,
       HT                 = HT,
       X1_control         = X1_BLP_M,
-      vcov_control       = vcov_BLP,
+      vcov_control       = vcov_BLP_M,
       significance_level = significance_level)
-
 
 
     ### step 1c: estimate GATES parameters by OLS ----
@@ -347,7 +350,7 @@ GenericML_single_NoChecks <-
       membership          = membership_M,
       HT                  = HT,
       X1_control          = X1_GATES_M,
-      vcov_control        = vcov_GATES,
+      vcov_control        = vcov_GATES_M,
       diff                = diff_GATES,
       significance_level  = significance_level)
 

@@ -35,7 +35,7 @@ setup_vcov(estimator = "vcovHC", arguments = list(type = "H0"))
 if (require("sandwich")){
 
 # use HAC-robust estimator with prewhitening and Andrews' (Econometrica, 1991) weights
-# since weightsAndrews() is a function in sandwich, require this package
+# since weightsAndrews() is a function in 'sandwich', require this package
 setup_vcov(estimator = "vcovHAC", arguments = list(prewhite = TRUE, weights = weightsAndrews))
 
 }
