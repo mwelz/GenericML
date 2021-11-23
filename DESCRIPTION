@@ -22,7 +22,7 @@ Authors@R:
              email = "vchern@mit.edu")) 
 Author: Max Welz [aut, cre] (<https://orcid.org/0000-0003-2945-1860>), Andreas Alfons [aut] (<https://orcid.org/0000-0002-2513-3788>), Mert Demirer [aut], Victor Chernozhukov [aut]
 Maintainer: Max Welz <welz@ese.eur.nl>           
-Description: R implementation of Generic Machine Learning Inference (Chernozhukov, Demirer, Duflo and Fernández-Val, 2020).
+Description: Generic Machine Learning Inference on heterogeneous treatment effects in randomized experiments as proposed in Chernozhukov, Demirer, Duflo and Fernández-Val (2020) <arXiv:1712.04802>. This package's workhorse is the 'mlr3' framework of Lang et al. (2019) <doi:10.21105/joss.01903>, which enables the specification of a wide variety of machine learners. The main functionality, GenericML(), runs Algorithm 1 in Chernozhukov, Demirer, Duflo and Fernández-Val (2020) <arXiv:1712.04802> for a suite of user-specified machine learners. All steps in the algorithm are customizable via setup functions. Methods for printing and plotting are available for objects returned by GenericML(). Parallel computing is supported.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true

@@ -271,7 +271,10 @@ InputChecks_index_set <- function(set, num_obs){
 } # FUN
 
 
-#' A function that returns \code{TRUE} if your OS is a Unix system and \code{FALSE} otherwise.
+#' Check if user's OS is a Unix system
+#'
+#' @return
+#' A Boolean that is \code{TRUE} if the user's operating system is a Unix system and \code{FALSE} otherwise.
 #'
 #' @export
 TrueIfUnix <- function(){

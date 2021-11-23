@@ -2,10 +2,13 @@
 % Please edit documentation in R/input-checks.R
 \name{TrueIfUnix}
 \alias{TrueIfUnix}
-\title{A function that returns \code{TRUE} if your OS is a Unix system and \code{FALSE} otherwise.}
+\title{Check if user's OS is a Unix system}
 \usage{
 TrueIfUnix()
 }
+\value{
+A Boolean that is \code{TRUE} if the user's operating system is a Unix system and \code{FALSE} otherwise.
+}
 \description{
-A function that returns \code{TRUE} if your OS is a Unix system and \code{FALSE} otherwise.
+Check if user's OS is a Unix system
 }

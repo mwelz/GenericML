@@ -5,6 +5,9 @@
 #' @param x An instance of \code{\link{GenericML}}.
 #' @param ... Additional arguments to be passed down.
 #'
+#' @return
+#' A print to the console.
+#'
 #' @examples
 #' if(require("glmnet")){
 #'

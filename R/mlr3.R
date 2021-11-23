@@ -113,6 +113,9 @@ propensity_score_mlr3 <- function(Z, D, learner = "random_forest"){
   # specify that the learner predicts Pr(D = 1 | Z)
   learner$predict_type = "prob"
 
+  # ensure that mlr3 only uses one thread (default in mlr3)
+  invisible(mlr3::set_threads(x = learner, n = 1L))
+
   # fit the learner
   learner$train(task.propensity_score)
 
@@ -218,6 +221,9 @@ proxy_BCA_NoChecks <- function(Z, D, Y,
 
   # specify that the learner predicts Y
   learner$predict_type = "response"
+
+  # ensure that mlr3 only uses one thread (default in mlr3)
+  invisible(mlr3::set_threads(x = learner, n = 1L))
 
   # indices of the control units in the auxiliary sample
   A_set.logical <- 1:length(Y) %in% A_set
@@ -342,6 +348,9 @@ proxy_CATE_NoChecks <- function(Z, D, Y,
 
   # specify that the learner predicts Y
   learner$predict_type = "response"
+
+  # ensure that mlr3 only uses one thread (default in mlr3)
+  invisible(mlr3::set_threads(x = learner, n = 1L))
 
   # specify the task for estimating E[Y | D=1, Z]
   task.proxy_CATE.treated.estimator <- mlr3::TaskRegr$new(id = "cate.treated",

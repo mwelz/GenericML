@@ -11,6 +11,9 @@
 
 \item{...}{Additional arguments to be passed down.}
 }
+\value{
+A print to the console.
+}
 \description{
 Prints key results of the analyses conducted in \code{\link{GenericML}}.
 }
