@@ -29,7 +29,7 @@ The specifications \code{lasso}, \code{random_forest}, and \code{tree} in \code{
 \examples{
 ## generate data
 set.seed(1)
-n  <- 200                        # number of observations
+n  <- 100                        # number of observations
 p  <- 5                          # number of covariates
 D  <- rbinom(n, 1, 0.5)          # random treatment assignment
 Z  <- matrix(runif(n*p), n, p)   # design matrix

@@ -36,7 +36,7 @@ The specifications \code{lasso}, \code{random_forest}, and \code{tree} in \code{
 if(require("ranger")){
 ## generate data
 set.seed(1)
-n  <- 200                                  # number of observations
+n  <- 150                                  # number of observations
 p  <- 5                                    # number of covariates
 D  <- rbinom(n, 1, 0.5)                    # random treatment assignment
 Z  <- matrix(runif(n*p), n, p)             # design matrix
@@ -46,7 +46,7 @@ Y  <- ifelse(D == 1, Y1, Y0)               # observed outcome
 A_set <- sample(1:n, size = n/2)           # auxiliary set
 
 ## BCA predictions via random forest
-proxy_BCA(Z, D, Y, A_set, learner = "mlr3::lrn('ranger', num.trees = 30)")
+proxy_BCA(Z, D, Y, A_set, learner = "mlr3::lrn('ranger', num.trees = 10)")
 }
 
 }

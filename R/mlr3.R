@@ -24,7 +24,7 @@
 #' @examples
 #' ## generate data
 #' set.seed(1)
-#' n  <- 200                        # number of observations
+#' n  <- 100                        # number of observations
 #' p  <- 5                          # number of covariates
 #' D  <- rbinom(n, 1, 0.5)          # random treatment assignment
 #' Z  <- matrix(runif(n*p), n, p)   # design matrix
@@ -166,7 +166,7 @@ propensity_score_mlr3 <- function(Z, D, learner = "random_forest"){
 #' if(require("ranger")){
 #' ## generate data
 #' set.seed(1)
-#' n  <- 200                                  # number of observations
+#' n  <- 150                                  # number of observations
 #' p  <- 5                                    # number of covariates
 #' D  <- rbinom(n, 1, 0.5)                    # random treatment assignment
 #' Z  <- matrix(runif(n*p), n, p)             # design matrix
@@ -176,7 +176,7 @@ propensity_score_mlr3 <- function(Z, D, learner = "random_forest"){
 #' A_set <- sample(1:n, size = n/2)           # auxiliary set
 #'
 #' ## BCA predictions via random forest
-#' proxy_BCA(Z, D, Y, A_set, learner = "mlr3::lrn('ranger', num.trees = 30)")
+#' proxy_BCA(Z, D, Y, A_set, learner = "mlr3::lrn('ranger', num.trees = 10)")
 #' }
 #'
 #' @export
@@ -286,7 +286,7 @@ proxy_BCA_NoChecks <- function(Z, D, Y,
 #' if(require("ranger")){
 #' ## generate data
 #' set.seed(1)
-#' n  <- 200                                  # number of observations
+#' n  <- 150                                  # number of observations
 #' p  <- 5                                    # number of covariates
 #' D  <- rbinom(n, 1, 0.5)                    # random treatment assignment
 #' Z  <- matrix(runif(n*p), n, p)             # design matrix
@@ -296,7 +296,7 @@ proxy_BCA_NoChecks <- function(Z, D, Y,
 #' A_set <- sample(1:n, size = n/2)           # auxiliary set
 #'
 #' ## CATE predictions via random forest
-#' proxy_CATE(Z, D, Y, A_set, learner = "mlr3::lrn('ranger', num.trees = 30)")
+#' proxy_CATE(Z, D, Y, A_set, learner = "mlr3::lrn('ranger', num.trees = 10)")
 #' }
 #'
 #' @export

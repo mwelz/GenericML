@@ -156,7 +156,7 @@ quantile_group_NoChecks <- function(x = x,
 #' if(require("ranger")){
 #' ## generate data
 #' set.seed(1)
-#' n  <- 200                        # number of observations
+#' n  <- 150                        # number of observations
 #' p  <- 5                          # number of covariates
 #' Z  <- matrix(runif(n*p), n, p)   # design matrix
 #' D  <- rbinom(n, 1, 0.5)          # random treatment assignment
@@ -165,7 +165,7 @@ quantile_group_NoChecks <- function(x = x,
 #' M_set <- sample(1:n, size = n/2) # main set
 #'
 #' ## specify learner
-#' learner <- "mlr3::lrn('ranger', num.trees = 30)"
+#' learner <- "mlr3::lrn('ranger', num.trees = 10)"
 #'
 #' ## run single GenericML iteration
 #' GenericML_single(Z, D, Y, learner, propensity_scores, M_set)

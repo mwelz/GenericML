@@ -24,7 +24,7 @@
 #' @examples
 #' ## generate data
 #' set.seed(1)
-#' n  <- 200                              # number of observations
+#' n  <- 150                              # number of observations
 #' p  <- 5                                # number of covariates
 #' Z_CLAN <- matrix(runif(n*p), n, p)     # design matrix to perform CLAN on
 #' membership <- quantile_group(rnorm(n)) # group membership

@@ -49,7 +49,7 @@ Performs the linear regression for the Best Linear Predictor (BLP) procedure.
 \examples{
 ## generate data
 set.seed(1)
-n  <- 200                        # number of observations
+n  <- 150                        # number of observations
 p  <- 5                          # number of covariates
 D  <- rbinom(n, 1, 0.5)          # random treatment assignment
 Y  <- runif(n)                   # outcome variable

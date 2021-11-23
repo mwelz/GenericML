@@ -43,7 +43,7 @@ if(require("glmnet")) {
 
 ## generate data
 set.seed(1)
-n  <- 200                                  # number of observations
+n  <- 150                                  # number of observations
 p  <- 5                                    # number of covariates
 D  <- rbinom(n, 1, 0.5)                    # random treatment assignment
 Z  <- matrix(runif(n*p), n, p)             # design matrix
@@ -68,7 +68,7 @@ diff_CLAN  <- setup_diff(subtract_from = "least",
 
 ## perform generic ML inference
 # small number of splits to keep computation time low
-x <- GenericML(Z, D, Y, learners, num_splits = 10,
+x <- GenericML(Z, D, Y, learners, num_splits = 2,
                quantile_cutoffs = quantile_cutoffs,
                diff_GATES = diff_GATES,
                diff_CLAN = diff_CLAN,
