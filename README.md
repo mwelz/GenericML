@@ -1,17 +1,29 @@
-# GenericML: Generic machine learning inference on heterogeneous treatment effects in randomized experiments
+# GenericML: Generic Machine Llearning Inference
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![R-CMD-check](https://github.com/mwelz/GenericML/workflows/R-CMD-check/badge.svg)](https://github.com/mwelz/GenericML/actions)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/GenericML)](https://cran.r-project.org/package=GenericML)
+[![metacran downloads](https://cranlogs.r-pkg.org/badges/GenericML)](https://cran.r-project.org/package=GenericML)
 
 To cite `GenericML` in publications, please use:
 
-> Welz M., Alfons, A., Demirer, M. and Chernozhukov, V. (2021). `GenericML`: An `R` package for generic machine learning inference on heterogeneous treatment effects in randomized experiments. *GitHub repository*. URL: https://github.com/mwelz/GenericML.
+> Welz M., Alfons, A., Demirer, M. and Chernozhukov, V. (2021). `GenericML`: Generic Machine Learning Inference. `R` package version 0.1.0. URL: https://CRAN.R-project.org/package=GenericML.
 
 
 ## Summary
-Highly customizable and parallelized, object-oriented  `R` implementation of [Generic Machine Learning (Chernozhukov, V., Demirer, M., Duflo, E., &amp; Fernández-Val, I., 2020)](https://arxiv.org/abs/1712.04802), using the [`mlr3`](https://github.com/mlr-org/mlr3) framework. We intend to extend this implementation to a fully-fledged `R` package for the CRAN. Please note that this implementation is still work in progress and has not yet been thoroughly tested, so we cannot yet guarantee correctness or stability. 
+
+`R` implementation of Generic Machine Learning Inference on heterogeneous treatment effects in randomized experiments as proposed in [Chernozhukov, Demirer, Duflo and Fernández-Val (2020)](https://arxiv.org/abs/1712.04802). This package's workhorse is the `mlr3` framework of [Lang et al. (2019)](https://joss.theoj.org/papers/10.21105/joss.01903), which enables the specification of a wide variety of machine learners. The main functionality, `GenericML()`, runs Algorithm 1 in [Chernozhukov, Demirer, Duflo and Fernández-Val (2020)](https://arxiv.org/abs/1712.04802) for a suite of user-specified machine learners. All steps in the algorithm are customizable via setup functions. Methods for printing and plotting are available for objects returned by `GenericML()`. Parallel computing is supported.
 
 ## Installation
+
+### From CRAN
+The package `GenericML` is on CRAN (The Comprehensive R Archive Network), hence the latest release can be easily installed from the `R` command line via
+```
+install.packages("GenericML")
+```
+
+### Building from source
+
 To install the latest (possibly unstable) development version from GitHub, you can pull this repository and install it from the `R` command line via
 ```
 install.packages("devtools")
