@@ -20,7 +20,7 @@
 
 \item{type}{The analysis whose parameters shall be plotted. Either \code{"GATES"}, \code{"BLP"}, or \code{"CLAN"}. Default is \code{"GATES"}.}
 
-\item{learner}{The learner whose results are to be returned. Default is \code{"best"} for the best learner as measured by the \eqn{Lambda} parameters.}
+\item{learner}{The learner whose results are to be returned. Default is \code{"best"} for the best learner as measured by the \eqn{\Lambda} parameters.}
 
 \item{CLAN_variable}{Name of the CLAN variable to be plotted. Only applicable if \code{type = "CLAN"}.}
 
