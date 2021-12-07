@@ -9,7 +9,7 @@
 #' A print to the console.
 #'
 #' @examples
-#' if(require("glmnet")){
+#' if(require("ranger")){
 #'
 #' ## generate data
 #' set.seed(1)
@@ -22,7 +22,7 @@
 #' Y  <- ifelse(D == 1, Y1, Y0)               # observed outcome
 #'
 #' ## specify learners
-#' learners <- c("lasso")
+#' learners <- c("random_forest")
 #'
 #' ## perform generic ML inference
 #' # small number of splits to keep computation time low

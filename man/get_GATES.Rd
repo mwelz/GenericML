@@ -20,10 +20,10 @@ A numeric matrix of GATES generic target estimates which contains information on
 Accessor function for the GATES generic target estimates
 }
 \examples{
-if(require("glmnet") && require("ranger")){
+if(require("rpart") && require("ranger")){
 ## generate data
 set.seed(1)
-n  <- 200                                  # number of observations
+n  <- 150                                  # number of observations
 p  <- 5                                    # number of covariates
 D  <- rbinom(n, 1, 0.5)                    # random treatment assignment
 Z  <- matrix(runif(n*p), n, p)             # design matrix
@@ -35,30 +35,30 @@ Y  <- ifelse(D == 1, Y1, Y0)               # observed outcome
 colnames(Z) <- paste0("V", 1:p)
 
 ## specify learners
-learners <- c("lasso", "mlr3::lrn('ranger', num.trees = 30)")
+learners <- c("tree", "mlr3::lrn('ranger', num.trees = 10)")
 
 ## perform generic ML inference
 # small number of splits to keep computation time low
-x <- GenericML(Z, D, Y, learners, num_splits = 10,
+x <- GenericML(Z, D, Y, learners, num_splits = 2,
                parallel = FALSE)
 
 ## access BLP generic targets for best learner w/o plot
 get_BLP(x, learner = "best", plot = FALSE)
 
 ## access BLP generic targets for ranger learner w/o plot
-get_BLP(x, learner = "mlr3::lrn('ranger', num.trees = 30)", plot = FALSE)
+get_BLP(x, learner = "mlr3::lrn('ranger', num.trees = 10)", plot = FALSE)
 
 ## access GATES generic targets for best learner w/o plot
 get_GATES(x, learner = "best", plot = FALSE)
 
 ## access GATES generic targets for ranger learner w/o plot
-get_GATES(x, learner = "mlr3::lrn('ranger', num.trees = 30)", plot = FALSE)
+get_GATES(x, learner = "mlr3::lrn('ranger', num.trees = 10)", plot = FALSE)
 
 ## access CLAN generic targets for "V1" & best learner, w/o plot
 get_CLAN(x, learner = "best", variable = "V1", plot = FALSE)
 
 ## access CLAN generic targets for "V1" & ranger learner, w/o plot
-get_CLAN(x, learner = "mlr3::lrn('ranger', num.trees = 30)",
+get_CLAN(x, learner = "mlr3::lrn('ranger', num.trees = 10)",
          variable = "V1", plot = FALSE)
 }
 

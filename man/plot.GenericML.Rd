@@ -39,7 +39,7 @@ An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}).
 Visualizes the estimates of the generic targets of interest: plots the point estimates as well as the corresponding confidence bounds. The generic targets of interest can be (subsets of) the parameters of the BLP, GATES, or CLAN analysis.
 }
 \examples{
-if(require("glmnet")) {
+if(require("ranger")) {
 
 ## generate data
 set.seed(1)
@@ -55,7 +55,7 @@ Y  <- ifelse(D == 1, Y1, Y0)               # observed outcome
 colnames(Z) <- paste0("V", 1:p)
 
 ## specify learners
-learners <- c("lasso")
+learners <- c("random_forest")
 
 ## specify quantile cutoffs (the 4 quartile groups here)
 quantile_cutoffs <- c(0.25, 0.5, 0.75)

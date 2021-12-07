@@ -79,6 +79,9 @@
 #' ## specify learners
 #' learners <- c("lasso", "mlr3::lrn('ranger', num.trees = 10)")
 #'
+#' ## glmnet v4.1.3 isn't supported on Solaris, so skip Lasso in this case
+#' if(Sys.info()["sysname"] == "SunOS") learners <- learners[-1]
+#'
 #' ## specify quantile cutoffs (the 4 quartile groups here)
 #' quantile_cutoffs <- c(0.25, 0.5, 0.75)
 #'

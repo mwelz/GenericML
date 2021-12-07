@@ -3,7 +3,7 @@
 # load package
 library("GenericML", quietly = TRUE)
 
-if (require("glmnet") && require("ranger") && require("rpart")) {
+if (require("ranger")) {
 
 ## generate data
 set.seed(1)
@@ -15,7 +15,7 @@ Y0 <- as.numeric(Z %*% rexp(p) + rnorm(n)) # potential outcome without treatment
 Y1 <- 2 + Y0                               # potential outcome under treatment
 Y  <- ifelse(D == 1, Y1, Y0)               # observed outcome
 Z_CLAN <- Z                                # data for CLAN
-learners <- "lasso"                  # specify learner
+learners <- "random_forest"                # specify learner
 
 
 

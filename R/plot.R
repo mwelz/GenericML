@@ -24,7 +24,7 @@
 #' @import ggplot2
 #'
 #' @examples
-#' if(require("glmnet")) {
+#' if(require("ranger")) {
 #'
 #' ## generate data
 #' set.seed(1)
@@ -40,7 +40,7 @@
 #' colnames(Z) <- paste0("V", 1:p)
 #'
 #' ## specify learners
-#' learners <- c("lasso")
+#' learners <- c("random_forest")
 #'
 #' ## specify quantile cutoffs (the 4 quartile groups here)
 #' quantile_cutoffs <- c(0.25, 0.5, 0.75)

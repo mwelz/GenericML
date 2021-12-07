@@ -20,7 +20,7 @@ A numeric matrix of BLP generic target estimates which contains information on p
 Accessor function for the BLP generic target estimates
 }
 \examples{
-if(require("glmnet") && require("ranger")){
+if(require("rpart") && require("ranger")){
 ## generate data
 set.seed(1)
 n  <- 150                                  # number of observations
