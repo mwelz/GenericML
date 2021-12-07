@@ -17,25 +17,25 @@ To cite `GenericML` in publications, please use:
 ## Installation
 
 ### From CRAN
-The package `GenericML` is on CRAN (The Comprehensive R Archive Network), hence the latest release can be easily installed from the `R` command line via
-```
+The package `GenericML` is on the CRAN (The Comprehensive R Archive Network), hence the latest release can be easily installed from the `R` command line via
+```R
 install.packages("GenericML")
 ```
 
 ### Building from source
 
 To install the latest (possibly unstable) development version from GitHub, you can pull this repository and install it from the `R` command line via
-```
+```R
 install.packages("devtools")
 devtools::install_github("mwelz/GenericML")
 ```
-If you already have package `devtools` installed, you can skip the first line.
+If you already have the package `devtools` installed, you can skip the first line.
 
 ## Community guidelines
 
 ### Report issues and request features
 
-If you experience any bugs or issues or if you have any suggestions for additional features, please submit an issue via the *Issues* tab of this repository. Please have a look at existing issues first to see if your problem for feature request has already been discussed.
+If you experience any bugs or issues or if you have any suggestions for additional features, please submit an issue via the [*Issues*](https://github.com/mwelz/GenericML/issues) tab of this repository. Please have a look at existing issues first to see if your problem or feature request has already been discussed.
 
 ### Contribute to the package
 
