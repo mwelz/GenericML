@@ -245,12 +245,15 @@ GenericML <- function(Z, D, Y,
                                store_learners             = store_learners,
                                store_splits               = store_splits)
 
-  # extract the best learners
-  best.learners <- get.best.learners(gen.ml.different.learners$generic_targets)
+  # extract the generic targets
+  generic_targets <- gen.ml.different.learners$generic_targets
+
+  # find the best learners
+  best.learners <- get.best.learners(generic_targets = generic_targets)
 
 
   ### step 3: perform VEIN analysis ----
-  vein <- VEIN(gen.ml.different.learners$generic_targets, best.learners)
+  vein <- VEIN(generic_targets = generic_targets, best.learners.obj = best.learners)
 
   # return instance of S3 class 'GenericML'
   return(

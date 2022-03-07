@@ -19,14 +19,20 @@ make.mlr3.environment <- function(learner.str, regr = TRUE){
 } # END FUN
 
 
+#' Get the best learners across sample splits
+#'
+#' @param generic_targets A list of generic targets for each learner. More specifically, each component is again a list of the generic targets pertaining to the BLP, GATES, CLAN, and best analyses. Each of those lists contains a 3-dimensional array containing the generic targets of a single learner for all sample splits (except CLAN where there is one more layer of lists).
+#'
+#' @return A list of the names of the best learner for BLP, GATES, CLAN, and an overview which is a matrix of the lambda and lambda.bar estimates of each best learner.
+#'
+#' @noRd
+get.best.learners <- function(generic_targets){
 
-get.best.learners <- function(generic.ml.across.learners.obj){
-
-  learners <- names(generic.ml.across.learners.obj)
+  learners <- names(generic_targets)
 
   # for each learner, take medians over the number of splits
   best.analysis <- sapply(learners,
-                          function(learner) apply(generic.ml.across.learners.obj[[learner]]$best, c(1,2), stats::median))
+                          function(learner) apply(generic_targets[[learner]]$best, c(1,2), stats::median))
   rownames(best.analysis) <- c("lambda", "lambda.bar")
 
   return(list(BLP      = learners[which.max(best.analysis["lambda", ])],
@@ -38,11 +44,18 @@ get.best.learners <- function(generic.ml.across.learners.obj){
 
 
 
-# TODO: make documentation; generic.ml.across.learners.obj is NOT the correct description for the input anymore (check genericML function!)
-VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
+#' Performs VEIN
+#'
+#' @param generic_targets A list of generic targets for each learner. More specifically, each component is again a list of the generic targets pertaining to the BLP, GATES, CLAN, and best analyses. Each of those lists contains a 3-dimensional array containing the generic targets of a single learner for all sample splits (except CLAN where there is one more layer of lists).
+#' @param best.learners.obj An object as returned by \code{get.best.learners()}, calculated on \code{generic_targets}.
+#'
+#' @return A list of VEIN results for all learners and only the best learners.
+#'
+#' @noRd
+VEIN <- function(generic_targets, best.learners.obj){
 
-  gen.ml.ls <- initialize.gen.ml(generic.ml.across.learners.obj)
-  learners  <- names(generic.ml.across.learners.obj)
+  gen.ml.ls <- initialize.gen.ml(generic_targets)
+  learners  <- names(generic_targets)
 
   for(learner in learners){
 
@@ -50,15 +63,15 @@ VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
     for(type in c("BLP", "GATES")){
 
       gen.ml.ls[[type]][[learner]][,"Estimate"] <-
-        apply(generic.ml.across.learners.obj[[learner]][[type]][,"Estimate",], 1, function(z) Med(z)$Med)
+        apply(generic_targets[[learner]][[type]][,"Estimate",], 1, function(z) Med(z)$Med)
       gen.ml.ls[[type]][[learner]][,"CB lower"] <-
-        apply(generic.ml.across.learners.obj[[learner]][[type]][,"CB lower",], 1, function(z) Med(z)$upper_median)
+        apply(generic_targets[[learner]][[type]][,"CB lower",], 1, function(z) Med(z)$upper_median)
       gen.ml.ls[[type]][[learner]][,"CB upper"] <-
-        apply(generic.ml.across.learners.obj[[learner]][[type]][,"CB upper",], 1, function(z) Med(z)$lower_median)
+        apply(generic_targets[[learner]][[type]][,"CB upper",], 1, function(z) Med(z)$lower_median)
       p.left.raw <-
-        apply(generic.ml.across.learners.obj[[learner]][[type]][,"Pr(<z)",], 1, function(z) Med(z)$lower_median)
+        apply(generic_targets[[learner]][[type]][,"Pr(<z)",], 1, function(z) Med(z)$lower_median)
       p.right.raw <-
-        apply(generic.ml.across.learners.obj[[learner]][[type]][,"Pr(>z)",], 1, function(z) Med(z)$lower_median)
+        apply(generic_targets[[learner]][[type]][,"Pr(>z)",], 1, function(z) Med(z)$lower_median)
       p.left.adj  <- 2 * p.left.raw
       p.right.adj <- 2 * p.right.raw
       p.left.adj[p.left.adj > 1]   <- 1 # p-values cannot exceed 1
@@ -70,20 +83,20 @@ VEIN <- function(generic.ml.across.learners.obj, best.learners.obj){
 
 
     # CLAN
-    z.clan.nam <- names(generic.ml.across.learners.obj[[1]]$CLAN)
+    z.clan.nam <- names(generic_targets[[1]]$CLAN)
 
     for(z.clan in z.clan.nam){
 
       gen.ml.ls$CLAN[[learner]][[z.clan]][,"Estimate"] <-
-        apply(generic.ml.across.learners.obj[[learner]][["CLAN"]][[z.clan]][,"Estimate",], 1, function(z) Med(z)$Med)
+        apply(generic_targets[[learner]][["CLAN"]][[z.clan]][,"Estimate",], 1, function(z) Med(z)$Med)
       gen.ml.ls$CLAN[[learner]][[z.clan]][,"CB lower"] <-
-        apply(generic.ml.across.learners.obj[[learner]][["CLAN"]][[z.clan]][,"CB lower",], 1, function(z) Med(z)$upper_median)
+        apply(generic_targets[[learner]][["CLAN"]][[z.clan]][,"CB lower",], 1, function(z) Med(z)$upper_median)
       gen.ml.ls$CLAN[[learner]][[z.clan]][,"CB upper"] <-
-        apply(generic.ml.across.learners.obj[[learner]][["CLAN"]][[z.clan]][,"CB upper",], 1, function(z) Med(z)$upper_median)
+        apply(generic_targets[[learner]][["CLAN"]][[z.clan]][,"CB upper",], 1, function(z) Med(z)$upper_median)
       p.left.raw <-
-        apply(generic.ml.across.learners.obj[[learner]][["CLAN"]][[z.clan]][,"Pr(<z)",], 1, function(z) Med(z)$lower_median)
+        apply(generic_targets[[learner]][["CLAN"]][[z.clan]][,"Pr(<z)",], 1, function(z) Med(z)$lower_median)
       p.right.raw <-
-        apply(generic.ml.across.learners.obj[[learner]][["CLAN"]][[z.clan]][,"Pr(>z)",], 1, function(z) Med(z)$lower_median)
+        apply(generic_targets[[learner]][["CLAN"]][[z.clan]][,"Pr(>z)",], 1, function(z) Med(z)$lower_median)
       p.left.adj  <- 2 * p.left.raw
       p.right.adj <- 2 * p.right.raw
       p.left.adj[p.left.adj > 1]   <- 1 # p-values cannot exceed 1
