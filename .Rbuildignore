@@ -2,3 +2,6 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^\.github$
+inst/doc/repo_plots
+inst/doc/examples
+README.md
