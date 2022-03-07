@@ -28,49 +28,49 @@ get_BLP(x, plot = FALSE)
 
 # the true ATE (= 0.979) is contained in the 90% confidence bounds of beta.1. Moreover, we reject the null of no significance of beta.2 at any reasonable level, which is expected since there is substantial treatment effect heterogeneity.
 
-pdf(file = paste0(getwd(), "/inst/doc/repo_plots/BLP.pdf"))
+svg(file = paste0(getwd(), "/inst/doc/repo_plots/BLP.svg"))
 plot(x, type = "BLP") # plot.GenericML() method
 dev.off()
 
 
 ### 4.3 GATES ----
 get_GATES(x, plot = FALSE)
-pdf(file = paste0(getwd(), "/inst/doc/repo_plots/GATES.pdf"))
+svg(file = paste0(getwd(), "/inst/doc/repo_plots/GATES.svg"))
 plot(x, type = "GATES")
 dev.off()
 # we know that here is treatment effect heterogeneity, so we expect a trend in the GATES per-group estimates as well as significance of all group differences. This is indeed the case.
 
 
 ### 4.4 CLAN of first variable ----
-pdf(file = paste0(getwd(), "/inst/doc/repo_plots/z1.pdf"))
+svg(file = paste0(getwd(), "/inst/doc/repo_plots/z1.svg"))
 plot(y = Z_CLAN[, "z1"], x = HTE, xlab = "True HTE", ylab = "Value of z1")
 dev.off()
 
-pdf(file = paste0(getwd(), "/inst/doc/repo_plots/z2.pdf"))
+svg(file = paste0(getwd(), "/inst/doc/repo_plots/z2.svg"))
 plot(y = Z_CLAN[, "z2"], x = HTE, xlab = "True HTE", ylab = "Value of z2")
 dev.off()
 
-pdf(file = paste0(getwd(), "/inst/doc/repo_plots/z3.pdf"))
+svg(file = paste0(getwd(), "/inst/doc/repo_plots/z3.svg"))
 plot(y = Z_CLAN[, "z3"], x = HTE, xlab = "True HTE", ylab = "Value of z3")
 dev.off()
 
-pdf(file = paste0(getwd(), "/inst/doc/repo_plots/random.pdf"))
+svg(file = paste0(getwd(), "/inst/doc/repo_plots/random.svg"))
 plot(y = Z_CLAN[, "random"], x = HTE, xlab = "True HTE", ylab = "Value of 'random'")
 dev.off()
 
 # CLAN
-pdf(file = paste0(getwd(), "/inst/doc/repo_plots/CLAN_z1.pdf"))
+svg(file = paste0(getwd(), "/inst/doc/repo_plots/CLAN_z1.svg"))
 get_CLAN(x, plot = TRUE, variable = "z1")
 dev.off()
 
-pdf(file = paste0(getwd(), "/inst/doc/repo_plots/CLAN_z2.pdf"))
+svg(file = paste0(getwd(), "/inst/doc/repo_plots/CLAN_z2.svg"))
 get_CLAN(x, plot = TRUE, variable = "z2")
 dev.off()
 
-pdf(file = paste0(getwd(), "/inst/doc/repo_plots/CLAN_z3.pdf"))
+svg(file = paste0(getwd(), "/inst/doc/repo_plots/CLAN_z3.svg"))
 get_CLAN(x, plot = TRUE, variable = "z3")
 dev.off()
 
-pdf(file = paste0(getwd(), "/inst/doc/repo_plots/CLAN_random.pdf"))
+svg(file = paste0(getwd(), "/inst/doc/repo_plots/CLAN_random.svg"))
 get_CLAN(x, plot = TRUE, variable = "random")
 dev.off()

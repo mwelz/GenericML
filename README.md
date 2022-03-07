@@ -175,7 +175,7 @@ x$best$CLAN
 
 ```
 
-_We emphasize that the number of cores influences the random number stream. Thus, different choices of `num_cores` may lead to different results. Thus, the results below are only reproducible for `num_cores = 8`._
+*We emphasize that the number of cores influences the random number stream. Thus, different choices of `num_cores` may lead to different results. Thus, the results below are only reproducible for `num_cores = 8`.*
 
 ### Best Linear Predictor (BLP) analysis
 
@@ -191,7 +191,7 @@ get_BLP(x, plot = FALSE)
 plot(x, type = "BLP") 
 ```
 
-<img src="./inst/doc/repo_plots/BLP.pdf" width="67%" style="display: block; margin: auto;" />
+<img src="./inst/doc/repo_plots/BLP.svg" width="67%" style="display: block; margin: auto;" />
 
 ### Group Average Treatment Effects (GATES) analysis
 
@@ -211,7 +211,7 @@ get_GATES(x, plot = FALSE)
 plot(x, type = "GATES")
 ```
 
-<img src="./inst/doc/repo_plots/GATES.pdf" width="67%" style="display: block; margin: auto;" />
+<img src="./inst/doc/repo_plots/GATES.svg" width="67%" style="display: block; margin: auto;" />
 
 ### Classification Analysis (CLAN) of each covariate
 
@@ -219,7 +219,7 @@ plot(x, type = "GATES")
 
 We first inspect the (true) treatment effect heterogeneity along the first variable:
 
-<img src="./inst/doc/repo_plots/z1.pdf" width="67%" style="display: block; margin: auto;" />
+<img src="./inst/doc/repo_plots/z1.svg" width="67%" style="display: block; margin: auto;" />
 
 The heterogeneity exhibits a jump pattern along the first variable. We thus expect that `G1 < G3`, `G2 < G4`, `G1 = G2`, `G3 = G4`, where the `G` denote the variable’s within-group averages. The groups are formed by treatment effect strength. Let’s see what CLAN suggests:
 
@@ -227,7 +227,7 @@ The heterogeneity exhibits a jump pattern along the first variable. We thus expe
 get_CLAN(x, plot = TRUE, variable = "z1")
 ```
 
-<img src="./inst/doc/repo_plots/CLAN_z1.pdf" width="67%" style="display: block; margin: auto;" />
+<img src="./inst/doc/repo_plots/CLAN_z1.svg" width="67%" style="display: block; margin: auto;" />
 
 CLAN indeed captured the correct pattern and that `G1 < G3`, `G2 < G4`, `G1 = G2`, and `G3 = G4`.
 
@@ -235,7 +235,7 @@ CLAN indeed captured the correct pattern and that `G1 < G3`, `G2 < G4`, `G1 = G2
 
 We inspect the (true) treatment effect heterogeneity along the second variable:
 
-<img src="./inst/doc/repo_plots/z2.pdf" width="67%" style="display: block; margin: auto;" />
+<img src="./inst/doc/repo_plots/z2.svg" width="67%" style="display: block; margin: auto;" />
 
 We clearly see the level shift at (1, 0.5). Thus, we expect that the two most affected groups should have a much stronger value of `z2` than the two least affected groups. Moreover, the two groups `G1` and `G2` should have the same value of `z2` and the two groups `G3` and `G4` should also have the same value. CLAN indeed captures this pattern:
 
@@ -243,13 +243,13 @@ We clearly see the level shift at (1, 0.5). Thus, we expect that the two most af
 get_CLAN(x, plot = TRUE, variable = "z2")
 ```
 
-<img src="./inst/doc/repo_plots/CLAN_z2.pdf" width="67%" style="display: block; margin: auto;" />
+<img src="./inst/doc/repo_plots/CLAN_z2.svg" width="67%" style="display: block; margin: auto;" />
 
 #### CLAN of third covariate
 
 We inspect the (true) treatment effect heterogeneity along the third variable:
 
-<img src="./inst/doc/repo_plots/z3.pdf" width="67%" style="display: block; margin: auto;" />
+<img src="./inst/doc/repo_plots/z3.svg" width="67%" style="display: block; margin: auto;" />
 
 There is no heterogeneity pattern along `z3`, so all CLAN groups should have roughly the same value. This is indeed the case:
 
@@ -257,17 +257,17 @@ There is no heterogeneity pattern along `z3`, so all CLAN groups should have rou
 get_CLAN(x, plot = TRUE, variable = "z3")
 ```
 
-<img src="./inst/doc/repo_plots/CLAN_z3.pdf" width="67%" style="display: block; margin: auto;" />
+<img src="./inst/doc/repo_plots/CLAN_z3.svg" width="67%" style="display: block; margin: auto;" />
 
 #### CLAN of fourth covariate
 
 We inspect the (true) treatment effect heterogeneity along the fourth variable which is just random noise:
 
-<img src="./inst/doc/repo_plots/random.pdf" width="67%" style="display: block; margin: auto;" />
+<img src="./inst/doc/repo_plots/random.svg" width="67%" style="display: block; margin: auto;" />
 
 There is no heterogeneity along `random`, so all CLAN groups should have roughly the same value. This is indeed the case:
 
-<img src="./inst/doc/repo_plots/CLAN_random.pdf" width="67%" style="display: block; margin: auto;" />
+<img src="./inst/doc/repo_plots/CLAN_random.svg" width="67%" style="display: block; margin: auto;" />
 
 
 ## Authors
