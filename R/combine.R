@@ -1,6 +1,6 @@
 #' Combine several GenericML objects
 #'
-#' This function combines multiple \code{GenericML} objects to one \code{GenericML} object. Combining several \code{GenericML} objects can be useful when you cannot run \code{\link{GenericML}} for sufficiently many splits due to memory constraints. In this case, you may run \code{\link{GenericML}} multiple times with only a small number of sample splits (\code{num_splits}) each. You may then use this function on a list consisting of these individual "small" \code{GenericML} objects.
+#' This function combines multiple \code{GenericML} objects into one \code{GenericML} object. Combining several \code{GenericML} objects can be useful when you cannot run \code{\link{GenericML}} for sufficiently many splits due to memory constraints. In this case, you may run \code{\link{GenericML}} multiple times with only a small number of sample splits each and combine the returned \code{GenericML} objects into one \code{GenericML} object with this function.
 #'
 #' @param x A list of \code{GenericML} objects returned by \code{\link{GenericML}}.
 #'
