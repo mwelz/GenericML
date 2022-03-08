@@ -217,6 +217,10 @@ plot(x, type = "GATES")
 
 We first inspect the (true) treatment effect heterogeneity along the first variable:
 
+```R
+plot(y = Z_CLAN[, "z1"], x = HTE, xlab = "True HTE", ylab = "Value of z1")
+```
+
 <img src="./inst/doc/repo_plots/z1.svg" width="67%" style="display: block; margin: auto;" />
 
 The heterogeneity exhibits a jump pattern along the first variable. We thus expect that `G1 < G3`, `G2 < G4`, `G1 = G2`, `G3 = G4`, where the `G` denote the variable’s within-group averages. The groups are formed by treatment effect strength. Let’s see what CLAN suggests:
@@ -233,6 +237,10 @@ CLAN indeed captured the correct pattern and that `G1 < G3`, `G2 < G4`, `G1 = G2
 
 We inspect the (true) treatment effect heterogeneity along the second variable:
 
+```R
+plot(y = Z_CLAN[, "z2"], x = HTE, xlab = "True HTE", ylab = "Value of z2")
+```
+
 <img src="./inst/doc/repo_plots/z2.svg" width="67%" style="display: block; margin: auto;" />
 
 We clearly see the level shift at (1, 0.5). Thus, we expect that the two most affected groups should have a much stronger value of `z2` than the two least affected groups. Moreover, the two groups `G1` and `G2` should have the same value of `z2` and the two groups `G3` and `G4` should also have the same value. CLAN indeed captures this pattern:
@@ -247,6 +255,10 @@ get_CLAN(x, plot = TRUE, variable = "z2")
 
 We inspect the (true) treatment effect heterogeneity along the third variable:
 
+```R
+plot(y = Z_CLAN[, "z3"], x = HTE, xlab = "True HTE", ylab = "Value of z3")
+```
+
 <img src="./inst/doc/repo_plots/z3.svg" width="67%" style="display: block; margin: auto;" />
 
 There is no heterogeneity pattern along `z3`, so all CLAN groups should have roughly the same value. This is indeed the case:
@@ -260,6 +272,10 @@ get_CLAN(x, plot = TRUE, variable = "z3")
 #### CLAN of fourth covariate
 
 We inspect the (true) treatment effect heterogeneity along the fourth variable which is just random noise:
+
+```R
+plot(y = Z_CLAN[, "random"], x = HTE, xlab = "True HTE", ylab = "Value of 'random'")
+```
 
 <img src="./inst/doc/repo_plots/random.svg" width="67%" style="display: block; margin: auto;" />
 
