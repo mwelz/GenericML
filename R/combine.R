@@ -57,10 +57,11 @@ GenericML_combine <- function(x)
   f <-  function(y, z) abind::abind(y, z, along = 3L)
 
   ## initialize
-  generic_targets <- rep(list(NULL), length(learners))
   m               <- length(x)
   vars            <- names(x[[1]]$generic_targets[[1]]$CLAN)
   learners        <- names(x[[1]]$generic_targets)
+  generic_targets <- rep(list(NULL), length(learners))
+
 
   ## merge the generic target 3D arrays
   for(i in 1:length(learners))
