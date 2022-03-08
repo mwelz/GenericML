@@ -47,7 +47,7 @@ If you need help using the package, or if you are interested in collaborations r
 
 
 ## Example
-We generate `n = 1000` samples from a randomized experiment which exhibit is substantial treatment effect heterogeneity.  Hence, Generic ML should indicate the existence of treatment effect heterogeneity and also capture the heterogeneity patterns.
+We generate `n = 1000` samples from a randomized experiment which exhibit substantial treatment effect heterogeneity. Hence, Generic ML should indicate the existence of treatment effect heterogeneity and also capture the heterogeneity patterns.
 
 ### Data generation and main functionality
 
@@ -156,8 +156,7 @@ x <- GenericML(Z = Z, D = D, Y = Y,
                store_learners = store_learners)
                
 
-### 4. general results ----
-
+### 4. General results ----
 ## print
 x
 
@@ -172,10 +171,9 @@ x$best$BLP
 x$best$GATES
 x$best$CLAN
 # "mlr3::lrn('ranger', num.trees = 100)"
-
 ```
 
-*We emphasize that the number of cores influences the random number stream. Thus, different choices of `num_cores` may lead to different results. Thus, the results below are only reproducible for `num_cores = 8`.*
+*We emphasize that the number of cores affects the random number stream. Thus, different choices of `num_cores` may lead to different results. Consequently, the results below are only reproducible for `num_cores = 8`.*
 
 ### Best Linear Predictor (BLP) analysis
 
@@ -266,6 +264,10 @@ We inspect the (true) treatment effect heterogeneity along the fourth variable w
 <img src="./inst/doc/repo_plots/random.svg" width="67%" style="display: block; margin: auto;" />
 
 There is no heterogeneity along `random`, so all CLAN groups should have roughly the same value. This is indeed the case:
+
+```R
+get_CLAN(x, plot = TRUE, variable = "random")
+```
 
 <img src="./inst/doc/repo_plots/CLAN_random.svg" width="67%" style="display: block; margin: auto;" />
 
