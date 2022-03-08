@@ -35,11 +35,12 @@
 #'   \item{\code{propensity_scores}}{The propensity score estimates as well as the \code{mlr3} objects used to estimate them (if \code{mlr3} was used for estimation).}
 #'   \item{\code{GenericML_single}}{Only nonempty if \code{store_learners = TRUE}. Contains all intermediate results of each learners for each split. That is, for a given learner (first level of the list) and split (second level),  objects of classes \code{\link{BLP}}, \code{\link{GATES}}, \code{\link{CLAN}}, \code{\link{proxy_BCA}}, \code{\link{proxy_CATE}} as well as the \eqn{\Lambda} criteria (\code{"best"})) are listed, which were computed with the given learner and split.}
 #'   \item{\code{splits}}{Only nonempty if \code{store_splits = TRUE}. Contains a character matrix of dimension \code{length(Y)} by \code{num_splits}. Contains the group membership (main or auxiliary) of each observation (rows) in each split (columns). \code{"M"} denotes the main set, \code{"A"} the auxiliary set.}
+#'   \item{\code{generic_targets}}{A list of generic target estimates for each learner. More specifically, each component is a list of the generic target estimates pertaining to the BLP, GATES, and CLAN analyses. Each of those lists contains a three-dimensional array containing the generic targets of a single learner for all sample splits (except CLAN where there is one more layer of lists).}
 #'   \item{\code{arguments}}{A list of arguments used in the function call.}
 #'   }
 #'
 #' @details
-#' The specifications \code{lasso}, \code{random_forest}, and \code{tree} in \code{learners_GenericML} and \code{learner_propensity_score} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{lasso} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{random_forest} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{tree} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}.
+#' The specifications \code{lasso}, \code{random_forest}, and \code{tree} in \code{learners_GenericML} and \code{learner_propensity_score} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{lasso} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{random_forest} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{tree} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}. **Warning:** \code{\link{GenericML}} can be quite memory-intensive, in particular when the data set is large. To alleviate memory usage, consider setting \code{store_learners = FALSE}, choosing a low number of cores via \code{num_cores} (at the expense of longer computing time), setting \code{prop_aux} to a value smaller than the default of 0.5, or using \code{\link{GenericML_combine}}.
 #'
 #'
 #' @note In an earlier development version, Lucas Kitzmueller alerted us to several minor bugs and proposed fixes. Many thanks to him!
@@ -58,7 +59,8 @@
 #' \code{\link{setup_X1}},
 #' \code{\link{setup_diff}},
 #' \code{\link{setup_vcov}},
-#' \code{\link{GenericML_single}}
+#' \code{\link{GenericML_single}},
+#' \code{\link{GenericML_combine}}
 #'
 #' @examples
 #' if (require("glmnet") && require("ranger")) {
@@ -245,12 +247,15 @@ GenericML <- function(Z, D, Y,
                                store_learners             = store_learners,
                                store_splits               = store_splits)
 
-  # extract the best learners
-  best.learners <- get.best.learners(gen.ml.different.learners$generic_targets)
+  # extract the generic targets
+  generic_targets <- gen.ml.different.learners$generic_targets
+
+  # find the best learners
+  best.learners <- get.best.learners(generic_targets = generic_targets)
 
 
   ### step 3: perform VEIN analysis ----
-  vein <- VEIN(gen.ml.different.learners$generic_targets, best.learners)
+  vein <- VEIN(generic_targets = generic_targets, best.learners.obj = best.learners)
 
   # return instance of S3 class 'GenericML'
   return(
@@ -261,6 +266,7 @@ GenericML <- function(Z, D, Y,
                                    mlr3_objects = propensity_scores.obj$mlr3_objects),
           GenericML_single = gen.ml.different.learners$genericML.by.split,
           splits = gen.ml.different.learners$splits,
+          generic_targets = generic_targets,
           arguments = list(learners_GenericML       = learners_GenericML,
                            learner_propensity_score = learner_propensity_score,
                            num_splits               = num_splits,

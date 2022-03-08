@@ -88,6 +88,7 @@ An object of class \code{GenericML}. On this object, we recommend to use the acc
 \item{\code{propensity_scores}}{The propensity score estimates as well as the \code{mlr3} objects used to estimate them (if \code{mlr3} was used for estimation).}
 \item{\code{GenericML_single}}{Only nonempty if \code{store_learners = TRUE}. Contains all intermediate results of each learners for each split. That is, for a given learner (first level of the list) and split (second level),  objects of classes \code{\link{BLP}}, \code{\link{GATES}}, \code{\link{CLAN}}, \code{\link{proxy_BCA}}, \code{\link{proxy_CATE}} as well as the \eqn{\Lambda} criteria (\code{"best"})) are listed, which were computed with the given learner and split.}
 \item{\code{splits}}{Only nonempty if \code{store_splits = TRUE}. Contains a character matrix of dimension \code{length(Y)} by \code{num_splits}. Contains the group membership (main or auxiliary) of each observation (rows) in each split (columns). \code{"M"} denotes the main set, \code{"A"} the auxiliary set.}
+\item{\code{generic_targets}}{A list of generic target estimates for each learner. More specifically, each component is a list of the generic target estimates pertaining to the BLP, GATES, and CLAN analyses. Each of those lists contains a three-dimensional array containing the generic targets of a single learner for all sample splits (except CLAN where there is one more layer of lists).}
 \item{\code{arguments}}{A list of arguments used in the function call.}
 }
 }
@@ -95,7 +96,7 @@ An object of class \code{GenericML}. On this object, we recommend to use the acc
 Performs generic machine learning inference on heterogeneous treatment effects as in \href{https://arxiv.org/abs/1712.04802}{Chernozhukov, Demirer, Duflo and Fernández-Val (2020)} with user-specified machine learning methods. Intended for randomized experiments.
 }
 \details{
-The specifications \code{lasso}, \code{random_forest}, and \code{tree} in \code{learners_GenericML} and \code{learner_propensity_score} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{lasso} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{random_forest} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{tree} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}.
+The specifications \code{lasso}, \code{random_forest}, and \code{tree} in \code{learners_GenericML} and \code{learner_propensity_score} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{lasso} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{random_forest} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{tree} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}. \strong{Warning:} \code{\link{GenericML}} can be quite memory-intensive, in particular when the data set is large. To alleviate memory usage, consider setting \code{store_learners = FALSE}, choosing a low number of cores via \code{num_cores} (at the expense of longer computing time), setting \code{prop_aux} to a value smaller than the default of 0.5, or using \code{\link{GenericML_combine}}.
 }
 \note{
 In an earlier development version, Lucas Kitzmueller alerted us to several minor bugs and proposed fixes. Many thanks to him!
@@ -167,5 +168,6 @@ Lang M., Binder M., Richter J., Schratz P., Pfisterer F., Coors S., Au Q., Casal
 \code{\link{setup_X1}},
 \code{\link{setup_diff}},
 \code{\link{setup_vcov}},
-\code{\link{GenericML_single}}
+\code{\link{GenericML_single}},
+\code{\link{GenericML_combine}}
 }

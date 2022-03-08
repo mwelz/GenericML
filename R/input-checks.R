@@ -271,6 +271,30 @@ InputChecks_index_set <- function(set, num_obs){
 } # FUN
 
 
+InputChecks_GenericML_combine <- function(x)
+{
+  stopifnot(is.list(x))
+  m <- length(x)
+  if(!all(sapply(1:m, function(i) inherits(x[[i]], "GenericML"))))
+  {
+    stop("All objects in the list 'x' must be objects of class 'GenericML'")
+  } # IF
+
+  args_ls <- lapply(1:m, function(i){
+    args <- x[[i]]$arguments
+    args[-which(names(args) %in% c("num_splits", "parallel", "num_cores", "seed", "store_learners"))]
+  })
+
+  if(!all(sapply(args_ls, identical, args_ls[[1]])))
+  {
+    stop(paste0("All GenericML objects in the list 'x' must have the exact same",
+                " parameter specifications in their original call to GenericML(),",
+                " except for the parameters 'num_splits', 'parallel', 'num_cores',",
+                " 'seed', and 'store_learners'."))
+  } # IF
+} # FUN
+
+
 #' Check if user's OS is a Unix system
 #'
 #' @return

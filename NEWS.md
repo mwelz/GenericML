@@ -1,3 +1,8 @@
+# GenericML 0.2.0
+
+- Added a function `GenericML_combine`, which combines multiple `GenericML` objects into one. 
+
+
 # GenericML 0.1.1
 
 - Fixed a few typos in the documentation.

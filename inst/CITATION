@@ -27,6 +27,6 @@ citEntry(entry = "Manual",
   textVersion  =
   paste("Max Welz, Andreas Alfons, Mert Demirer and Victor Chernozhukov (2021).",
         "GenericML: Generic Machine Learning Inference.",
-        "R package version 0.1.1.",
+        "R package version 0.2.0.",
         "https://CRAN.R-project.org/package=GenericML")
 )
