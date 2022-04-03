@@ -157,38 +157,3 @@ get.df.from.X1_control <- function(functions.of.Z_mat,
   out
 
 } # FUN
-
-
-#' Performs the sample splitting (internal use)
-#'
-#' @param D Binary vector of treatment assignment
-#' @param N sample size
-#' @param N_set 1:N
-#' @param prop Total number of samples in the auxiliary set
-#'
-#' @noRd
-sample_split <- function(D, N, N_set = 1:N, prop){
-
-  temp <- TRUE
-
-  while(temp){
-
-    # sample candidate set for A_set
-    A_set <- sample(N_set, size = prop, replace = FALSE)
-
-    # Avoid imbalance in A_set for estimation of BCA and CATE.
-    # BCA is estimated on the control units, CATE on the treated units.
-    # We want to avoid that either of them is estimated on too small a sample.
-    # To achieve this, have the control units in A_set make up no more
-    # than 90% of all samples in A_set
-    if(mean(D[A_set] == 0) <= 0.9) temp <- FALSE
-
-  } # WHILE
-
-  A_set <- as.integer(sort(A_set, decreasing = FALSE))
-
-  # return
-  return(list(A_set = A_set,
-              M_set = setdiff(N_set, A_set)))
-
-} # FUN

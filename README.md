@@ -119,6 +119,9 @@ equal_variances_CLAN <- FALSE
 # specify the proportion of samples that shall be selected in the auxiliary set
 prop_aux <- 0.5
 
+# specify sampling strategy (possibly stratified). Here ordinary random sampling is used.
+stratify <- setup_stratify()
+
 # specify whether or not the splits and auxiliary results of the learners shall be stored
 store_splits   <- TRUE
 store_learners <- FALSE # to save memory
@@ -147,6 +150,7 @@ x <- GenericML(Z = Z, D = D, Y = Y,
                diff_CLAN = diff_CLAN,
                equal_variances_CLAN = equal_variances_CLAN,
                prop_aux = prop_aux,
+               stratify = stratify,
                significance_level = significance_level,
                min_variation = min_variation,
                parallel = parallel,

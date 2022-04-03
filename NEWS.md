@@ -1,6 +1,7 @@
 # GenericML 0.2.0
 
-- Added a function `GenericML_combine`, which combines multiple `GenericML` objects into one. 
+- Added a function `GenericML_combine`, which combines multiple `GenericML` objects into one.
+- Implemented stratified sampling for sample splitting
 
 
 # GenericML 0.1.1
