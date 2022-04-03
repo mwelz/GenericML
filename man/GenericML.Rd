@@ -67,7 +67,7 @@ GenericML(
 
 \item{prop_aux}{Proportion of samples that shall be in the auxiliary set in case of random sample splitting. Default is 0.5. The number of samples in the auxiliary set will be equal to \code{floor(prop_aux * length(Y))}. If the data set is large, you can save computing time by choosing \code{prop_aux} to be smaller than 0.5. In case of stratified sampling (controlled through the argument \code{stratify} via \code{\link{setup_stratify}}), \code{prop_aux} does not have an effect, and the number of samples in the auxiliary set is specified via \code{\link{setup_stratify}}.}
 
-\item{stratify}{Specifies whether or not stratified sample splitting shall be performed. Should be an instance of \code{\link{setup_stratify}}. See the documentation of \code{\link{setup_stratify}} for details.}
+\item{stratify}{A list that specifies whether or not stratified sample splitting shall be performed. It is recommended to use the returned object of \code{\link{setup_stratify}} as this list. See the documentation of \code{\link{setup_stratify}} for details.}
 
 \item{significance_level}{Significance level for VEIN. Default is 0.05.}
 

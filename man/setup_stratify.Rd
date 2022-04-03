@@ -18,6 +18,26 @@ This function controls whether or not stratified sample splitting shall be perfo
 \details{
 The output of this setup function is intended to be used as argument \code{stratify} in the function \code{\link{GenericML}}. If arguments are passed to \code{\link[splitstackshape]{stratified}} via this function, make sure to  pass the necessary objects that \code{\link[splitstackshape]{stratified}} requires. The necessary objects are called \code{indt}, \code{group}, and \code{size} (see the documentation of  \code{\link[splitstackshape]{stratified}} for details). If either of these objects is missing, an error is thrown.
 }
+\examples{
+## sample data of group membership (with two groups)
+set.seed(1)
+n <- 500
+groups <- data.frame(group1 = rbinom(n, 1, 0.2),
+                     group2 = rbinom(n, 1, 0.3))
+
+## suppose we want both groups to be present in a strata...
+group <- c("group1", "group2")
+
+## ... and that the size of the strata equals half of the observations per group
+size <- 0.5
+
+## obtain a list of arguments that will be passed to splitstackshape::stratified()
+setup_stratify(indt = groups, group = group, size = size)
+
+## if no stratified sampling shall be used, do not pass anything
+setup_stratify()
+
+}
 \seealso{
 \code{\link[splitstackshape]{stratified}}
 \code{\link{GenericML}}

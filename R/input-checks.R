@@ -301,7 +301,8 @@ InputChecks_stratify <- function(args_stratified)
 
   ## ensure that 'args_stratified' is a list
   if(!is.list(args_stratified)){
-    stop("'args_stratified' must be a list, for instance as returned by setup_stratify()")
+    stop("'args_stratified' must be a list, for instance as returned by setup_stratify()",
+         call. = FALSE)
   } # IF
 
 
@@ -312,7 +313,7 @@ InputChecks_stratify <- function(args_stratified)
     if(!all(c("indt", "group", "size") %in% names(args_stratified))){
       stop(paste0("splitstackshape::stratified requires at least the arguments ",
                   "'indt', 'group', and 'size', which were not passed to setup_stratify().",
-                  " See ?splitstackshape::stratified for details." ))
+                  " See ?splitstackshape::stratified for details." ), call. = FALSE)
     } # IF
   } # IF
 } # FUN

@@ -13,7 +13,25 @@
 #' @seealso
 #' \code{\link[splitstackshape]{stratified}}
 #' \code{\link{GenericML}}
-
+#'
+#' @examples
+#' ## sample data of group membership (with two groups)
+#' set.seed(1)
+#' n <- 500
+#' groups <- data.frame(group1 = rbinom(n, 1, 0.2),
+#'                      group2 = rbinom(n, 1, 0.3))
+#'
+#' ## suppose we want both groups to be present in a strata...
+#' group <- c("group1", "group2")
+#'
+#' ## ... and that the size of the strata equals half of the observations per group
+#' size <- 0.5
+#'
+#' ## obtain a list of arguments that will be passed to splitstackshape::stratified()
+#' setup_stratify(indt = groups, group = group, size = size)
+#'
+#' ## if no stratified sampling shall be used, do not pass anything
+#' setup_stratify()
 #'
 #' @export
 setup_stratify <- function(...) list(...)
