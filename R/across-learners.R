@@ -1,4 +1,4 @@
-# helper functions
+# helper function that whose arguments correspond to the arguments of GenericML().
 generic.ml.across.learners <- function(Z, D, Y,
                                        propensity_scores,
                                        learners, # need to be mlr3 objects!
@@ -12,6 +12,7 @@ generic.ml.across.learners <- function(Z, D, Y,
                                        vcov_GATES           = setup_vcov(),
                                        equal_variances_CLAN = FALSE,
                                        prop_aux             = 0.5,
+                                       stratify             = setup_stratify(),
                                        quantile_cutoffs     = c(0.25, 0.5, 0.75),
                                        diff_GATES           = setup_diff(),
                                        diff_CLAN            = setup_diff(),
@@ -40,6 +41,7 @@ generic.ml.across.learners <- function(Z, D, Y,
                       vcov_GATES                 = vcov_GATES,
                       equal_variances_CLAN       = equal_variances_CLAN,
                       prop_aux                   = prop_aux,
+                      stratify                   = stratify,
                       quantile_cutoffs           = quantile_cutoffs,
                       diff_GATES                 = diff_GATES,
                       diff_CLAN                  = diff_CLAN,
@@ -67,6 +69,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
                                               vcov_GATES           = setup_vcov(),
                                               equal_variances_CLAN = FALSE,
                                               prop_aux             = 0.5,
+                                              stratify             = setup_stratify(),
                                               quantile_cutoffs     = c(0.25, 0.5, 0.75),
                                               diff_GATES           = setup_diff(),
                                               diff_CLAN            = setup_diff(),
@@ -77,24 +80,10 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
                                               store_learners       = FALSE,
                                               store_splits         = FALSE){
 
+  # control random number seeding
+  seed_control(seed)
 
-  # set seed
-  if(is.null(seed)){
-
-    # ensure reproducibility
-    rng <- RNGkind()
-    RNGkind("L'Ecuyer-CMRG")
-    on.exit(RNGkind(kind = rng[1], normal.kind = rng[2], sample.kind = rng[3]))
-
-  } else{
-
-    # ensure reproducibility
-    rng <- RNGkind()
-    set.seed(seed, "L'Ecuyer")
-    on.exit(RNGkind(kind = rng[1], normal.kind = rng[2], sample.kind = rng[3]))
-
-  } # IF
-
+  # prepare objects
   num.vars.in.Z_CLAN <- ncol(Z_CLAN)
   genericML.by.split <- list()
   N     <- length(Y)
@@ -192,6 +181,7 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
                                               vcov_GATES           = setup_vcov(),
                                               equal_variances_CLAN = FALSE,
                                               prop_aux             = 0.5,
+                                              stratify             = setup_stratify(),
                                               quantile_cutoffs     = c(0.25, 0.5, 0.75),
                                               diff_GATES           = setup_diff(),
                                               diff_CLAN            = setup_diff(),
@@ -203,23 +193,10 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
                                               store_splits         = FALSE){
 
 
-  # set seed
-  if(is.null(seed)){
+  # control random number seeding
+  seed_control(seed)
 
-    # ensure reproducibility
-    rng <- RNGkind()
-    RNGkind("L'Ecuyer-CMRG")
-    on.exit(RNGkind(kind = rng[1], normal.kind = rng[2], sample.kind = rng[3]))
-
-  } else{
-
-    # ensure reproducibility
-    rng <- RNGkind()
-    set.seed(seed, "L'Ecuyer")
-    on.exit(RNGkind(kind = rng[1], normal.kind = rng[2], sample.kind = rng[3]))
-
-  } # IF
-
+  # prepare objects
   num.vars.in.Z_CLAN <- ncol(Z_CLAN)
   K <- length(quantile_cutoffs) + 1
   num.generic_targets.gates <- K + length(diff_GATES$subtracted)

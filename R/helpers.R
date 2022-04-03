@@ -157,3 +157,30 @@ get.df.from.X1_control <- function(functions.of.Z_mat,
   out
 
 } # FUN
+
+
+# helper function to control random number seeding
+seed_control <- function(seed)
+{
+
+  # extract current random number generator
+  rng <- RNGkind()
+
+  if(is.null(seed)){
+
+    ## case 1: no seed is passed, so no random seed is specified
+    # use L'Ecuyer generator to ensure variation in random number draws in parallel
+    RNGkind("L'Ecuyer-CMRG")
+
+  } else{
+
+    ## case 2: seed is passed, so control random number stream with this seed
+    # use L'Ecuyer generator to ensure reproducibility in parallel
+    set.seed(seed, "L'Ecuyer")
+
+  } # IF
+
+  # restore the original settings
+  on.exit(RNGkind(kind = rng[1], normal.kind = rng[2], sample.kind = rng[3]))
+
+} # FUN
