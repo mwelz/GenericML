@@ -295,6 +295,30 @@ InputChecks_GenericML_combine <- function(x)
 } # FUN
 
 
+# check list of arguments that specifies stratified sampling technique
+InputChecks_stratify <- function(args_stratified)
+{
+
+  ## ensure that 'args_stratified' is a list
+  if(!is.list(args_stratified)){
+    stop("'args_stratified' must be a list, for instance as returned by setup_stratify()")
+  } # IF
+
+
+  ## if stratified sampling:
+  # check that all necessary arguments for splitstackshape::stratified are passed
+  if(length(args_stratified) > 0L){
+
+    if(!all(c("indt", "group", "size") %in% names(args_stratified))){
+      stop(paste0("splitstackshape::stratified requires at least the arguments ",
+                  "'indt', 'group', and 'size', which were not passed to setup_stratify().",
+                  " See ?splitstackshape::stratified for details." ))
+    } # IF
+  } # IF
+} # FUN
+
+
+
 #' Check if user's OS is a Unix system
 #'
 #' @return

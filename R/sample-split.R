@@ -1,20 +1,30 @@
 #' Setup function for stratified sampling
 #'
-#' Stratified sampling will be performed via \code{\link[splitstackshape]{stratified}}. This function gathers the arguments that shall be passed to \code{\link[splitstackshape]{stratified}}. If no arguments are passed, no stratified sampling will be performed. Instead, ordinary random sampling will be performed.
+#' This function controls whether or not stratified sample splitting shall be performed. If no stratified sampling shall be performed, do not pass any arguments to this function (this is the default). If stratified sampling shall be performed, use this function to pass arguments to \code{\link[splitstackshape]{stratified}}, which is used for obtaining the strata. In this case, the specification for \code{prop_aux} in \code{\link{GenericML}} does not have an effect because the number of samples in the auxiliary set is specified with the \code{size} argument in \code{\link[splitstackshape]{stratified}}.
 #'
-#' @param ... Named objects that shall be used as arguments in \code{\link[splitstackshape]{stratified}}. If empty, ordinary random sampling will be performed.
+#' @param ... Named objects that shall be used as arguments in \code{\link[splitstackshape]{stratified}}. If empty (default), ordinary random sampling will be performed.
 #'
 #' @return
-#' A list of named objects (possibly empty) specifying the stratified sampling strategy. If empty, no stratified sampling will be performed. Instead, ordinary random sampling will be performed.
+#' A list of named objects (possibly empty) specifying the stratified sampling strategy. If empty, no stratified sampling will be performed and instead ordinary random sampling will be performed.
+#'
+#' @details
+#' The output of this setup function is intended to be used as argument \code{stratify} in the function \code{\link{GenericML}}. If arguments are passed to \code{\link[splitstackshape]{stratified}} via this function, make sure to  pass the necessary objects that \code{\link[splitstackshape]{stratified}} requires. The necessary objects are called \code{indt}, \code{group}, and \code{size} (see the documentation of  \code{\link[splitstackshape]{stratified}} for details). If either of these objects is missing, an error is thrown.
+#'
+#' @seealso
+#' \code{\link[splitstackshape]{stratified}}
+#' \code{\link{GenericML}}
+
 #'
 #' @export
-setup_stratified <- function(...) list(...)
+setup_stratify <- function(...) list(...)
 
 
 
 #' Generates a function for sample splitting (internal use)
 #'
-#' @param args_stratified A list of arguments that shall be passed to \code{\link[splitstackshape]{stratified}}; typically returned by \code{\link{setup_stratified}}
+#' Input checks will be performed via \code{\link{InputChecks_stratify}}.
+#'
+#' @param args_stratified A list of arguments that shall be passed to \code{\link[splitstackshape]{stratified}}; typically returned by \code{\link{setup_stratify}}
 #' @param N Number of samples
 #' @param prop_aux Proportion of samples that shall be in the auxiliary set. In case of stratified sampling, the effective proportion of samples in the auxiliary set might deviate from \code{prop_aux}, depending on the specifications of the strata.
 #'
@@ -25,11 +35,6 @@ setup_stratified <- function(...) list(...)
 make_split_fn <- function(args_stratified, N, prop_aux)
 {
 
-  ## ensure that 'args_stratified' is a list
-  if(!is.list(args_stratified)){
-    stop("'args_stratified' must be a list, for instance as returned by setup_stratified()")
-  }
-
   if(length(args_stratified) == 0L)
   {
     ## case 1: no stratified sampling shall be used, so sample randomly
@@ -39,13 +44,6 @@ make_split_fn <- function(args_stratified, N, prop_aux)
   } else
   {
     ## case 2: stratified sampling
-    # check that all necessary arguments for splitstackshape::stratified are passed
-    if(!all(c("indt", "group", "size") %in% names(args_stratified))){
-      stop(paste0("splitstackshape::stratified requires at least the arguments ",
-                  "'indt', 'group', and 'size', which were not passed to setup_stratified().",
-                  " See ?splitstackshape::stratified for details." ))
-    } # IF
-
     # overwrite/specify the arguments 'keep.rownames' and 'bothSets'
     args_stratified$keep.rownames <- TRUE
     args_stratified$bothSets      <- FALSE
@@ -76,20 +74,23 @@ make_split_fn <- function(args_stratified, N, prop_aux)
 
 #' Performs the sample splitting (internal use)
 #'
+#' @param split_fn A function that splits the data by returning the indices of samples that will be in the auxiliary set. Such a function is returned by \code{make_split_fn} (internal function).
 #' @param D Binary vector of treatment assignment
-#' @param N sample size
-#' @param N_set 1:N
-#' @param prop Total number of samples in the auxiliary set
+#' @param N sample size, must be equal to length of \code{D}
+#'
+#' @return
+#' A list consisting of the indices of samples in the main set (\code{M_set}) and auxiliary set (\code{A_set}).
 #'
 #' @noRd
-sample_split <- function(D, N, N_set = 1:N, prop){
+sample_split <- function(split_fn, D, N){
 
+  # initialize
   temp <- TRUE
 
   while(temp){
 
     # sample candidate set for A_set
-    A_set <- sample(N_set, size = prop, replace = FALSE)
+    A_set <- split_fn()
 
     # Avoid imbalance in A_set for estimation of BCA and CATE.
     # BCA is estimated on the control units, CATE on the treated units.
@@ -104,6 +105,6 @@ sample_split <- function(D, N, N_set = 1:N, prop){
 
   # return
   return(list(A_set = A_set,
-              M_set = setdiff(N_set, A_set)))
+              M_set = setdiff(1:N, A_set)))
 
 } # FUN

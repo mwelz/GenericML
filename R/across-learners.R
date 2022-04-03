@@ -24,7 +24,14 @@ generic.ml.across.learners <- function(Z, D, Y,
                                        store_learners       = FALSE,
                                        store_splits         = FALSE){
 
-  # call correct main function
+  ## get a function that performs sample splitting by sampling indices for the auxiliary set
+  # either random sampling or stratified sampling, depending on user specification
+  # input checks have been performed in the parent function GenericML()
+  split_fn <- make_split_fn(args_stratified = stratify,
+                            N = nrow(Z),
+                            prop_aux = prop_aux)
+
+  ## call corresponding main function
   do.call(what = get(ifelse(parallel,
                             "generic.ml.across.learners_parallel",
                             "generic.ml.across.learners_serial")),
@@ -32,6 +39,7 @@ generic.ml.across.learners <- function(Z, D, Y,
                       propensity_scores          = propensity_scores,
                       learners                   = learners,
                       learners.names             = learners.names,
+                      split_fn                   = split_fn,
                       num_splits                 = num_splits,
                       Z_CLAN                     = Z_CLAN,
                       X1_BLP                     = X1_BLP,
@@ -41,7 +49,6 @@ generic.ml.across.learners <- function(Z, D, Y,
                       vcov_GATES                 = vcov_GATES,
                       equal_variances_CLAN       = equal_variances_CLAN,
                       prop_aux                   = prop_aux,
-                      stratify                   = stratify,
                       quantile_cutoffs           = quantile_cutoffs,
                       diff_GATES                 = diff_GATES,
                       diff_CLAN                  = diff_CLAN,
@@ -60,6 +67,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
                                               propensity_scores,
                                               learners, # need to be mlr3 objects!
                                               learners.names,
+                                              split_fn,
                                               num_splits           = 100,
                                               Z_CLAN               = Z,
                                               X1_BLP               = setup_X1(),
@@ -69,19 +77,32 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
                                               vcov_GATES           = setup_vcov(),
                                               equal_variances_CLAN = FALSE,
                                               prop_aux             = 0.5,
-                                              stratify             = setup_stratify(),
                                               quantile_cutoffs     = c(0.25, 0.5, 0.75),
                                               diff_GATES           = setup_diff(),
                                               diff_CLAN            = setup_diff(),
                                               significance_level   = 0.05,
                                               min_variation        = 1e-05,
                                               num_cores            = parallel::detectCores(), # dead argument here
-                                              seed                 = NULL,
+                                              seed                 = seed,
                                               store_learners       = FALSE,
                                               store_splits         = FALSE){
 
-  # control random number seeding
-  seed_control(seed)
+  # set seed
+  if(is.null(seed)){
+
+    # ensure reproducibility
+    rng <- RNGkind()
+    RNGkind("L'Ecuyer-CMRG")
+    on.exit(RNGkind(kind = rng[1], normal.kind = rng[2], sample.kind = rng[3]))
+
+  } else{
+
+    # ensure reproducibility
+    rng <- RNGkind()
+    set.seed(seed, "L'Ecuyer")
+    on.exit(RNGkind(kind = rng[1], normal.kind = rng[2], sample.kind = rng[3]))
+
+  } # IF
 
   # prepare objects
   num.vars.in.Z_CLAN <- ncol(Z_CLAN)
@@ -106,7 +127,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
   for(s in 1:num_splits){
 
     # perform sample splitting into main set and auxiliary set
-    split.ls <- sample_split(D = D, N = N, N_set = N_set, prop = prop)
+    split.ls <- sample_split(split_fn = split_fn, D = D, N = N)
     M_set    <- split.ls$M_set
     A_set    <- split.ls$A_set
 
@@ -172,6 +193,7 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
                                               propensity_scores,
                                               learners, # need to be mlr3 objects!
                                               learners.names,
+                                              split_fn,
                                               num_splits           = 100,
                                               Z_CLAN               = Z,
                                               X1_BLP               = setup_X1(),
@@ -181,20 +203,32 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
                                               vcov_GATES           = setup_vcov(),
                                               equal_variances_CLAN = FALSE,
                                               prop_aux             = 0.5,
-                                              stratify             = setup_stratify(),
                                               quantile_cutoffs     = c(0.25, 0.5, 0.75),
                                               diff_GATES           = setup_diff(),
                                               diff_CLAN            = setup_diff(),
                                               significance_level   = 0.05,
                                               min_variation        = 1e-05,
                                               num_cores            = parallel::detectCores(),
-                                              seed                 = NULL,
+                                              seed                 = seed,
                                               store_learners       = FALSE,
                                               store_splits         = FALSE){
 
+  # set seed
+  if(is.null(seed)){
 
-  # control random number seeding
-  seed_control(seed)
+    # ensure reproducibility
+    rng <- RNGkind()
+    RNGkind("L'Ecuyer-CMRG")
+    on.exit(RNGkind(kind = rng[1], normal.kind = rng[2], sample.kind = rng[3]))
+
+  } else{
+
+    # ensure reproducibility
+    rng <- RNGkind()
+    set.seed(seed, "L'Ecuyer")
+    on.exit(RNGkind(kind = rng[1], normal.kind = rng[2], sample.kind = rng[3]))
+
+  } # IF
 
   # prepare objects
   num.vars.in.Z_CLAN <- ncol(Z_CLAN)
@@ -225,7 +259,7 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
 
 
     # perform sample splitting into main set and auxiliary set
-    split.ls <- sample_split(D = D, N = N, N_set = N_set, prop = prop)
+    split.ls <- sample_split(split_fn = split_fn, D = D, N = N)
     M_set    <- split.ls$M_set
     A_set    <- split.ls$A_set
 

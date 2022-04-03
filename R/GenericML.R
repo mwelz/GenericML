@@ -18,7 +18,8 @@
 #' @param vcov_BLP Specifies the covariance matrix estimator in the BLP regression. Must be an instance of \code{\link{setup_vcov}}. See the documentation of \code{\link{setup_vcov}} for details.
 #' @param vcov_GATES Same as \code{vcov_BLP}, just for the GATES regression.
 #' @param equal_variances_CLAN Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.
-#' @param prop_aux Proportion of samples that shall be in the auxiliary set. Default is 0.5. The number of samples in the auxiliary set will be equal to \code{floor(prop_aux * length(Y))}. If the data set is large, you can save computing time by choosing \code{prop_aux} to be smaller than 0.5.
+#' @param prop_aux Proportion of samples that shall be in the auxiliary set in case of random sample splitting. Default is 0.5. The number of samples in the auxiliary set will be equal to \code{floor(prop_aux * length(Y))}. If the data set is large, you can save computing time by choosing \code{prop_aux} to be smaller than 0.5. In case of stratified sampling (controlled through the argument \code{stratify} via \code{\link{setup_stratify}}), \code{prop_aux} does not have an effect, and the number of samples in the auxiliary set is specified via \code{\link{setup_stratify}}.
+#' @param stratify Specifies whether or not stratified sample splitting shall be performed. Should be returned by \code{\link{setup_stratify}}. See the documentation of \code{\link{setup_stratify}} for details.
 #' @param significance_level Significance level for VEIN. Default is 0.05.
 #' @param min_variation Specifies a threshold for the minimum variation of the BCA/CATE predictions. If the variation of a BCA/CATE prediction falls below this threshold, random noise with distribution \eqn{N(0, var(Y)/20)} is added to it. Default is \code{1e-05}.
 #' @param parallel Logical. If \code{TRUE}, parallel computing will be used. Currently only supported for Unix systems.
@@ -59,6 +60,7 @@
 #' \code{\link{setup_X1}},
 #' \code{\link{setup_diff}},
 #' \code{\link{setup_vcov}},
+#' \code{\link{setup_stratify}},
 #' \code{\link{GenericML_single}},
 #' \code{\link{GenericML_combine}}
 #'
@@ -130,6 +132,7 @@ GenericML <- function(Z, D, Y,
                       vcov_GATES               = setup_vcov(),
                       equal_variances_CLAN     = FALSE,
                       prop_aux                 = 0.5,
+                      stratify                 = setup_stratify(),
                       significance_level       = 0.05,
                       min_variation            = 1e-05,
                       parallel                 = TrueIfUnix(),
@@ -162,6 +165,7 @@ GenericML <- function(Z, D, Y,
   stopifnot(is.numeric(min_variation) & min_variation > 0)
   stopifnot(is.character(learners_GenericML))
   stopifnot(is.character(learner_propensity_score) | is.numeric(learner_propensity_score))
+  InputChecks_stratify(stratify)
 
   # if no input provided, set Z_CLAN equal to Z
   if(is.null(Z_CLAN)) Z_CLAN <- Z
@@ -236,6 +240,7 @@ GenericML <- function(Z, D, Y,
                                vcov_GATES                 = setup_vcov_align(vcov_GATES), # align for consistency
                                equal_variances_CLAN       = equal_variances_CLAN,
                                prop_aux                   = prop_aux,
+                               stratify                   = stratify,
                                quantile_cutoffs           = quantile_cutoffs,
                                diff_GATES                 = diff_GATES,
                                diff_CLAN                  = diff_CLAN,
