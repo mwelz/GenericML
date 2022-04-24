@@ -10,6 +10,7 @@
   learner = "best",
   CLAN_variable = NULL,
   groups = "all",
+  plot_ATE = TRUE,
   limits = NULL,
   title = NULL,
   ...
@@ -26,7 +27,9 @@
 
 \item{groups}{Character vector indicating the per-group parameter estimates that shall be plotted in GATES and CLAN analyses. Default is \code{"all"} for all parameters. If there are \eqn{K} groups, this variable is a subset of \code{c("G1", "G2",...,"GK", "G1-G2", "G1-G2",..., "G1-GK", "GK-G1", "GK-G2",...)}, where Gk denotes the k-th group. Note that this set depends on the choices of the arguments \code{"diff_GATES"} and \code{"diff_CLAN"} of the \code{\link{GenericML}} object.}
 
-\item{limits}{The limits of the y-axis of the plot.}
+\item{plot_ATE}{Logical. If \code{TRUE} (default), then the BLP estimate of the average treatment effect along with confidence bounds will be added to the plot. Only applicable if \code{type} is \code{"CLAN"} or \code{"GATES"}.}
+
+\item{limits}{A numeric vector of length two holding the limits of the y-axis of the plot.}
 
 \item{title}{The title of the plot.}
 
