@@ -28,7 +28,7 @@ An object of class \code{setup_plot}, which is a list with the following element
 \describe{
 \item{\code{data_plot}}{A data frame containing point and interval estimates of the generic target specified in the argument \code{type}.}
 \item{\code{data_BLP}}{A data frame containing point and interval estimates of the BLP analysis.}
-\item{\code{confidence_level} The confidence level reflected by the confidence bounds of the interval estimates. The confidence level is equal to  \code{1 - 2 * significance_level}, which is the adjustment proposed in the paper.}}
+\item{\code{confidence_level}}{The confidence level reflected by the confidence bounds of the interval estimates. The confidence level is equal to  \code{1 - 2 * significance_level}, which is the adjustment proposed in the paper.}}
 }
 \description{
 Extract the relevant information for visualizing the point and interval estimates of the generic targets of interest. The generic targets of interest can be (subsets of) the parameters of the BLP, GATES, or CLAN analysis.
