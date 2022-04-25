@@ -201,7 +201,7 @@ setup_plot <- function(x,
 #' @param learner The learner whose results are to be returned. Default is \code{"best"} for the best learner as measured by the \eqn{\Lambda} parameters.
 #' @param CLAN_variable Name of the CLAN variable to be plotted. Only applicable if \code{type = "CLAN"}.
 #' @param groups Character vector indicating the per-group parameter estimates that shall be plotted in GATES and CLAN analyses. Default is \code{"all"} for all parameters. If there are \eqn{K} groups, this variable is a subset of \code{c("G1", "G2",...,"GK", "G1-G2", "G1-G2",..., "G1-GK", "GK-G1", "GK-G2",...)}, where Gk denotes the k-th group. Note that this set depends on the choices of the arguments \code{"diff_GATES"} and \code{"diff_CLAN"} of the \code{\link{GenericML}} object.
-#' @param plot_ATE Logical. If \code{TRUE} (default), then the BLP estimate of the average treatment effect along with confidence bounds will be added to the plot. Only applicable if \code{type} is \code{"CLAN"} or \code{"GATES"}.
+#' @param ATE Logical. If \code{TRUE} (default), then the BLP estimate of the average treatment effect along with confidence bounds will be added to the plot. Only applicable if \code{type} is \code{"CLAN"} or \code{"GATES"}.
 #' @param limits A numeric vector of length two holding the limits of the y-axis of the plot.
 #' @param title The title of the plot.
 #' @param ... Additional arguments to be passed down.
@@ -271,13 +271,13 @@ plot.GenericML <- function(x,
                            learner = "best",
                            CLAN_variable = NULL,
                            groups = "all",
-                           plot_ATE = TRUE,
+                           ATE = TRUE,
                            limits = NULL,
                            title = NULL,
                            ...){
 
   ## input check
-  stopifnot(is.logical(plot_ATE) & length(plot_ATE) == 1L)
+  stopifnot(is.logical(ATE) & length(ATE) == 1L)
 
   ## get the data to be plotted
   data <- setup_plot(x = x,
@@ -305,7 +305,7 @@ plot.GenericML <- function(x,
   ## specify the limits
   if(is.null(limits) & type != "BLP"){
 
-    if(plot_ATE){
+    if(ATE){
 
       limits <- c(min(c(0.0, df[, "cb_lower"], df_blp["beta.1", "cb_lower"])),
                   max(c(0.0, df[, "cb_upper"], df_blp["beta.1", "cb_upper"])))
@@ -358,7 +358,7 @@ plot.GenericML <- function(x,
       ggtitle(title)
 
 
-    if(plot_ATE){
+    if(ATE){
 
       p <- p +
         geom_hline(aes(yintercept = df_blp["beta.1", "estimate"],
