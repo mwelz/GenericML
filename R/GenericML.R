@@ -181,12 +181,6 @@ GenericML <- function(Z, D, Y,
   } # IF
 
 
-  if(parallel & !TrueIfUnix()){
-    message("Parallelization is currently only supported on Unix systems (you are using Windows). Therefore, no parallelization will be employed", call. = FALSE)
-    parallel <- FALSE
-
-  } # IF
-
   # render the learners mlr3 environments
   learners <- lapply(1:length(learners_GenericML),
                      function(x) get.learner_regr(make.mlr3.environment(learners_GenericML[x])))
