@@ -215,7 +215,6 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
 
   ## check if user system is Windows
   win <- !TrueIfUnix()
-  win = TRUE # TODO: remove
 
   ## set seed
   if(is.null(seed)){

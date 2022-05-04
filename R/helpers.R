@@ -168,7 +168,23 @@ get_varlist <- function(){
             "get_clan.3d.ls",
             "sample_split",
             "split_fn",
-            "GenericML_single_NoChecks")
+            "GenericML_single_NoChecks",
+            "proxy_BCA_NoChecks",
+            "proxy_CATE_NoChecks",
+            "setup_X1_NoChecks",
+            "setup_X1_NoChecks",
+            "setup_vcov_subset",
+            "BLP_NoChecks",
+            "BLP.classic",
+            "BLP.HT",
+            "get.df.from.X1_control",
+            "get.vcov",
+            "VEIN",
+            "generic_targets_BLP",
+            "quantile_group_NoChecks",
+            "GATES_NoChecks", "GATES.classic", "GATES.HT", "generic_targets_GATES",
+            "CLAN_NoChecks",
+            "lambda_parameters_NoChecks")
 
   vars <- c("num.learners",
             "learners.names",
@@ -196,6 +212,6 @@ get_varlist <- function(){
             "diff_CLAN",
             "significance_level",
             "min_variation",
-            "prop_aux") # for the call to split_fn()
+            "prop_aux")
   return(c(funs, vars))
 } # FUN

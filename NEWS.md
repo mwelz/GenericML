@@ -1,5 +1,6 @@
 # GenericML 0.2.0
 
+- Parallel computing is now also supported on Windows
 - Added a method `setup_plot()` that returns the data frame that is used for plotting. Also, made the addition of ATEs in plots optional via the argument `ATE` in `plot.GenericML()`.
 - Added a function `GenericML_combine`, which combines multiple `GenericML` objects into one.
 - Implemented stratified sampling for sample splitting
