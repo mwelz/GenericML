@@ -126,15 +126,16 @@ stratify <- setup_stratify()
 store_splits   <- TRUE
 store_learners <- FALSE # to save memory
 
-# parallelization options (currently only supported on Unix systems)
+# parallelization options
 parallel  <- TRUE
 num_cores <- 8      # 8 cores
 seed      <- 123456
-# Note that the number of cores influences the random number stream. Thus, different choices of `num_cores` may lead to different results.
+# Note that the number of cores as well as your type of operating system (Unix vs. Windows) influences the random number stream. Thus, different choices of `num_cores` may lead to different results. Results of parallel processes are reproducible across all Unix systems, but might deviate on Windows systems.
+
 
 
 ### 3. Run the GenericML() function with these arguments ----
-# runtime: ~90 seconds with R version 4.1.2 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 21.10. Returns a GenericML object.
+# runtime: ~90 seconds with R version 4.2.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 21.10. Returns a GenericML object.
 x <- GenericML(Z = Z, D = D, Y = Y,
                learner_propensity_score = learner_propensity_score,
                learners_GenericML = learners_GenericML,
@@ -177,7 +178,7 @@ x$best$CLAN
 # "mlr3::lrn('ranger', num.trees = 100)"
 ```
 
-*We emphasize that the number of cores affects the random number stream. Thus, different choices of `num_cores` may lead to different results. Consequently, the results below are only reproducible for `num_cores = 8`.*
+*We emphasize that the number of cores and your type of operating system affect the random number stream. Thus, different choices of `num_cores` may lead to different results. Moreover, results of parallel processes are reproducible across all Unix systems, but might deviate on Windows systems. Consequently, the results below are only reproducible on Unix systems for `num_cores = 8`.*
 
 ### Best Linear Predictor (BLP) analysis
 

@@ -58,7 +58,7 @@
 #' @export
 get_BLP <- function(x, learner = "best", plot = TRUE){
 
-  if(class(x) != "GenericML") stop("x needs to be instance of the class GenericML")
+  if(!isa(x = x, what = "GenericML")) stop("x needs to be instance of the class GenericML")
 
   if(learner == "best"){
 
@@ -152,7 +152,7 @@ get_BLP <- function(x, learner = "best", plot = TRUE){
 #' @export
 get_GATES <- function(x, learner = "best", plot = TRUE){
 
-  if(class(x) != "GenericML") stop("x needs to be instance of the class GenericML")
+  if(!isa(x = x, what = "GenericML")) stop("x needs to be instance of the class GenericML")
 
   if(learner == "best"){
 
@@ -244,7 +244,7 @@ get_GATES <- function(x, learner = "best", plot = TRUE){
 #' @export
 get_CLAN <- function(x, variable, learner = "best", plot = TRUE){
 
-  if(class(x) != "GenericML") stop("x needs to be instance of the class GenericML")
+  if(!isa(x = x, what = "GenericML")) stop("x needs to be instance of the class GenericML")
   if(!(variable %in% names(x$VEIN$best_learners$CLAN))){
     stop(paste0("No CLAN was performed on this variable. ",
                 "CLAN was performed on the variables ",
