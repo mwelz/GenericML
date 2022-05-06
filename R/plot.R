@@ -84,7 +84,7 @@ setup_plot <- function(x,
 {
 
   ## 0.1 input check ----
-  if(class(x) != "GenericML"){
+  if(!isa(x = x, what = "GenericML")){
     stop("The object 'x' must be an instance of GenericML()")
   }
 
