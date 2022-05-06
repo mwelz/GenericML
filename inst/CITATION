@@ -20,7 +20,7 @@ citEntry(entry = "Manual",
          family = "Chernozhukov",
          role = "aut",
          email = "vchern@mit.edu")),
-  note = "R package version 0.1.0",
+  note = "R package version 0.2.0",
   year = "2021",
   url = "https://CRAN.R-project.org/package=GenericML",
 
