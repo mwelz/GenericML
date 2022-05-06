@@ -41,6 +41,9 @@ An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}).
 \description{
 Visualizes the estimates of the generic targets of interest: plots the point estimates as well as the corresponding confidence bounds. The generic targets of interest can be (subsets of) the parameters of the BLP, GATES, or CLAN analysis.
 }
+\details{
+If you wish to retrieve the data frame that this plot method visualizes, please use \code{\link{setup_plot}}.
+}
 \examples{
 if(require("ranger")) {
 
@@ -90,6 +93,7 @@ plot(x, type = "CLAN", CLAN_variable = "V1",
 
 }
 \seealso{
+\code{\link{setup_plot}},
 \code{\link{GenericML}},
 \code{\link{get_BLP}},
 \code{\link{get_GATES}},

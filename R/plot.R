@@ -10,7 +10,7 @@
 #'
 #'
 #' @details
-#' This function is used internally by plot.GenericML(). It may also be useful for users who want to produce a similar plot, but who want more control over what information to display or how to display that information.
+#' This function is used internally by \code{\link{plot.GenericML}}. It may also be useful for users who want to produce a similar plot, but who want more control over what information to display or how to display that information.
 #'
 #' @return
 #' An object of class \code{setup_plot}, which is a list with the following elements.
@@ -209,7 +209,11 @@ setup_plot <- function(x,
 #' @return
 #' An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}).
 #'
+#' @details
+#' If you wish to retrieve the data frame that this plot method visualizes, please use \code{\link{setup_plot}}.
+#'
 #' @seealso
+#' \code{\link{setup_plot}},
 #' \code{\link{GenericML}},
 #' \code{\link{get_BLP}},
 #' \code{\link{get_GATES}},

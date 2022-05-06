@@ -34,7 +34,7 @@ An object of class \code{setup_plot}, which is a list with the following element
 Extract the relevant information for visualizing the point and interval estimates of the generic targets of interest. The generic targets of interest can be (subsets of) the parameters of the BLP, GATES, or CLAN analysis.
 }
 \details{
-This function is used internally by plot.GenericML(). It may also be useful for users who want to produce a similar plot, but who want more control over what information to display or how to display that information.
+This function is used internally by \code{\link{plot.GenericML}}. It may also be useful for users who want to produce a similar plot, but who want more control over what information to display or how to display that information.
 }
 \examples{
 if(require("ranger") && require("ggplot2")) {
