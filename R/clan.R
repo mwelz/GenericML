@@ -84,7 +84,7 @@ CLAN_NoChecks <- function(Z_CLAN,
   z                 <- stats::qnorm(1-significance_level/2) # the quantile
 
   # loop over the CLAN variables
-  for(j in 1:ncol(Z_CLAN)){
+  for(j in seq_len(ncol(Z_CLAN))){
 
     # initialize matrix
     out.mat <- matrix(NA_real_,
@@ -94,7 +94,7 @@ CLAN_NoChecks <- function(Z_CLAN,
 
 
     ### 1. get summary statistics for most and least affected group ----
-    for(k in 1:K){
+    for(k in seq_len(K)){
 
       if(stats::var(Z_CLAN[membership[, k], j]) == 0){
 

@@ -157,3 +157,61 @@ get.df.from.X1_control <- function(functions.of.Z_mat,
   out
 
 } # FUN
+
+
+#' helper function that returns the names of objects that shall be exported to each parallel worker via parallel::clusterExport
+#' @noRd
+get_varlist <- function(){
+  funs <- c("get_blp.3d",
+            "get_gates.3d",
+            "get_best.3d",
+            "get_clan.3d.ls",
+            "sample_split",
+            "split_fn",
+            "GenericML_single_NoChecks",
+            "proxy_BCA_NoChecks",
+            "proxy_CATE_NoChecks",
+            "setup_X1_NoChecks",
+            "setup_X1_NoChecks",
+            "setup_vcov_subset",
+            "BLP_NoChecks",
+            "BLP.classic",
+            "BLP.HT",
+            "get.df.from.X1_control",
+            "get.vcov",
+            "VEIN",
+            "generic_targets_BLP",
+            "quantile_group_NoChecks",
+            "GATES_NoChecks", "GATES.classic", "GATES.HT", "generic_targets_GATES",
+            "CLAN_NoChecks",
+            "lambda_parameters_NoChecks")
+
+  vars <- c("num.learners",
+            "learners.names",
+            "num.generic_targets.gates",
+            "num.generic_targets.clan",
+            "num.vars.in.Z_CLAN",
+            "namZ_CLAN",
+            "store_learners",
+            "store_splits",
+            "D",
+            "N",
+            "Z",
+            "Y",
+            "learners",
+            "propensity_scores",
+            "Z_CLAN",
+            "X1_BLP",
+            "X1_GATES",
+            "HT",
+            "vcov_BLP",
+            "vcov_GATES",
+            "equal_variances_CLAN",
+            "quantile_cutoffs",
+            "diff_GATES",
+            "diff_CLAN",
+            "significance_level",
+            "min_variation",
+            "prop_aux")
+  return(c(funs, vars))
+} # FUN

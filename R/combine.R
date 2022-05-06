@@ -64,7 +64,7 @@ GenericML_combine <- function(x)
 
 
   ## merge the generic target 3D arrays
-  for(i in 1:length(learners))
+  for(i in seq_along(learners))
   {
 
     blp_ls   <- lapply(1:m, function(j) x[[j]]$generic_targets[[i]]$BLP)
@@ -72,7 +72,7 @@ GenericML_combine <- function(x)
     best_ls  <- lapply(1:m, function(j) x[[j]]$generic_targets[[i]]$best)
 
     clan <- list()
-    for(k in 1:length(vars)){
+    for(k in seq_along(vars)){
       clan_ls  <- lapply(1:m, function(j) x[[j]]$generic_targets[[i]]$CLAN[[k]])
       clan[[k]] <- Reduce(f = f, x = clan_ls)
     } # FOR

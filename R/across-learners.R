@@ -124,7 +124,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
                                             diff_CLAN = diff_CLAN)
 
   # loop over the sample splits
-  for(s in 1:num_splits){
+  for(s in seq_len(num_splits)){
 
     # perform sample splitting into main set and auxiliary set
     split.ls <- sample_split(split_fn = split_fn, D = D, N = N)
@@ -140,7 +140,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
 
 
     # loop over the learners
-    for(i in 1:length(learners)){
+    for(i in seq_along(learners)){
 
       generic.ml.obj <-
         GenericML_single_NoChecks(Z = Z, D = D, Y = Y,
@@ -170,7 +170,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
 
       }
 
-      for(j in 1:num.vars.in.Z_CLAN){
+      for(j in seq_len(num.vars.in.Z_CLAN)){
         generic_targets[[i]]$CLAN[[j]][,,s] <- generic.ml.obj$CLAN$generic_targets[[j]]
       }
 
@@ -213,7 +213,10 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
                                               store_learners       = FALSE,
                                               store_splits         = FALSE){
 
-  # set seed
+  ## check if user system is Windows
+  win <- !TrueIfUnix()
+
+  ## set seed
   if(is.null(seed)){
 
     # ensure reproducibility
@@ -239,16 +242,59 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
   N_set <- 1:N
   num.learners <- length(learners)
   prop <- floor(prop_aux * N)
+  namZ_CLAN <- colnames(Z_CLAN)
+
+  if(win){
+
+    ## start cluster
+    cl <- parallel::makeCluster(spec = num_cores)
+
+    ## export objects to each worker process
+    # doing so ensures that no shared memory is required
+    # (parallel processes have no shared memory on Windows)
+    parallel::clusterExport(cl = cl,
+                            varlist = get_varlist(),
+                            envir = environment())
+
+    ## set up independent parallel random number streams on each worker process
+    parallel::clusterSetRNGStream(cl = cl, iseed = seed)
+
+    ## define parallel lapply function
+    par_lapply <- function(cl, num_cores, X, FUN)
+    {
+      parallel::parLapply(cl = cl, X = X, fun = FUN)
+    } # FUN
+
+  } else{
+
+    ## no workers need to be specified in this case
+    cl <- NULL
+
+    ## define parallel lapply function
+    par_lapply <- function(cl, num_cores, X, FUN)
+    {
+      parallel::mclapply(mc.cores = num_cores, X = X, FUN = FUN)
+    } # FUN
+
+  } # IF
 
 
-  # loop over the sample splits
-  out <- parallel::mclapply(mc.cores = num_cores, X = 1:num_splits, FUN = function(s){
+  ## parallelized loop over the sample splits
+  out <- par_lapply(cl = cl, num_cores = num_cores, X = 1:num_splits, FUN = function(s){
 
     # initialize
-    blp.3d     <- get_blp.3d(num.learners, learners.names)
-    gates.3d   <- get_gates.3d(num.learners, learners.names, num.generic_targets.gates)
-    best.3d    <- get_best.3d(num.learners, learners.names)
-    clan.3d.ls <- get_clan.3d.ls(num.learners, learners.names, num.generic_targets.clan, num.vars.in.Z_CLAN, colnames(Z_CLAN))
+    blp.3d     <- get_blp.3d(num.learners = num.learners,
+                             learners.names = learners.names)
+    gates.3d   <- get_gates.3d(num.learners = num.learners,
+                               learners.names = learners.names,
+                               num.generic_targets.gates = num.generic_targets.gates)
+    best.3d    <- get_best.3d(num.learners = num.learners,
+                              learners.names = learners.names)
+    clan.3d.ls <- get_clan.3d.ls(num.learners = num.learners,
+                                 learners.names = learners.names,
+                                 num.generic_targets.clan = num.generic_targets.clan,
+                                 num.vars.in.Z_CLAN = num.vars.in.Z_CLAN,
+                                 Z_CLAN.names = namZ_CLAN)
 
 
     if(store_learners){
@@ -274,7 +320,7 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
 
 
     # loop over the learners
-    for(i in 1:length(learners)){
+    for(i in seq_len(num.learners)){
 
       generic.ml.obj <-
         GenericML_single_NoChecks(Z = Z, D = D, Y = Y,
@@ -298,7 +344,7 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
       gates.3d[,,i] <- generic.ml.obj$GATES$generic_targets
       best.3d[,,i]  <- c(generic.ml.obj$best$lambda, generic.ml.obj$best$lambda.bar)
 
-      for(j in 1:num.vars.in.Z_CLAN){
+      for(j in seq_len(num.vars.in.Z_CLAN)){
         clan.3d.ls[[j]][,,i] <- generic.ml.obj$CLAN$generic_targets[[j]]
       }
 
@@ -314,6 +360,8 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
 
   }) # MCLAPPLY
 
+  ## stop cluster (if applicable)
+  if(win) parallel::stopCluster(cl = cl)
 
   # now bring it in desired form:
   generic_targets <- initializer.for.splits(Z = Z, Z_CLAN = Z_CLAN,
@@ -322,14 +370,14 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
                                             diff_GATES = diff_GATES,
                                             diff_CLAN = diff_CLAN)
 
-  for(s in 1:num_splits){
-    for(i in 1:length(learners)){
+  for(s in seq_len(num_splits)){
+    for(i in seq_along(learners)){
 
       generic_targets[[i]]$BLP[,,s]   <- out[[s]]$BLP[,,i]
       generic_targets[[i]]$GATES[,,s] <- out[[s]]$GATES[,,i]
       generic_targets[[i]]$best[,,s]  <- out[[s]]$best[,,i]
 
-      for(j in 1:num.vars.in.Z_CLAN){
+      for(j in seq_len(num.vars.in.Z_CLAN)){
         generic_targets[[i]]$CLAN[[j]][,,s] <- out[[s]]$CLAN[[j]][,,i]
       } # FOR
 
@@ -348,8 +396,8 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
 
     stored.learners <- list()
 
-    for(s in 1:num_splits){
-      for(i in 1:length(learners)){
+    for(s in seq_len(num_splits)){
+      for(i in seq_along(learners)){
         stored.learners[[learners.names[i]]][[s]] <- out[[s]]$GML[[i]]
       }
     }
