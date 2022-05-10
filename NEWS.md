@@ -1,3 +1,8 @@
+# GenericML 0.2.1
+
+- Replaced `isa()` with `inherits()` to avoid reliance on `R >= 4.1`.
+- Changed default in `parallel` argument in `GenericML` to `FALSE`.
+
 # GenericML 0.2.0
 
 - Replaced `1:length(x)`-like loops with safer `seq()`-based counterparts.
