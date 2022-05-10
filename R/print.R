@@ -36,7 +36,7 @@
 #' @export
 print.GenericML <- function(x, ...){
 
-  if(!isa(x = x, what = "GenericML")){
+  if(!inherits(x = x, what = "GenericML", which = FALSE)){
     stop("The object 'x' must be an instance of GenericML()")
   }
 

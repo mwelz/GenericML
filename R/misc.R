@@ -425,10 +425,10 @@ lambda_parameters <- function(BLP,
                               proxy_CATE,
                               membership){
 
-  if(!isa(x = BLP, what = "BLP")){
+  if(!inherits(x = BLP, what = "BLP", which = FALSE)){
     stop("The BLP object must be an instance of BLP()")
   }
-  if(!isa(x = GATES, what = "GATES")){
+  if(!inherits(x = GATES, what = "GATES", which = FALSE)){
     stop("The GATES object must be an instance of GATES()")
   }
   InputChecks_group.membership(membership)
