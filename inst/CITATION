@@ -20,13 +20,13 @@ citEntry(entry = "Manual",
          family = "Chernozhukov",
          role = "aut",
          email = "vchern@mit.edu")),
-  note = "R package version 0.2.0",
-  year = "2021",
+  note = "R package version 0.2.1",
+  year = "2022",
   url = "https://CRAN.R-project.org/package=GenericML",
 
   textVersion  =
-  paste("Max Welz, Andreas Alfons, Mert Demirer and Victor Chernozhukov (2021).",
+  paste("Max Welz, Andreas Alfons, Mert Demirer and Victor Chernozhukov (2022).",
         "GenericML: Generic Machine Learning Inference.",
-        "R package version 0.2.0.",
+        "R package version 0.2.1.",
         "https://CRAN.R-project.org/package=GenericML")
 )

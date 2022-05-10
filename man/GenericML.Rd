@@ -25,7 +25,7 @@ GenericML(
   stratify = setup_stratify(),
   significance_level = 0.05,
   min_variation = 1e-05,
-  parallel = TrueIfUnix(),
+  parallel = FALSE,
   num_cores = parallel::detectCores(),
   seed = NULL,
   store_learners = FALSE,
@@ -73,7 +73,7 @@ GenericML(
 
 \item{min_variation}{Specifies a threshold for the minimum variation of the BCA/CATE predictions. If the variation of a BCA/CATE prediction falls below this threshold, random noise with distribution \eqn{N(0, var(Y)/20)} is added to it. Default is \code{1e-05}.}
 
-\item{parallel}{Logical. If \code{TRUE}, parallel computing will be used. On Unix systems, this will be done via forking (shared memory across threads). On non-Unix systems, this will be done through parallel socket clusters.}
+\item{parallel}{Logical. If \code{TRUE}, parallel computing will be used. Default is \code{FALSE}. On Unix systems, this will be done via forking (shared memory across threads). On non-Unix systems, this will be done through parallel socket clusters.}
 
 \item{num_cores}{Number of cores to be used in parallelization (if applicable). Default is the number of cores of the user's machine.}
 

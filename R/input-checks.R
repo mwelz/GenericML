@@ -74,7 +74,7 @@ InputChecks_Z_CLAN <- function(Z_CLAN){
 # helper that throws error in case of illegal input in 'X1_control'
 InputChecks_X1 <- function(X1_control, num.obs){
 
-  if(!isa(x = X1_control, what = "setup_X1")){
+  if(!inherits(x = X1_control, what = "setup_X1", which = FALSE)){
     stop(paste0(deparse(substitute(X1_control))),
          " must be an instance of setup_X1()", call. = FALSE)
   } # IF
@@ -105,7 +105,7 @@ InputChecks_X1 <- function(X1_control, num.obs){
 
 InputChecks_vcov.control <- function(vcov_control){
 
-  if(!isa(x = vcov_control, what = "setup_vcov")){
+  if(!inherits(x = vcov_control, what = "setup_vcov", which = FALSE)){
     stop(paste0(deparse(substitute(vcov_control))),
                 " must be an instance of setup_vcov()", call. = FALSE)
   } # IF
@@ -115,7 +115,7 @@ InputChecks_vcov.control <- function(vcov_control){
 
 InputChecks_diff <- function(diff, K){
 
-  if(!isa(x = diff, what = "setup_diff")){
+  if(!inherits(x = diff, what = "setup_diff", which = FALSE)){
     stop(paste0(deparse(substitute(diff))),
          " must be an instance of setup_diff()", call. = FALSE)
   } # IF
