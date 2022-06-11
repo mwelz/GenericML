@@ -180,7 +180,10 @@ get_GATES <- function(x, learner = "best", plot = TRUE){
                 pval)
   colnames(out)[4] <- "Pr(>|z|)"
 
-  if(plot) print(plot.GenericML(x = x, learner = learner, type = "GATES"))
+  if(plot){
+    print(plot.GenericML(x = x, learner = learner,
+                         type = "GATES", ATE = TRUE))
+  }
 
   out
 
@@ -281,7 +284,11 @@ get_CLAN <- function(x, variable, learner = "best", plot = TRUE){
                 pval)
   colnames(out)[4] <- "Pr(>|z|)"
 
-  if(plot) print(plot(x = x, learner = learner, type = "CLAN", CLAN_variable = variable))
+  if(plot){
+    print(plot(x = x, learner = learner,
+               type = "CLAN", CLAN_variable = variable,
+               ATE = FALSE))
+  }
 
   out
 
