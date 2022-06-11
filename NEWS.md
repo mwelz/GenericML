@@ -1,3 +1,8 @@
+# GenericML 0.2.2
+
+- Fixed a few typos in documentation
+- Changed behavior of `get_CLAN()` to not plot ATE estimates when `plot = TRUE`
+
 # GenericML 0.2.1
 
 - Replaced `isa()` with `inherits()` to avoid reliance on `R >= 4.1`.

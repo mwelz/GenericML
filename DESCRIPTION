@@ -1,6 +1,6 @@
 Package: GenericML
 Title: Generic Machine Learning Inference
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: 
     c(person(given = "Max",
            family = "Welz",
@@ -44,5 +44,8 @@ Suggests:
     ranger,
     rpart,
     e1071,
+    xgboost,
+    kknn,
+    DiceKriging,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
