@@ -65,3 +65,86 @@ print.GenericML <- function(x, ...){
   cat("\n")
 
 } # FUN
+
+
+#' Print method for a \code{BLP_info} object
+#'
+#' @param x An object of class \code{"BLP_info"}.
+#' @param digits Number of digits to print.
+#' @param ... Additional arguments to be passed down.
+#'
+#' @return
+#' A print to the console.
+#'
+#' @export
+print.BLP_info <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
+{
+  cat("BLP generic targets\n---\n")
+  print_accessors(x = x, digits = digits, print_confidence = TRUE, ... = ...)
+} # FUN
+
+
+#' Print method for a \code{GATES_info} object
+#'
+#' @param x An object of class \code{"GATES_info"}.
+#' @param digits Number of digits to print.
+#' @param ... Additional arguments to be passed down.
+#'
+#' @return
+#' A print to the console.
+#'
+#' @export
+print.GATES_info <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
+{
+  cat("GATES generic targets\n---\n")
+  print_accessors(x = x, digits = digits, print_confidence = TRUE, ... = ...)
+} # FUN
+
+#' Print method for a \code{CLAN_info} object
+#'
+#' @param x An object of class \code{"CLAN_info"}.
+#' @param digits Number of digits to print.
+#' @param ... Additional arguments to be passed down.
+#'
+#' @return
+#' A print to the console.
+#'
+#' @export
+print.CLAN_info <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
+{
+  cat(sprintf("CLAN generic targets for variable '%s' \n---\n", x$CLAN_variable))
+  print_accessors(x = x, digits = digits, print_confidence = TRUE, ... = ...)
+} # FUN
+
+
+#' Internal function to support print methods of accessors; returns a print
+#'
+#' @param x An object of class \code{"BLP_info"}, \code{"GATES_info"}, or \code{"CLAN_info"}
+#' @param digits Number of digits to print
+#' @param print_confidence Logical. Shall the confidence level be printed as well?
+#' @param ... Additional arguments to be passed down
+#'
+#' @noRd
+print_accessors <- function(x, digits, print_confidence,...)
+{
+  # prepare coefficient matrix
+  mat <- cbind(x$estimate, x$confidence_interval, x$pvalue)
+  colnames(mat) <- c("Estimate", "CB lower", "CB upper", "p-value")
+
+  # print it
+  stats::printCoefmat(mat, digits = digits, ... = ...)
+
+  # print confidence level if requested
+  if(isTRUE(print_confidence))
+  {
+    cat("---\nLevel of confidence of the confidence bounds (CB): ",
+        format(100 * x$confidence_level), " %\n", sep = "")
+  } # IF
+
+  # create plot if requested
+  p <- x$plot
+  if (!is.null(p)) print(p)
+
+  # return object invisibly
+  invisible(x)
+} # FUN
