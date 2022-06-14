@@ -30,7 +30,7 @@ The output of this setup function is intended to be used as argument in the func
 setup_vcov(estimator = "vcovHC", arguments = list(type = "const"))
 
 # use White's heteroskedasticity-robust estimator
-setup_vcov(estimator = "vcovHC", arguments = list(type = "H0"))
+setup_vcov(estimator = "vcovHC", arguments = list(type = "HC0"))
 
 if (require("sandwich")){
 
