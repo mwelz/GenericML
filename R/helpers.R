@@ -215,3 +215,29 @@ get_varlist <- function(){
             "prop_aux")
   return(c(funs, vars))
 } # FUN
+
+
+#' Internal function that returns the names of variables for which CLAN was performed
+#' @param x A \code{"GenericML"} object
+#' @noRd
+CLAN_names <- function(x)
+{
+  return(names(x$VEIN$best_learners$CLAN))
+} # FUN
+
+# helper that checks if x is a "GenericML" object
+isGenericMLcheck <- function(x)
+{
+  if(!inherits(x = x, what = "GenericML", which = FALSE)){
+    stop("x needs to be instance of the class GenericML")
+  } # IF
+} # FUN
+
+
+#' Internal function that returns the confidence level
+#' @param x A \code{"GenericML"} object
+#' @noRd
+confidence_level <- function(x)
+{
+  return(1.0 - 2 * x$arguments$significance_level)
+} # FUN

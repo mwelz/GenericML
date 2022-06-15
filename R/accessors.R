@@ -236,17 +236,29 @@ get_CLAN <- function(x, variable, learner = "best", plot = TRUE){
 #' @noRd
 accessor_CLAN <- function(x, variable, learner)
 {
-  if(!inherits(x = x, what = "GenericML", which = FALSE)){
-    stop("x needs to be instance of the class GenericML")
-  } # IF
+  # input check
+  isGenericMLcheck(x)
 
-  if(!(variable %in% names(x$VEIN$best_learners$CLAN))){
+  # get CLAN names
+  CLAN_vars <- CLAN_names(x)
+
+  if(!(variable %in% CLAN_vars)){
     stop(paste0("No CLAN was performed on this variable. ",
                 "CLAN was performed on the variables ",
-                paste0(names(x$VEIN$best_learners$CLAN), collapse = ", ")))
+                paste0(CLAN_vars, collapse = ", ")))
   } # IF
 
+  # call the main function
+  accessor_CLAN_noChecks(x = x,
+                         variable = variable,
+                         learner = learner)
 
+} # FUN
+
+
+# same as accessor_CLAN(), just without input checks
+accessor_CLAN_noChecks <- function(x, variable, learner)
+{
   if(identical(learner, "best")){
 
     out <- x$VEIN$best_learners$CLAN[[variable]]
@@ -264,7 +276,6 @@ accessor_CLAN <- function(x, variable, learner)
   } # IF
 
   return(out)
-
 } # FUN
 
 
@@ -278,9 +289,8 @@ accessor_CLAN <- function(x, variable, learner)
 #' @noRd
 accessor_BLP_GATES <- function(x, type, learner)
 {
-  if(!inherits(x = x, what = "GenericML", which = FALSE)){
-    stop("x needs to be instance of the class GenericML")
-  } # IF
+  # input check
+  isGenericMLcheck(x)
 
   if(identical(learner, "best")){
 
@@ -329,7 +339,7 @@ accessor_output <- function(x, accessor_obj, plot, type, learner, CLAN_variable,
   ## prepare output
   # Generic ML estimation has size control of 2 * significance_level
   out <- list(estimate = Estimate, confidence_interval = ConfidenceInterval, pvalue = pval,
-              confidence_level = 1.0 - 2 * x$arguments$significance_level)
+              confidence_level = confidence_level(x), learner = learner)
 
   ## if requested, add ggplot object to output
   if(isTRUE(plot)){
