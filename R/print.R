@@ -148,3 +148,36 @@ print_accessors <- function(x, digits, print_confidence,...)
   # return object invisibly
   invisible(x)
 } # FUN
+
+
+#' Print method for a \code{"heterogeneity_CLAN"} object
+#'#'
+#' @param x An object of class \code{"\link{heterogeneity_CLAN}"}.
+#' @param ... Additional arguments to be passed down.
+#'
+#' @return
+#' A print to the console.
+#'
+#' @export
+print.heterogeneity_CLAN <- function(x, ...)
+{
+  if(!inherits(x = x, what = "heterogeneity_CLAN", which = FALSE)){
+    stop("x needs to be instance of the class heterogeneity_CLAN")
+  } # IF
+
+  cat("There is significant treatment effect heterogeneity along the following CLAN variables:\n\t")
+
+  if(x$significant$num_variables > 0L)
+  {
+    cat(paste0(x$significant$variables, collapse = ", "))
+  } else{
+    cat("(none)")
+  } # IF
+
+  cat("\n---\nLevel of significance: ",
+      format(100 * x$significance_level), " %\n", sep = "")
+  cat("---\nUse 'get_CLAN()' to further explore CLAN along these variables")
+
+  # return object invisibly
+  invisible(x)
+} # FUN
