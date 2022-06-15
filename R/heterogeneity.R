@@ -76,7 +76,7 @@ heterogeneity_CLAN <- function(x, learner = "best", significance_level = 0.05) #
   significant   <- minpval < significance_level # is it significant?
 
   return(
-    structure(list(pvalues = pvalues,
+    structure(list(pvalues = pvalues_mat,
                    significant = list(variables = sig_vars,
                                       num_variables = length(sig_vars),
                                       num_params = num_sig_params),
