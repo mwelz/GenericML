@@ -13,10 +13,18 @@ get_CLAN(x, variable, learner = "best", plot = TRUE)
 
 \item{learner}{A character string of the learner whose CLAN generic target estimates shall be accessed. Default is \code{"best"} for the best learner for CLAN}
 
-\item{plot}{Logical. If \code{TRUE} (default), a plot is printed.}
+\item{plot}{Logical. If \code{TRUE} (default), a \code{"\link[ggplot2]{ggplot}"} object is computed.}
 }
 \value{
-A numeric matrix of CLAN generic target estimates which contains information on point estimates, confidence bounds, and (adjusted) p-values. Furthermore, prints a plot if \code{plot = TRUE}.
+An object of class \code{"CLAN_info"}, which consists of the following components:
+\describe{
+\item{\code{estimate}}{A numeric vector of point estimates of the CLAN generic targets.}
+\item{\code{confidence_interval}}{A numeric matrix of the lower and upper confidence bounds for each generic target. The implied confidence level is equal to \code{1 - 2 * significance_level}.}
+\item{\code{confidence_level}}{The confidence level of the confidence intervals. Equals \code{1 - 2 * significance_level}.}
+\item{\code{learner}}{The argument \code{learner}.}
+\item{\code{plot}}{An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}). Only returned if the argument \code{plot = TRUE}.}
+\item{\code{CLAN_variable}}{The name of the CLAN variable of interest.}
+}
 }
 \description{
 Accessor function for the CLAN generic target estimates
@@ -44,6 +52,9 @@ learners <- c("tree", "mlr3::lrn('ranger', num.trees = 10)")
 x <- GenericML(Z, D, Y, learners, num_splits = 2,
                parallel = FALSE)
 
+## access best learner
+get_best(x)
+
 ## access BLP generic targets for best learner w/o plot
 get_BLP(x, learner = "best", plot = FALSE)
 
@@ -69,5 +80,8 @@ get_CLAN(x, learner = "mlr3::lrn('ranger', num.trees = 10)",
 \code{\link{GenericML}},
 \code{\link{get_BLP}},
 \code{\link{get_GATES}},
-\code{\link[=plot.GenericML]{plot}}
+\code{\link{get_best}},
+\code{\link{print.BLP_info}},
+\code{\link{print.GATES_info}},
+\code{\link{print.CLAN_info}}
 }

@@ -2,9 +2,16 @@
 #'
 #' @param x An object of the class \code{\link{GenericML}}.
 #' @param learner A character string of the learner whose BLP generic target estimates shall be accessed. Default is \code{"best"} for the best learner for BLP.
-#' @param plot Logical. If \code{TRUE} (default), a plot is printed.
+#' @param plot Logical. If \code{TRUE} (default), a \code{"\link[ggplot2]{ggplot}"} object is computed.
 #'
-#' @return A numeric matrix of BLP generic target estimates which contains information on point estimates, confidence bounds, and (adjusted) p-values. Furthermore, prints a plot if \code{plot = TRUE}.
+#' @return An object of class \code{"BLP_info"}, which consists of the following components:
+#' \describe{
+#'   \item{\code{estimate}}{A numeric vector of point estimates of the BLP generic targets.}
+#'   \item{\code{confidence_interval}}{A numeric matrix of the lower and upper confidence bounds for each generic target. The implied confidence level is equal to \code{1 - 2 * significance_level}.}
+#'   \item{\code{confidence_level}}{The confidence level of the confidence intervals. Equals \code{1 - 2 * significance_level}.}
+#'   \item{\code{learner}}{The argument \code{learner}.}
+#'   \item{\code{plot}}{An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}). Only returned if the argument \code{plot = TRUE}.}
+#'   }
 #'
 #' @examples
 #' if(require("rpart") && require("ranger")){
@@ -28,6 +35,9 @@
 #' # small number of splits to keep computation time low
 #' x <- GenericML(Z, D, Y, learners, num_splits = 2,
 #'                parallel = FALSE)
+#'
+#' ## access best learner
+#' get_best(x)
 #'
 #' ## access BLP generic targets for best learner w/o plot
 #' get_BLP(x, learner = "best", plot = FALSE)
@@ -53,7 +63,10 @@
 #' \code{\link{GenericML}},
 #' \code{\link{get_GATES}},
 #' \code{\link{get_CLAN}},
-#' \code{\link[=plot.GenericML]{plot}}
+#' \code{\link{get_best}},
+#' \code{\link{print.BLP_info}},
+#' \code{\link{print.GATES_info}},
+#' \code{\link{print.CLAN_info}}
 #'
 #' @export
 get_BLP <- function(x, learner = "best", plot = TRUE){
@@ -79,9 +92,16 @@ get_BLP <- function(x, learner = "best", plot = TRUE){
 #'
 #' @param x An object of the class \code{\link{GenericML}}.
 #' @param learner A character string of the learner whose GATES generic target estimates shall be accessed. Default is \code{"best"} for the best learner for GATES.
-#' @param plot Logical. If \code{TRUE} (default), a plot is printed.
+#' @param plot Logical. If \code{TRUE} (default), a \code{"\link[ggplot2]{ggplot}"} object is computed.
 #'
-#' @return A numeric matrix of GATES generic target estimates which contains information on point estimates, confidence bounds, and (adjusted) p-values. Furthermore, prints a plot if \code{plot = TRUE}.
+#' @return An object of class \code{"GATES_info"}, which consists of the following components:
+#' \describe{
+#'   \item{\code{estimate}}{A numeric vector of point estimates of the GATES generic targets.}
+#'   \item{\code{confidence_interval}}{A numeric matrix of the lower and upper confidence bounds for each generic target. The implied confidence level is equal to \code{1 - 2 * significance_level}.}
+#'   \item{\code{confidence_level}}{The confidence level of the confidence intervals. Equals \code{1 - 2 * significance_level}.}
+#'   \item{\code{learner}}{The argument \code{learner}.}
+#'   \item{\code{plot}}{An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}). Only returned if the argument \code{plot = TRUE}.}
+#'   }
 #'
 #' @examples
 #' if(require("rpart") && require("ranger")){
@@ -105,6 +125,9 @@ get_BLP <- function(x, learner = "best", plot = TRUE){
 #' # small number of splits to keep computation time low
 #' x <- GenericML(Z, D, Y, learners, num_splits = 2,
 #'                parallel = FALSE)
+#'
+#' ## access best learner
+#' get_best(x)
 #'
 #' ## access BLP generic targets for best learner w/o plot
 #' get_BLP(x, learner = "best", plot = FALSE)
@@ -130,7 +153,10 @@ get_BLP <- function(x, learner = "best", plot = TRUE){
 #' \code{\link{GenericML}},
 #' \code{\link{get_BLP}},
 #' \code{\link{get_CLAN}},
-#' \code{\link[=plot.GenericML]{plot}}
+#' \code{\link{get_best}},
+#' \code{\link{print.BLP_info}},
+#' \code{\link{print.GATES_info}},
+#' \code{\link{print.CLAN_info}}
 #'
 #' @export
 get_GATES <- function(x, learner = "best", plot = TRUE){
@@ -155,9 +181,17 @@ get_GATES <- function(x, learner = "best", plot = TRUE){
 #' @param x An object of the class \code{\link{GenericML}}.
 #' @param variable The (character) name of a variabe on which CLAN was performed.
 #' @param learner A character string of the learner whose CLAN generic target estimates shall be accessed. Default is \code{"best"} for the best learner for CLAN
-#' @param plot Logical. If \code{TRUE} (default), a plot is printed.
+#' @param plot Logical. If \code{TRUE} (default), a \code{"\link[ggplot2]{ggplot}"} object is computed.
 #'
-#' @return A numeric matrix of CLAN generic target estimates which contains information on point estimates, confidence bounds, and (adjusted) p-values. Furthermore, prints a plot if \code{plot = TRUE}.
+#' @return An object of class \code{"CLAN_info"}, which consists of the following components:
+#' \describe{
+#'   \item{\code{estimate}}{A numeric vector of point estimates of the CLAN generic targets.}
+#'   \item{\code{confidence_interval}}{A numeric matrix of the lower and upper confidence bounds for each generic target. The implied confidence level is equal to \code{1 - 2 * significance_level}.}
+#'   \item{\code{confidence_level}}{The confidence level of the confidence intervals. Equals \code{1 - 2 * significance_level}.}
+#'   \item{\code{learner}}{The argument \code{learner}.}
+#'   \item{\code{plot}}{An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}). Only returned if the argument \code{plot = TRUE}.}
+#'   \item{\code{CLAN_variable}}{The name of the CLAN variable of interest.}
+#'   }
 #'
 #' @examples
 #' if(require("rpart") && require("ranger")){
@@ -181,6 +215,9 @@ get_GATES <- function(x, learner = "best", plot = TRUE){
 #' # small number of splits to keep computation time low
 #' x <- GenericML(Z, D, Y, learners, num_splits = 2,
 #'                parallel = FALSE)
+#'
+#' ## access best learner
+#' get_best(x)
 #'
 #' ## access BLP generic targets for best learner w/o plot
 #' get_BLP(x, learner = "best", plot = FALSE)
@@ -206,7 +243,10 @@ get_GATES <- function(x, learner = "best", plot = TRUE){
 #' \code{\link{GenericML}},
 #' \code{\link{get_BLP}},
 #' \code{\link{get_GATES}},
-#' \code{\link[=plot.GenericML]{plot}}
+#' \code{\link{get_best}},
+#' \code{\link{print.BLP_info}},
+#' \code{\link{print.GATES_info}},
+#' \code{\link{print.CLAN_info}}
 #'
 #' @export
 get_CLAN <- function(x, variable, learner = "best", plot = TRUE){
@@ -354,4 +394,80 @@ accessor_output <- function(x, accessor_obj, plot, type, learner, CLAN_variable,
 
   return(out)
 
+} # FUN
+
+
+#' Accessor function for the best learner estimates
+#'
+#' The best learner is determined by maximizing the criteria \eqn{\Lambda} and \eqn{\bar{\Lambda}}, see Sections 5.2 and 5.3 of the paper. This function accesses the estimates of these two criteria,
+#'
+#' @param x An object of class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.
+#'
+#' @return
+#' An object of class \code{"best"}, which consists of the following components:
+#' \describe{
+#'   \item{\code{BLP}}{A string holding the name of the best learner for a BLP analysis.}
+#'   \item{\code{GATES}}{A string holding the name of the best learner for a GATES analysis.}
+#'   \item{\code{CLAN}}{A string holding the name of the best learner for a CLAN analysis (same learner as in \code{GATES}).}
+#'   \item{\code{overview}}{A numeric matrix of the estimates of the performance measures \eqn{\Lambda} and \eqn{\bar{\Lambda}} for each learner.}}
+#'
+#' @examples
+#' if(require("rpart") && require("ranger")){
+#' ## generate data
+#' set.seed(1)
+#' n  <- 150                                  # number of observations
+#' p  <- 5                                    # number of covariates
+#' D  <- rbinom(n, 1, 0.5)                    # random treatment assignment
+#' Z  <- matrix(runif(n*p), n, p)             # design matrix
+#' Y0 <- as.numeric(Z %*% rexp(p) + rnorm(n)) # potential outcome without treatment
+#' Y1 <- 2 + Y0                               # potential outcome under treatment
+#' Y  <- ifelse(D == 1, Y1, Y0)               # observed outcome
+#'
+#' ## column names of Z
+#' colnames(Z) <- paste0("V", 1:p)
+#'
+#' ## specify learners
+#' learners <- c("tree", "mlr3::lrn('ranger', num.trees = 10)")
+#'
+#' ## perform generic ML inference
+#' # small number of splits to keep computation time low
+#' x <- GenericML(Z, D, Y, learners, num_splits = 2,
+#'                parallel = FALSE)
+#'
+#' ## access best learner
+#' get_best(x)
+#'
+#' ## access BLP generic targets for best learner w/o plot
+#' get_BLP(x, learner = "best", plot = FALSE)
+#'
+#' ## access BLP generic targets for ranger learner w/o plot
+#' get_BLP(x, learner = "mlr3::lrn('ranger', num.trees = 10)", plot = FALSE)
+#'
+#' ## access GATES generic targets for best learner w/o plot
+#' get_GATES(x, learner = "best", plot = FALSE)
+#'
+#' ## access GATES generic targets for ranger learner w/o plot
+#' get_GATES(x, learner = "mlr3::lrn('ranger', num.trees = 10)", plot = FALSE)
+#'
+#' ## access CLAN generic targets for "V1" & best learner, w/o plot
+#' get_CLAN(x, learner = "best", variable = "V1", plot = FALSE)
+#'
+#' ## access CLAN generic targets for "V1" & ranger learner, w/o plot
+#' get_CLAN(x, learner = "mlr3::lrn('ranger', num.trees = 10)",
+#'          variable = "V1", plot = FALSE)
+#' }
+#'
+#' @seealso
+#' \code{\link{GenericML}},
+#' \code{\link}{get_BLP}
+#' \code{\link{get_GATES}},
+#' \code{\link{get_CLAN}},
+#'
+#' @export
+get_best <- function(x)
+{
+  isGenericMLcheck(x)
+  out <- x$best
+  out$num_splits <- x$arguments$num_splits
+  return(structure(out, class = "best"))
 } # FUN
