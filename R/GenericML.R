@@ -52,8 +52,8 @@
 #' Lang M., Binder M., Richter J., Schratz P., Pfisterer F., Coors S., Au Q., Casalicchio G., Kotthoff L., Bischl B. (2019). \dQuote{mlr3: A Modern Object-Oriented Machine Learning Framework in R.} \emph{Journal of Open Source Software}, \bold{4}(44), 1903. \doi{10.21105/joss.01903}.
 #'
 #' @seealso
-#' \code{\link[=plot.GenericML]{plot}},
-#' \code{\link[=print.GenericML]{print}},
+#' \code{\link{plot.GenericML}}
+#' \code{\link{print.GenericML}}
 #' \code{\link{get_BLP}},
 #' \code{\link{get_GATES}},
 #' \code{\link{get_CLAN}},

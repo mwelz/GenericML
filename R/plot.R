@@ -404,3 +404,39 @@ plot.GenericML <- function(x,
   return(p)
 
 } # FUN
+
+
+#' @export
+plot.BLP_info <- function(x, ...){
+  p <- x$plot
+  if(is.null(p)){
+    stop(paste0("This object does not contain a ggplot object.",
+        " Try the argument plot = TRUE in get_BLP()."))
+  } else{
+    return(p)
+  }
+} # FUN
+
+
+#' @export
+plot.GATES_info <- function(x, ...){
+  p <- x$plot
+  if(is.null(p)){
+    stop(paste0("This object does not contain a ggplot object.",
+                " Try the argument plot = TRUE in get_GATES()."))
+  } else{
+    return(p)
+  }
+} # FUN
+
+
+#' @export
+plot.CLAN_info <- function(x, ...){
+  p <- x$plot
+  if(is.null(p)){
+    stop(paste0("This object does not contain a ggplot object.",
+                " Try the argument plot = TRUE in get_CLAN()."))
+  } else{
+    return(p)
+  }
+} # FUN

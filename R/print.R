@@ -181,3 +181,14 @@ print.heterogeneity_CLAN <- function(x, ...)
   # return object invisibly
   invisible(x)
 } # FUN
+
+#' @export
+print.best <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
+{
+  print(x$overview, digits = digits)
+  cat("---\n")
+  cat(paste0("The best learner for BLP is ", x$BLP,
+             " with lambda = ", round(x$overview[x$BLP, "lambda"], digits), "."), "\n")
+  cat(paste0("The best learner for GATES and CLAN is ", x$BLP,
+             " with lambda.bar = ", round(x$overview[x$GATES, "lambda.bar"], digits), "."))
+}
