@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.R
 \name{plot.GenericML}
 \alias{plot.GenericML}
-\title{Plot method for a \code{GenericML} object}
+\title{Plot method for a \code{"GenericML"} object}
 \usage{
 \method{plot}{GenericML}(
   x,
@@ -17,7 +17,7 @@
 )
 }
 \arguments{
-\item{x}{An instance of \code{\link{GenericML}}.}
+\item{x}{An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.}
 
 \item{type}{The analysis whose parameters shall be plotted. Either \code{"GATES"}, \code{"BLP"}, or \code{"CLAN"}. Default is \code{"GATES"}.}
 
@@ -42,7 +42,7 @@ An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}).
 Visualizes the estimates of the generic targets of interest: plots the point estimates as well as the corresponding confidence bounds. The generic targets of interest can be (subsets of) the parameters of the BLP, GATES, or CLAN analysis.
 }
 \details{
-If you wish to retrieve the data frame that this plot method visualizes, please use \code{\link{setup_plot}}.
+If you wish to retrieve the data frame that this plot method visualizes, please use \code{\link{setup_plot}()}.
 }
 \examples{
 if(require("ranger")) {

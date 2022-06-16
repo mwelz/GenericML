@@ -2,7 +2,7 @@
 #'
 #' Extract the relevant information for visualizing the point and interval estimates of the generic targets of interest. The generic targets of interest can be (subsets of) the parameters of the BLP, GATES, or CLAN analysis.
 #'
-#' @param x An instance of \code{\link{GenericML}}.
+#' @param x An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.
 #' @param type The analysis whose parameters shall be plotted. Either \code{"GATES"}, \code{"BLP"}, or \code{"CLAN"}. Default is \code{"GATES"}.
 #' @param learner The learner whose results are to be returned. Default is \code{"best"} for the best learner as measured by the \eqn{\Lambda} parameters.
 #' @param CLAN_variable Name of the CLAN variable to be plotted. Only applicable if \code{type = "CLAN"}.
@@ -10,10 +10,10 @@
 #'
 #'
 #' @details
-#' This function is used internally by \code{\link{plot.GenericML}}. It may also be useful for users who want to produce a similar plot, but who want more control over what information to display or how to display that information.
+#' This function is used internally by \code{\link{plot.GenericML}()}. It may also be useful for users who want to produce a similar plot, but who want more control over what information to display or how to display that information.
 #'
 #' @return
-#' An object of class \code{setup_plot}, which is a list with the following elements.
+#' An object of class \code{"setup_plot"}, which is a list with the following elements.
 #' \describe{
 #'   \item{\code{data_plot}}{A data frame containing point and interval estimates of the generic target specified in the argument \code{type}.}
 #'   \item{\code{data_BLP}}{A data frame containing point and interval estimates of the BLP analysis.}
@@ -192,11 +192,11 @@ setup_plot <- function(x,
 
 
 
-#' Plot method for a \code{GenericML} object
+#' Plot method for a \code{"GenericML"} object
 #'
 #' Visualizes the estimates of the generic targets of interest: plots the point estimates as well as the corresponding confidence bounds. The generic targets of interest can be (subsets of) the parameters of the BLP, GATES, or CLAN analysis.
 #'
-#' @param x An instance of \code{\link{GenericML}}.
+#' @param x An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.
 #' @param type The analysis whose parameters shall be plotted. Either \code{"GATES"}, \code{"BLP"}, or \code{"CLAN"}. Default is \code{"GATES"}.
 #' @param learner The learner whose results are to be returned. Default is \code{"best"} for the best learner as measured by the \eqn{\Lambda} parameters.
 #' @param CLAN_variable Name of the CLAN variable to be plotted. Only applicable if \code{type = "CLAN"}.
@@ -210,7 +210,7 @@ setup_plot <- function(x,
 #' An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}).
 #'
 #' @details
-#' If you wish to retrieve the data frame that this plot method visualizes, please use \code{\link{setup_plot}}.
+#' If you wish to retrieve the data frame that this plot method visualizes, please use \code{\link{setup_plot}()}.
 #'
 #' @seealso
 #' \code{\link{setup_plot}},

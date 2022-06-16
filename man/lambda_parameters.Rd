@@ -7,13 +7,13 @@
 lambda_parameters(BLP, GATES, proxy_CATE, membership)
 }
 \arguments{
-\item{BLP}{An instance of \code{\link{BLP}}.}
+\item{BLP}{An object of class \code{"\link{BLP}"}.}
 
-\item{GATES}{An instance of \code{\link{GATES}}.}
+\item{GATES}{An object of class \code{"\link{GATES}"}.}
 
 \item{proxy_CATE}{Proxy estimates of the CATE.}
 
-\item{membership}{A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be of type \code{\link{quantile_group}}. Typically, the grouping is based on CATE estimates, which are for instance returned by \code{proxy_CATE}.}
+\item{membership}{A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be of type \code{"\link{quantile_group}"}. Typically, the grouping is based on CATE estimates, which are for instance returned by \code{\link{proxy_CATE}()}.}
 }
 \value{
 A list containing the estimates of \eqn{\Lambda} and \eqn{\bar{\Lambda}}, denoted \code{lambda} and \code{lambda.bar}, respectively.

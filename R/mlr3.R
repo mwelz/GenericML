@@ -7,14 +7,14 @@
 #' @param estimator Character specifying the estimator. Must either be equal to \code{'constant'} (estimates the propensity scores by \code{mean(D)}), \code{'lasso'}, \code{'random_forest'}, \code{'tree'}, or \code{mlr3} syntax. Note that in case of \code{mlr3} syntax, do \emph{not} specify if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 500)'} for a random forest learner. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.
 #'
 #' @return
-#' An object of class \code{propensity_score}, consisting of the following components:
+#' An object of class \code{"propensity_score"}, consisting of the following components:
 #' \describe{
 #'   \item{\code{estimates}}{A numeric vector of propensity score estimates.}
 #'   \item{\code{mlr3_objects}}{\code{mlr3} objects used for estimation. Only non-empty if \code{mlr3} was used.}
 #'   }
 #'
 #' @details
-#' The specifications \code{lasso}, \code{random_forest}, and \code{tree} in \code{estimator} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{lasso} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{random_forest} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{tree} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}.
+#' The specifications \code{"lasso"}, \code{"random_forest"}, and \code{"tree"} in \code{estimator} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{"lasso"} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{"random_forest"} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{"tree"} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}.
 #'
 #' @references
 #' Rosenbaum P.R., Rubin D.B. (1983). \dQuote{The Central Role of the Propensity Score in Observational Studies for Causal Effects.} \emph{Biometrika}, \bold{70}(1), 41--55. \doi{10.1093/biomet/70.1.41}.
@@ -146,14 +146,14 @@ propensity_score_mlr3 <- function(Z, D, learner = "random_forest"){
 #' @param min_variation Specifies a threshold for the minimum variation of the predictions. If the variation of a BCA prediction falls below this threshold, random noise with distribution \eqn{N(0, var(Y)/20)} is added to it. Default is \code{1e-05}.
 #'
 #' @return
-#' An object of class \code{proxy_BCA}, consisting of the following components:
+#' An object of class \code{"proxy_BCA"}, consisting of the following components:
 #' \describe{
 #'   \item{\code{estimates}}{A numeric vector of BCA estimates of each observation.}
 #'   \item{\code{mlr3_objects}}{\code{mlr3} objects used for estimation.}
 #'   }
 #'
 #' @details
-#' The specifications \code{lasso}, \code{random_forest}, and \code{tree} in \code{learner} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{lasso} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{random_forest} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{tree} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}.
+#' The specifications \code{"lasso"}, \code{"random_forest"}, and \code{"tree"} in \code{learner} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{"lasso"} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{"random_forest"} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{"tree"} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}.
 #'
 #' @references
 #' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
@@ -266,14 +266,14 @@ proxy_BCA_NoChecks <- function(Z, D, Y,
 #' @param min_variation Minimum variation of the predictions before random noise with distribution \eqn{N(0, var(Y)/20)} is added. Default is \code{1e-05}.
 #'
 #' @return
-#' An object of class \code{proxy_CATE}, consisting of the following components:
+#' An object of class \code{"proxy_CATE"}, consisting of the following components:
 #' \describe{
 #'   \item{\code{estimates}}{A numeric vector of CATE estimates of each observation.}
 #'   \item{\code{mlr3_objects}}{\code{mlr3} objects used for estimation of \eqn{E[Y | D=1, Z]} (\code{Y1_learner}) and \eqn{E[Y | D=0, Z]} (\code{Y0_learner}). The latter is not available if \code{proxy_BCA = NULL}.}
 #'   }
 #'
 #' @details
-#' The specifications \code{lasso}, \code{random_forest}, and \code{tree} in \code{learner} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{lasso} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{random_forest} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{tree} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}.
+#' The specifications \code{"lasso"}, \code{"random_forest"}, and \code{"tree"} in \code{learner} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{"lasso"} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{"random_forest"} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{"tree"} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}.
 #'
 #' @references
 #' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.

@@ -2,7 +2,7 @@
 #'
 #' Prints key results of the analyses conducted in \code{\link{GenericML}}.
 #'
-#' @param x An instance of \code{\link{GenericML}}.
+#' @param x An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.
 #' @param ... Additional arguments to be passed down.
 #'
 #' @return
@@ -69,7 +69,7 @@ print.GenericML <- function(x, ...){
 
 #' Print method for a \code{BLP_info} object
 #'
-#' @param x An object of class \code{"BLP_info"}.
+#' @param x An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.
 #' @param digits Number of digits to print.
 #' @param ... Additional arguments to be passed down.
 #'
@@ -86,7 +86,7 @@ print.BLP_info <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
 
 #' Print method for a \code{GATES_info} object
 #'
-#' @param x An object of class \code{"GATES_info"}.
+#' @param x An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.
 #' @param digits Number of digits to print.
 #' @param ... Additional arguments to be passed down.
 #'
@@ -102,7 +102,7 @@ print.GATES_info <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
 
 #' Print method for a \code{CLAN_info} object
 #'
-#' @param x An object of class \code{"CLAN_info"}.
+#' @param x An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.
 #' @param digits Number of digits to print.
 #' @param ... Additional arguments to be passed down.
 #'
@@ -181,6 +181,7 @@ print.heterogeneity_CLAN <- function(x, ...)
   # return object invisibly
   invisible(x)
 } # FUN
+
 
 #' @export
 print.best <- function(x, digits = max(3L, getOption("digits") - 3L), ...)

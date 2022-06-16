@@ -19,12 +19,12 @@ CLAN(
 
 \item{equal_variances}{If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.}
 
-\item{diff}{Specifies the generic targets of CLAN. Must be an instance of \code{\link{setup_diff}}. See the documentation of \code{\link{setup_diff}} for details.}
+\item{diff}{Specifies the generic targets of CLAN. Must be an object of class \code{"\link{setup_diff}"}. See the documentation of \code{\link{setup_diff}()} for details.}
 
 \item{significance_level}{Significance level. Default is 0.05.}
 }
 \value{
-An object of the class \code{CLAN}, consisting of the following components:
+An object of the class \code{"CLAN"}, consisting of the following components:
 \describe{
 \item{\code{generic_targets}}{A list of result matrices for each variable in \code{Z_CLAN}. Each matrix contains inferential results on the CLAN generic targets.}
 \item{\code{coefficients}}{A matrix of point estimates of each CLAN generic target parameter.}

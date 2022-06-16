@@ -7,7 +7,7 @@
 get_GATES(x, learner = "best", plot = TRUE)
 }
 \arguments{
-\item{x}{An object of the class \code{\link{GenericML}}.}
+\item{x}{An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.}
 
 \item{learner}{A character string of the learner whose GATES generic target estimates shall be accessed. Default is \code{"best"} for the best learner for GATES.}
 

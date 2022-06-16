@@ -7,7 +7,7 @@
 \method{print}{GenericML}(x, ...)
 }
 \arguments{
-\item{x}{An instance of \code{\link{GenericML}}.}
+\item{x}{An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.}
 
 \item{...}{Additional arguments to be passed down.}
 }

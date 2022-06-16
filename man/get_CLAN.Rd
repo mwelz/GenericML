@@ -7,7 +7,7 @@
 get_CLAN(x, variable, learner = "best", plot = TRUE)
 }
 \arguments{
-\item{x}{An object of the class \code{\link{GenericML}}.}
+\item{x}{An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.}
 
 \item{variable}{The (character) name of a variabe on which CLAN was performed.}
 

@@ -37,8 +37,8 @@ if (require("ranger")) {
                   seed = seed,
                   parallel = FALSE)
 
-  expect_equal(object = as.numeric(get_BLP(x1, plot = FALSE)),
-               expected = as.numeric(get_BLP(x2, plot = FALSE)))
+  expect_equal(object = x1$VEIN$best_learners$BLP[1,],
+               expected = x2$VEIN$best_learners$BLP[1,])
 
   # with stratified sampling
   x1 <- GenericML(Z = Z, D = D, Y = Y, num_splits = num_splits,
@@ -50,8 +50,8 @@ if (require("ranger")) {
                   stratify = stratify, seed = seed,
                   parallel = FALSE)
 
-  expect_equal(object = as.numeric(get_BLP(x1, plot = FALSE)),
-               expected = as.numeric(get_BLP(x2, plot = FALSE)))
+  expect_equal(object = x1$VEIN$best_learners$BLP[1,],
+               expected = x2$VEIN$best_learners$BLP[1,])
 
   ## on the contrary, no specification of seeds should cause non-reproducible results
   x1 <- GenericML(Z = Z, D = D, Y = Y, num_splits = num_splits,
@@ -63,8 +63,8 @@ if (require("ranger")) {
                   stratify = stratify, seed = NULL,
                   parallel = FALSE)
 
-  expect_false(isTRUE(all.equal(target  = as.numeric(get_BLP(x1, plot = FALSE)),
-                                current = as.numeric(get_BLP(x2, plot = FALSE)))))
+  expect_false(isTRUE(all.equal(target  = x1$VEIN$best_learners$BLP[1,],
+                                current = x2$VEIN$best_learners$BLP[1,])))
 
 
   ## check 2: reproducibility of parallel implementation
@@ -82,8 +82,8 @@ if (require("ranger")) {
   #                 seed = seed,
   #                 parallel = TRUE, num_cores = num_cores)
   #
-  # expect_equal(object = as.numeric(get_BLP(x1, plot = FALSE)),
-  #              expected = as.numeric(get_BLP(x2, plot = FALSE)))
+  # expect_equal(object = x1$VEIN$best_learners$BLP[1,],
+  #              expected = x2$VEIN$best_learners$BLP[1,])
   #
   # # with stratified sampling
   # x1 <- GenericML(Z = Z, D = D, Y = Y, num_splits = num_splits,
@@ -95,7 +95,7 @@ if (require("ranger")) {
   #                 stratify = stratify, seed = seed,
   #                 parallel = TRUE, num_cores = num_cores)
   #
-  # expect_equal(object = as.numeric(get_BLP(x1, plot = FALSE)),
-  #              expected = as.numeric(get_BLP(x2, plot = FALSE)))
+  # expect_equal(object = x1$VEIN$best_learners$BLP[1,],
+  #              expected = x2$VEIN$best_learners$BLP[1,])
 
 }

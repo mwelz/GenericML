@@ -22,7 +22,7 @@ proxy_CATE(Z, D, Y, A_set, learner, proxy_BCA = NULL, min_variation = 1e-05)
 \item{min_variation}{Minimum variation of the predictions before random noise with distribution \eqn{N(0, var(Y)/20)} is added. Default is \code{1e-05}.}
 }
 \value{
-An object of class \code{proxy_CATE}, consisting of the following components:
+An object of class \code{"proxy_CATE"}, consisting of the following components:
 \describe{
 \item{\code{estimates}}{A numeric vector of CATE estimates of each observation.}
 \item{\code{mlr3_objects}}{\code{mlr3} objects used for estimation of \eqn{E[Y | D=1, Z]} (\code{Y1_learner}) and \eqn{E[Y | D=0, Z]} (\code{Y0_learner}). The latter is not available if \code{proxy_BCA = NULL}.}
@@ -32,7 +32,7 @@ An object of class \code{proxy_CATE}, consisting of the following components:
 Proxy estimation of the Conditional Average Treatment Effect (CATE), defined by \eqn{E[Y | D=1, Z] - E[Y | D=0, Z]}. Estimation is done on the auxiliary sample, but CATE predictions are made for all observations.
 }
 \details{
-The specifications \code{lasso}, \code{random_forest}, and \code{tree} in \code{learner} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{lasso} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{random_forest} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{tree} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}.
+The specifications \code{"lasso"}, \code{"random_forest"}, and \code{"tree"} in \code{learner} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{"lasso"} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{"random_forest"} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{"tree"} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}.
 }
 \examples{
 if(require("ranger")){

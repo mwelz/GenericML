@@ -7,7 +7,7 @@
 \method{print}{CLAN_info}(x, digits = max(3L, getOption("digits") - 3L), ...)
 }
 \arguments{
-\item{x}{An object of class \code{"CLAN_info"}.}
+\item{x}{An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.}
 
 \item{digits}{Number of digits to print.}
 

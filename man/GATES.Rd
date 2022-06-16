@@ -27,26 +27,26 @@ GATES(
 
 \item{proxy_BCA}{A numeric vector of proxy baseline conditional average (BCA) estimates. We recommend to use the estimates of a \code{\link{proxy_BCA}} object.}
 
-\item{proxy_CATE}{A numeric vector of proxy conditional average treatment effect (CATE) estimates. We recommend to use the estimates of a \code{\link{proxy_CATE}} object.}
+\item{proxy_CATE}{A numeric vector of proxy conditional average treatment effect (CATE) estimates. We recommend to use the estimates of a \code{"\link{proxy_CATE}"} object.}
 
-\item{membership}{A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be of type \code{\link{quantile_group}}. Typically, the grouping is based on CATE estimates, which are for instance returned by \code{\link{proxy_CATE}}.}
+\item{membership}{A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be of type \code{"\link{quantile_group}"}. Typically, the grouping is based on CATE estimates, which are for instance returned by \code{\link{proxy_CATE}()}.}
 
 \item{HT}{Logical. If \code{TRUE}, a Horvitz-Thompson (HT) transformation is applied (GATES2 in the paper). Default is \code{FALSE}.}
 
-\item{X1_control}{Specifies the design matrix \eqn{X_1} in the regression. Must be an instance of \code{\link{setup_X1}}. See the documentation of \code{\link{setup_X1}} for details.}
+\item{X1_control}{Specifies the design matrix \eqn{X_1} in the regression. Must be an instance of \code{\link{setup_X1}}. See the documentation of \code{\link{setup_X1}()} for details.}
 
-\item{vcov_control}{Specifies the covariance matrix estimator. Must be an instance of \code{\link{setup_vcov}}. See the documentation of \code{\link{setup_vcov}} for details.}
+\item{vcov_control}{Specifies the covariance matrix estimator. Must be an object of class \code{"\link{setup_vcov}"}. See the documentation of \code{\link{setup_vcov}()} for details.}
 
-\item{diff}{Specifies the generic targets of GATES. Must be an instance of \code{\link{setup_diff}}. See the documentation of \code{\link{setup_diff}} for details.}
+\item{diff}{Specifies the generic targets of CLAN. Must be an object of class \code{"\link{setup_diff}"}. See the documentation of \code{\link{setup_diff}()} for details.}
 
 \item{significance_level}{Significance level. Default is 0.05.}
 }
 \value{
-An object of class \code{GATES}, consisting of the following components:
+An object of class \code{"GATES"}, consisting of the following components:
 \describe{
 \item{\code{generic_targets}}{A matrix of the inferential results on the GATES generic targets.}
-\item{\code{coefficients}}{An object of class \code{\link[lmtest]{coeftest}}, contains the coefficients of the GATES regression.}
-\item{\code{lm}}{An object of class \code{\link[stats]{lm}} used to fit the linear regression model.}
+\item{\code{coefficients}}{An object of class \code{"\link[lmtest]{coeftest}"}, contains the coefficients of the GATES regression.}
+\item{\code{lm}}{An object of class \code{"\link[stats]{lm}"} used to fit the linear regression model.}
 }
 }
 \description{

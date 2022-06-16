@@ -51,15 +51,15 @@ GenericML(
 
 \item{quantile_cutoffs}{The cutoff points of the quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.}
 
-\item{X1_BLP}{Specifies the design matrix \eqn{X_1} in the BLP regression. Must be an instance of \code{\link{setup_X1}}. See the documentation of \code{\link{setup_X1}} for details.}
+\item{X1_BLP}{Specifies the design matrix \eqn{X_1} in the regression. Must be an instance of \code{\link{setup_X1}}. See the documentation of \code{\link{setup_X1}()} for details.}
 
 \item{X1_GATES}{Same as \code{X1_BLP}, just for the GATES regression.}
 
-\item{diff_GATES}{Specifies the generic targets of GATES. Must be an instance of \code{\link{setup_diff}}. See the documentation of \code{\link{setup_diff}} for details.}
+\item{diff_GATES}{Specifies the generic targets of GATES. Must be an object of class \code{"\link{setup_diff}"}. See the documentation of \code{\link{setup_diff}()} for details.}
 
 \item{diff_CLAN}{Same as \code{diff_GATES}, just for the CLAN generic targets.}
 
-\item{vcov_BLP}{Specifies the covariance matrix estimator in the BLP regression. Must be an instance of \code{\link{setup_vcov}}. See the documentation of \code{\link{setup_vcov}} for details.}
+\item{vcov_BLP}{Specifies the covariance matrix estimator in the BLP regression. Must be an object of class \code{"\link{setup_vcov}"}. See the documentation of \code{\link{setup_vcov}()} for details.}
 
 \item{vcov_GATES}{Same as \code{vcov_BLP}, just for the GATES regression.}
 
@@ -67,7 +67,7 @@ GenericML(
 
 \item{prop_aux}{Proportion of samples that shall be in the auxiliary set in case of random sample splitting. Default is 0.5. The number of samples in the auxiliary set will be equal to \code{floor(prop_aux * length(Y))}. If the data set is large, you can save computing time by choosing \code{prop_aux} to be smaller than 0.5. In case of stratified sampling (controlled through the argument \code{stratify} via \code{\link{setup_stratify}}), \code{prop_aux} does not have an effect, and the number of samples in the auxiliary set is specified via \code{\link{setup_stratify}}.}
 
-\item{stratify}{A list that specifies whether or not stratified sample splitting shall be performed. It is recommended to use the returned object of \code{\link{setup_stratify}} as this list. See the documentation of \code{\link{setup_stratify}} for details.}
+\item{stratify}{A list that specifies whether or not stratified sample splitting shall be performed. It is recommended to use the returned object of \code{\link{setup_stratify}()} as this list. See the documentation of \code{\link{setup_stratify}()} for details.}
 
 \item{significance_level}{Significance level for VEIN. Default is 0.05.}
 
@@ -84,12 +84,12 @@ GenericML(
 \item{store_splits}{Logical. If \code{TRUE} (default), the sample splits will be stored.}
 }
 \value{
-An object of class \code{GenericML}. On this object, we recommend to use the accessor functions \code{\link{get_BLP}}, \code{\link{get_GATES}}, and \code{\link{get_CLAN}} to extract the results of the analyses of BLP, GATES, and CLAN, respectively. An object of class \code{GenericML} contains the following components:
+An object of class \code{"GenericML"}. On this object, we recommend to use the accessor functions \code{\link{get_BLP}()}, \code{\link{get_GATES}()}, and \code{\link{get_CLAN}()} to extract the results of the analyses of BLP, GATES, and CLAN, respectively. An object of class \code{"GenericML"} contains the following components:
 \describe{
 \item{\code{VEIN}}{A list containing two sub-lists called \code{best_learners} and \code{all_learners}, respectively. Each of these two sub-lists contains the inferential VEIN results on the generic targets of the BLP, GATES, and CLAN analyses. \code{all_learners} does this for all learners specified in the argument \code{learners_GenericML}, \code{best_learners} only for the corresponding best learners. Which learner is best for which analysis is assessed by the \eqn{\Lambda} criteria discussed in Sections 5.2 and 5.3 of the paper.}
 \item{\code{best}}{A list containing information on the evaluation of which learner is the best for which analysis. Contains four components. The first three contain the name of the best learner for BLP, GATES, and CLAN, respectively. The fourth component, \code{overview}, contains the two \eqn{\Lambda} criteria used to determine the best learners (discussed in Sections 5.2 and 5.3 of the paper).}
-\item{\code{propensity_scores}}{The propensity score estimates as well as the \code{mlr3} objects used to estimate them (if \code{mlr3} was used for estimation).}
-\item{\code{GenericML_single}}{Only nonempty if \code{store_learners = TRUE}. Contains all intermediate results of each learners for each split. That is, for a given learner (first level of the list) and split (second level),  objects of classes \code{\link{BLP}}, \code{\link{GATES}}, \code{\link{CLAN}}, \code{\link{proxy_BCA}}, \code{\link{proxy_CATE}} as well as the \eqn{\Lambda} criteria (\code{"best"})) are listed, which were computed with the given learner and split.}
+\item{\code{propensity_scores}}{The propensity score estimates as well as the \code{"mlr3"} objects used to estimate them (if \code{mlr3} was used for estimation).}
+\item{\code{GenericML_single}}{Only nonempty if \code{store_learners = TRUE}. Contains all intermediate results of each learners for each split. That is, for a given learner (first level of the list) and split (second level),  objects of classes \code{"\link{BLP}"}, \code{"\link{GATES}"}, \code{"\link{CLAN}"}, \code{"\link{proxy_BCA}"}, \code{"\link{proxy_CATE}"} as well as the \eqn{\Lambda} criteria (\code{"best"})) are listed, which were computed with the given learner and split.}
 \item{\code{splits}}{Only nonempty if \code{store_splits = TRUE}. Contains a character matrix of dimension \code{length(Y)} by \code{num_splits}. Contains the group membership (main or auxiliary) of each observation (rows) in each split (columns). \code{"M"} denotes the main set, \code{"A"} the auxiliary set.}
 \item{\code{generic_targets}}{A list of generic target estimates for each learner. More specifically, each component is a list of the generic target estimates pertaining to the BLP, GATES, and CLAN analyses. Each of those lists contains a three-dimensional array containing the generic targets of a single learner for all sample splits (except CLAN where there is one more layer of lists).}
 \item{\code{arguments}}{A list of arguments used in the function call.}
@@ -99,7 +99,7 @@ An object of class \code{GenericML}. On this object, we recommend to use the acc
 Performs generic machine learning inference on heterogeneous treatment effects as in \href{https://arxiv.org/abs/1712.04802}{Chernozhukov, Demirer, Duflo and Fernández-Val (2020)} with user-specified machine learning methods. Intended for randomized experiments.
 }
 \details{
-The specifications \code{lasso}, \code{random_forest}, and \code{tree} in \code{learners_GenericML} and \code{learner_propensity_score} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{lasso} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{random_forest} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{tree} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}. \strong{Warning:} \code{\link{GenericML}} can be quite memory-intensive, in particular when the data set is large. To alleviate memory usage, consider setting \code{store_learners = FALSE}, choosing a low number of cores via \code{num_cores} (at the expense of longer computing time), setting \code{prop_aux} to a value smaller than the default of 0.5, or using \code{\link{GenericML_combine}}.
+The specifications \code{"lasso"}, \code{"random_forest"}, and \code{"tree"} in \code{learners_GenericML} and \code{learner_propensity_score} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{"lasso"} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{"random_forest"} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{"tree"} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}. \strong{Warning:} \code{\link{GenericML}()} can be quite memory-intensive, in particular when the data set is large. To alleviate memory usage, consider setting \code{store_learners = FALSE}, choosing a low number of cores via \code{num_cores} (at the expense of longer computing time), setting \code{prop_aux} to a value smaller than the default of 0.5, or using \code{\link{GenericML_combine}()}.
 }
 \note{
 In an earlier development version, Lucas Kitzmueller alerted us to several minor bugs and proposed fixes. Many thanks to him!

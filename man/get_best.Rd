@@ -7,7 +7,7 @@
 get_best(x)
 }
 \arguments{
-\item{x}{An object of class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.}
+\item{x}{An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.}
 }
 \value{
 An object of class \code{"best"}, which consists of the following components:
@@ -69,7 +69,7 @@ get_CLAN(x, learner = "mlr3::lrn('ranger', num.trees = 10)",
 }
 \seealso{
 \code{\link{GenericML}},
-\code{\link}{get_BLP}
+\code{\link{get_BLP}},
 \code{\link{get_GATES}},
-\code{\link{get_CLAN}},
+\code{\link{get_CLAN}}
 }

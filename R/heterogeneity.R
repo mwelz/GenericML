@@ -17,7 +17,7 @@
 #'   }
 #'
 #' @export
-heterogeneity_CLAN <- function(x, learner = "best", significance_level = 0.05) # x is GenericML object
+heterogeneity_CLAN <- function(x, learner = "best", significance_level = 0.05)
 {
   # input check
   isGenericMLcheck(x)

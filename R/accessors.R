@@ -1,6 +1,6 @@
 #' Accessor function for the BLP generic target estimates
 #'
-#' @param x An object of the class \code{\link{GenericML}}.
+#' @param x An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.
 #' @param learner A character string of the learner whose BLP generic target estimates shall be accessed. Default is \code{"best"} for the best learner for BLP.
 #' @param plot Logical. If \code{TRUE} (default), a \code{"\link[ggplot2]{ggplot}"} object is computed.
 #'
@@ -90,7 +90,7 @@ get_BLP <- function(x, learner = "best", plot = TRUE){
 
 #' Accessor function for the GATES generic target estimates
 #'
-#' @param x An object of the class \code{\link{GenericML}}.
+#' @param x An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.
 #' @param learner A character string of the learner whose GATES generic target estimates shall be accessed. Default is \code{"best"} for the best learner for GATES.
 #' @param plot Logical. If \code{TRUE} (default), a \code{"\link[ggplot2]{ggplot}"} object is computed.
 #'
@@ -178,7 +178,7 @@ get_GATES <- function(x, learner = "best", plot = TRUE){
 
 #' Accessor function for the CLAN generic target estimates
 #'
-#' @param x An object of the class \code{\link{GenericML}}.
+#' @param x An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.
 #' @param variable The (character) name of a variabe on which CLAN was performed.
 #' @param learner A character string of the learner whose CLAN generic target estimates shall be accessed. Default is \code{"best"} for the best learner for CLAN
 #' @param plot Logical. If \code{TRUE} (default), a \code{"\link[ggplot2]{ggplot}"} object is computed.
@@ -401,7 +401,7 @@ accessor_output <- function(x, accessor_obj, plot, type, learner, CLAN_variable,
 #'
 #' The best learner is determined by maximizing the criteria \eqn{\Lambda} and \eqn{\bar{\Lambda}}, see Sections 5.2 and 5.3 of the paper. This function accesses the estimates of these two criteria,
 #'
-#' @param x An object of class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.
+#' @param x An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.
 #'
 #' @return
 #' An object of class \code{"best"}, which consists of the following components:
@@ -459,9 +459,9 @@ accessor_output <- function(x, accessor_obj, plot, type, learner, CLAN_variable,
 #'
 #' @seealso
 #' \code{\link{GenericML}},
-#' \code{\link}{get_BLP}
+#' \code{\link{get_BLP}},
 #' \code{\link{get_GATES}},
-#' \code{\link{get_CLAN}},
+#' \code{\link{get_CLAN}}
 #'
 #' @export
 get_best <- function(x)
