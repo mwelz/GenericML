@@ -1,0 +1,251 @@
+% -----------------------------------
+% Author: Andreas Alfons
+%         Erasmus School of Economics
+% -----------------------------------
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{beamerthemeESE}%
+[2021/12/13 Erasmus School of Economics beamer theme 0.3.2]
+
+
+%% process options
+\newif\if@framenumbers
+\newif\if@navigation
+\newif\if@nologo
+\newif\if@notes
+\newif\if@sectiontitles
+\DeclareOption{framenumbers}{\@framenumberstrue}
+\DeclareOption{navigation}{\@navigationtrue}
+\DeclareOption{nologo}{\@nologotrue}
+\DeclareOption{notes}{\@notestrue}
+\DeclareOption{sectiontitles}{\@sectiontitlestrue}
+\DeclareOption*{\PackageWarning{ESE}{Unknown option `\CurrentOption'}}
+\ProcessOptions\relax
+
+
+%% encoding and font
+\RequirePackage[latin1]{inputenc}
+\RequirePackage[T1]{fontenc}  % better handling for words with accents
+\RequirePackage{lmodern}
+
+%% additional packages
+\RequirePackage{amsfonts}
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{hyperref}
+\RequirePackage{listings}
+\RequirePackage[round]{natbib}
+\RequirePackage{ulem}  % for underlining speaker
+\RequirePackage{upquote}
+
+%% new commands
+\newcommand{\arrowitem}{\item[$\longrightarrow$]}  % use arrow in itemize
+\newcommand{\mat}[1]{\boldsymbol{#1}}   % matrix
+\newcommand{\vect}[1]{\boldsymbol{#1}}  % vector
+\newcommand{\obs}[1]{\mathbf{#1}}		    % observation
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\pkg}[1]{\texttt{#1}}
+\newcommand{\proglang}[1]{\textsf{#1}}
+
+
+%% define colors
+% EUR/ESE colors
+\definecolor{EURbrightgreen}{RGB}{12,128,102}
+\definecolor{EURgreen}{RGB}{0,35,40}
+\definecolor{EURwarmgrey}{RGB}{227,218,216}
+\definecolor{EURwarmgray}{RGB}{227,218,216}
+\definecolor{ESEyellow}{RGB}{255,215,0}
+% other colors
+\definecolor{lightgrey}{cmyk}{0.1,0,0,0.5}
+\definecolor{lightgray}{cmyk}{0.1,0,0,0.5}
+
+%% set colors for basic elements
+\setbeamercolor{title}{fg=EURgreen, bg=ESEyellow}        % presentation title
+\setbeamercolor{subtitle}{fg=EURgreen}                   % presentation subtitle
+\setbeamercolor{author}{fg=EURgreen}                     % author on title slide
+\setbeamercolor{date}{fg=EURgreen}                       % date on title slide
+\setbeamercolor{frametitle}{fg=black}                    % frame title
+\setbeamercolor{title in sidebar}{fg=black}
+\setbeamercolor{author in sidebar}{fg=black}
+\setbeamercolor{section in sidebar}{fg=black, bg=ESEyellow}
+\setbeamercolor{section in sidebar shaded}{fg=black, bg=}
+\setbeamercolor{subsection in sidebar}{fg=black, bg=ESEyellow}
+\setbeamercolor{subsection in sidebar shaded}{fg=black, bg=}
+\setbeamercolor{subsubsection in sidebar}{fg=black, bg=ESEyellow}
+\setbeamercolor{subsubsection in sidebar shaded}{fg=black, bg=}
+\setbeamercolor{alerted text}{fg=EURbrightgreen}         % emphasized text
+\setbeamercolor{structure}{fg=EURgreen}                  % enumeration items
+\setbeamercolor{page number in head/foot}{fg=black}      % page numbers
+
+%% set colors for block statements (definition, theorem, proof, etc.)
+\setbeamercolor{block title}{fg=black, bg=ESEyellow}
+\setbeamercolor{block body}{bg=ESEyellow!40!white}
+\setbeamercolor{block title alerted}{bg=ESEyellow}
+\setbeamercolor{block body alerted}{bg=ESEyellow!40!white}
+\setbeamercolor{block title example}{fg=EURbrightgreen, bg=ESEyellow}
+\setbeamercolor{block body example}{bg=ESEyellow!40!white}
+
+%% set bold font for titles
+\setbeamerfont{title}{series=\bfseries}
+\setbeamerfont{subtitle}{series=\bfseries}
+\setbeamerfont{frametitle}{series=\bfseries}
+
+
+%% set outer theme
+\useoutertheme{sidebar}
+
+%% use rectangular inner theme (enumerations etc.)
+\useinnertheme{circles}
+
+
+%% use bold face to emphasize
+\let\emph\textbf
+
+%% set covered text to be transparent
+\setbeamercovered{transparent}
+
+%% remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+
+%% show notes if requested
+\if@notes
+  % set option to show notes
+  \setbeameroption{show notes}
+  % define blank note page with bigger vertical space
+  \setbeamertemplate{note page}{
+    \bigskip
+    \nointerlineskip
+    \insertnote
+  }
+\fi
+
+
+%% insert frames with section titles if requested
+\if@sectiontitles
+  \AtBeginSection{
+    \begin{frame}
+    \begin{beamercolorbox}[center, sep=1ex]{title}
+    \bfseries\Large \insertsection
+    \end{beamercolorbox}
+    \end{frame}
+  }
+\fi
+
+
+%% define layout
+\newlength{\sidebarwidth}
+\if@navigation
+
+  % define navigation bar
+  \setbeamertemplate{sidebar left}{
+    \beamer@tempdim=\beamer@sidebarwidth
+    \advance\beamer@tempdim by -6pt
+    {\usebeamerfont{title in sidebar}
+      \vskip1.5em
+      \hskip3pt
+      \usebeamercolor[fg]{title in sidebar}
+      \insertshorttitle[width=\beamer@tempdim,respectlinebreaks]\par
+      \vskip1.25em
+    }
+    {
+      \hskip1pt  % \insertshortauthor yields additional indent of 2pt
+      \usebeamercolor[fg]{author in sidebar}
+      \usebeamerfont{author in sidebar}
+      \insertshortauthor[width=\beamer@tempdim,respectlinebreaks]\par
+      \vskip1.25em
+    }
+    \insertverticalnavigation{\beamer@sidebarwidth}
+    \vfill
+  }
+
+  % store width of sidebar
+  \setlength{\sidebarwidth}{\beamer@sidebarwidth}
+
+\else
+
+  % empty sidebar
+  \setbeamertemplate{sidebar left}{}
+  \setbeamersize{sidebar width left=0pt}
+  % store width of sidebar
+  \setlength{\sidebarwidth}{0pt}
+
+\fi
+
+
+%% if requested, add frame number to footline
+\setbeamertemplate{footline}[frame number]
+
+
+%% put logo in bottom right corner
+%% (This is done by defining the background for the slides rather than putting
+%% the logo in the footline.  The reason is that the bottom right corner also
+%% contains the slide number.  This is not an issue as the logo contains some
+%% empty space around the Erasmus signature.)
+%% FIXME: This also shows the logo on plain slides.
+\if@nologo
+\else
+  \usebackgroundtemplate{
+    \rule{0pt}{\paperheight}%
+    \hspace*{\paperwidth}%
+    \makebox[0pt][r]{\includegraphics[width=30mm]{logo/ESE-Logo.pdf}}
+  }
+\fi
+
+
+%% space between institutions on title page
+\makeatletter
+\def\beamer@andinst{\\[0.5em]}
+\makeatother
+
+%% new command to create title page
+\newcommand{\ESEtitleframe}{
+  % set ESE title page design as background (this is wrapped in curly braces
+  % such that the background is only changed for the slide that is generated
+  % by this command
+  {
+    \mode<beamer|handout>{
+      \usebackgroundtemplate{
+        \includegraphics[width=\paperwidth]{logo/ESE-Titlepage.pdf}
+      }
+    }
+    % create title page
+    \begin{frame}[plain,t]
+    % align box containing the relevant information with ESE logo
+    \vspace{12.4mm}
+    \hspace{0.4mm}\hspace{-\sidebarwidth}
+    % title, author and date are put in a box in the yellow part of the slide
+    % (information is centered vertically within the box)
+    \begin{minipage}[t][40.6mm][c]{100mm}
+    \raggedright
+    {\usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle}\par
+    \ifx\insertsubtitle\@empty
+    \else
+      \vskip0.5em\par
+      {\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle}\par
+    \fi
+    \vskip1em\par
+    {\usebeamerfont{author}\usebeamercolor[fg]{author}\insertauthor}\par
+    \ifx\insertinstitute@empty
+    \else
+      \vskip0.75em\par
+    {\usebeamerfont{institute}\usebeamercolor[fg]{institute}\insertinstitute}\par
+    \fi
+    \ifx\insertdate\@empty
+    \else
+      \vskip1em\par
+      {\usebeamerfont{date}\usebeamercolor[fg]{date}\insertdate}\par
+    \fi
+    \end{minipage}
+    \end{frame}
+  }
+}
+
+
+%% define display of code listings
+\lstset{basicstyle=\ttfamily\scriptsize, frame=trbl, numbers=none, upquote=true}
+
+%% make beamer work nicely with natbib
+\renewcommand*{\newblock}{}   % necessary to make beamer work with natbib
+\renewcommand{\bibsection}{}  % suppresses section for references
+
