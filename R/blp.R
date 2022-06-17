@@ -214,8 +214,8 @@ generic_targets_BLP <- function(coeftest.object, significance_level = 0.05){
   # helper that computes generic targets beta.1, beta.2 in BLP
   coefficients.temp <- coeftest.object[c("beta.1", "beta.2"), 1:3]
   colnames(coefficients.temp) <- c("Estimate", "Std. Error", "z value")
-  p.right <- stats::pnorm(coefficients.temp[,"z value"], lower.tail = FALSE) # right p-value: Pr(Z>z)
-  p.left  <- stats::pnorm(coefficients.temp[,"z value"], lower.tail = TRUE)  # left p-value: Pr(Z<z)
+  p.right <- stats::pnorm(coefficients.temp[,"z value"], lower.tail = FALSE) # right p value: Pr(Z>z)
+  p.left  <- stats::pnorm(coefficients.temp[,"z value"], lower.tail = TRUE)  # left p value: Pr(Z<z)
   ci.lo   <- coefficients.temp[,"Estimate"] - stats::qnorm(1-significance_level/2) * coefficients.temp[,"Std. Error"]
   ci.up   <- coefficients.temp[,"Estimate"] + stats::qnorm(1-significance_level/2) * coefficients.temp[,"Std. Error"]
   generic_targets <- cbind(coefficients.temp, ci.lo, ci.up, p.left, p.right)

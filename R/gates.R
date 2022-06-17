@@ -265,8 +265,8 @@ generic_targets_GATES <- function(coeftest.object, K, vcov,
   z          <- stats::qnorm(1-significance_level/2)
 
   # compute relevant statistics
-  p.right <- stats::pnorm(coefficients.temp[,"z value"], lower.tail = FALSE) # right p-value: Pr(Z>z)
-  p.left  <- stats::pnorm(coefficients.temp[,"z value"], lower.tail = TRUE)  # left p-value: Pr(Z<z)
+  p.right <- stats::pnorm(coefficients.temp[,"z value"], lower.tail = FALSE) # right p value: Pr(Z>z)
+  p.left  <- stats::pnorm(coefficients.temp[,"z value"], lower.tail = TRUE)  # left p value: Pr(Z<z)
   ci.lo   <- coefficients.temp[,"Estimate"] - z * coefficients.temp[,"Std. Error"]
   ci.up   <- coefficients.temp[,"Estimate"] + z * coefficients.temp[,"Std. Error"]
 
@@ -309,8 +309,8 @@ generic_targets_GATES <- function(coeftest.object, K, vcov,
   ci.lo   <- diff. - z * diff.se
   ci.up   <- diff. + z * diff.se
   zstat   <- diff. / diff.se
-  p.right <- stats::pnorm(zstat, lower.tail = FALSE) # right p-value: Pr(Z>z)
-  p.left  <- stats::pnorm(zstat, lower.tail = TRUE)  # left p-value: Pr(Z<z)
+  p.right <- stats::pnorm(zstat, lower.tail = FALSE) # right p value: Pr(Z>z)
+  p.left  <- stats::pnorm(zstat, lower.tail = TRUE)  # left p value: Pr(Z<z)
 
   diff.mat <- cbind(diff., ci.lo, ci.up, diff.se, zstat, p.left, p.right)
   rownames(diff.mat) <- nam

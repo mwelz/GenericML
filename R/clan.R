@@ -108,8 +108,8 @@ CLAN_NoChecks <- function(Z_CLAN,
         ttest.deltak <- stats::t.test(Z_CLAN[membership[, k], j])
         ci.lo        <- ttest.deltak$estimate - z * ttest.deltak$stderr
         ci.up        <- ttest.deltak$estimate + z * ttest.deltak$stderr
-        p.right      <- stats::pnorm(ttest.deltak$statistic, lower.tail = FALSE) # right p-value: Pr(Z>z)
-        p.left       <- stats::pnorm(ttest.deltak$statistic, lower.tail = TRUE)  # left p-value: Pr(Z<z)
+        p.right      <- stats::pnorm(ttest.deltak$statistic, lower.tail = FALSE) # right p value: Pr(Z>z)
+        p.left       <- stats::pnorm(ttest.deltak$statistic, lower.tail = TRUE)  # left p value: Pr(Z<z)
         out.mat[ct,] <- c(ttest.deltak$estimate, ci.lo, ci.up,
                           ttest.deltak$stderr, ttest.deltak$statistic, p.left, p.right)
 
@@ -146,8 +146,8 @@ CLAN_NoChecks <- function(Z_CLAN,
         ci.lo        <- diff. - z * diff.se
         ci.up        <- diff. + z * diff.se
         z.diff       <- ttest.diff$statistic
-        p.right      <- stats::pnorm(z.diff, lower.tail = FALSE) # right p-value: Pr(Z>z)
-        p.left       <- stats::pnorm(z.diff, lower.tail = TRUE)  # left p-value: Pr(Z<z)
+        p.right      <- stats::pnorm(z.diff, lower.tail = FALSE) # right p value: Pr(Z>z)
+        p.left       <- stats::pnorm(z.diff, lower.tail = TRUE)  # left p value: Pr(Z<z)
 
       } # IF
 

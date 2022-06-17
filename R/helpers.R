@@ -74,7 +74,7 @@ VEIN <- function(generic_targets, best.learners.obj){
         apply(generic_targets[[learner]][[type]][,"Pr(>z)",], 1, function(z) Med(z)$lower_median)
       p.left.adj  <- 2 * p.left.raw
       p.right.adj <- 2 * p.right.raw
-      p.left.adj[p.left.adj > 1]   <- 1 # p-values cannot exceed 1
+      p.left.adj[p.left.adj > 1]   <- 1 # p values cannot exceed 1
       p.right.adj[p.right.adj > 1] <- 1
       gen.ml.ls[[type]][[learner]][,"Pr(<z) adjusted"] <- p.left.adj
       gen.ml.ls[[type]][[learner]][,"Pr(>z) adjusted"] <- p.right.adj
@@ -99,7 +99,7 @@ VEIN <- function(generic_targets, best.learners.obj){
         apply(generic_targets[[learner]][["CLAN"]][[z.clan]][,"Pr(>z)",], 1, function(z) Med(z)$lower_median)
       p.left.adj  <- 2 * p.left.raw
       p.right.adj <- 2 * p.right.raw
-      p.left.adj[p.left.adj > 1]   <- 1 # p-values cannot exceed 1
+      p.left.adj[p.left.adj > 1]   <- 1 # p values cannot exceed 1
       p.right.adj[p.right.adj > 1] <- 1
       gen.ml.ls$CLAN[[learner]][[z.clan]][,"Pr(<z) adjusted"] <- p.left.adj
       gen.ml.ls$CLAN[[learner]][[z.clan]][,"Pr(>z) adjusted"] <- p.right.adj

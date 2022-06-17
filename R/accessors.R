@@ -272,7 +272,7 @@ get_CLAN <- function(x, variable, learner = "best", plot = TRUE){
 #' @param variable Name of variable for which CLAN should be performed
 #' @param learner Learner of the analysis, either \code{"best"} or learners used in \code{x} (error if not)
 #'
-#' @return A matrix of point estimates, confidence bounds, and adjusted p-values (upper and lower)
+#' @return A matrix of point estimates, confidence bounds, and adjusted p values (upper and lower)
 #' @noRd
 accessor_CLAN <- function(x, variable, learner)
 {
@@ -325,7 +325,7 @@ accessor_CLAN_noChecks <- function(x, variable, learner)
 #' @param type Type of analysis, either \code{"BLP"} or \code{"GATES"}
 #' @param learner Learner of the analysis, either \code{"best"} or learners used in \code{x} (error if not)
 #'
-#' @return A matrix of point estimates, confidence bounds, and adjusted p-values (upper and lower)
+#' @return A matrix of point estimates, confidence bounds, and adjusted p values (upper and lower)
 #' @noRd
 accessor_BLP_GATES <- function(x, type, learner)
 {
@@ -363,7 +363,7 @@ accessor_BLP_GATES <- function(x, type, learner)
 #' @param CLAN_variable Variable along which CLAN shall be performed. Only applicable if \code{type = "CLAN"}
 #' @param ATE Shall ATE be included in plot?
 #'
-#' @return A list of point estimates, confidence bounds, and adjusted p-values (minimum of the lower and upper p-value estimates)
+#' @return A list of point estimates, confidence bounds, and adjusted p values (minimum of the lower and upper p value estimates)
 #' @noRd
 accessor_output <- function(x, accessor_obj, plot, type, learner, CLAN_variable, ATE)
 {
@@ -373,12 +373,12 @@ accessor_output <- function(x, accessor_obj, plot, type, learner, CLAN_variable,
   ConfidenceInterval <- accessor_obj[, c("CB lower", "CB upper")]
   colnames(ConfidenceInterval) <- c("lower", "upper")
 
-  ## only return the minimum of the two probabilities as p-value
+  ## only return the minimum of the two probabilities as p value
   pval <- pmin(accessor_obj[, "Pr(<z) adjusted"], accessor_obj[, "Pr(>z) adjusted"])
 
   ## prepare output
   # Generic ML estimation has size control of 2 * significance_level
-  out <- list(estimate = Estimate, confidence_interval = ConfidenceInterval, pvalue = pval,
+  out <- list(estimate = Estimate, confidence_interval = ConfidenceInterval, p_value = pval,
               confidence_level = confidence_level(x), learner = learner)
 
   ## if requested, add ggplot object to output
