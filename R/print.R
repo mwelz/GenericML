@@ -3,6 +3,7 @@
 #' Prints key results of the analyses conducted in \code{\link{GenericML}}.
 #'
 #' @param x An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.
+#' @param digits Number of digits to print.
 #' @param ... Additional arguments to be passed down.
 #'
 #' @return
@@ -34,7 +35,7 @@
 #' }
 #'
 #' @export
-print.GenericML <- function(x, ...){
+print.GenericML <- function(x, digits = max(3L, getOption("digits") - 3L), ...){
 
   if(!inherits(x = x, what = "GenericML", which = FALSE)){
     stop("The object 'x' must be an instance of GenericML()")
@@ -59,9 +60,9 @@ print.GenericML <- function(x, ...){
       round(x$VEIN$best_learners$BLP["beta.2", "CB lower"], 3), ",",
       round(x$VEIN$best_learners$BLP["beta.2", "CB upper"], 3), ")\n")
   cat("The best learner for the BLP is ", x$best$BLP,
-      " (lambda of ", round(max(x$best$overview[,"lambda"]), 3), ")\n",
+      " (lambda of ", round(max(x$best$overview[,"lambda"]), digits), ")\n",
       "The best learner for the GATES and CLAN is ", x$best$GATES,
-      " (lambda.bar of ", round(max(x$best$overview[,"lambda.bar"]), 3), ")", sep = "")
+      " (lambda.bar of ", round(max(x$best$overview[,"lambda.bar"]), digits), ")", sep = "")
   cat("\n")
 
 } # FUN
@@ -169,14 +170,14 @@ print.heterogeneity_CLAN <- function(x, ...)
 
   if(x$significant$num_variables > 0L)
   {
-    cat(paste0(x$significant$variables, collapse = ", "))
+    cat(x$significant$variables, sep = ", ")
   } else{
     cat("(none)")
   } # IF
 
   cat("\n---\nLevel of significance: ",
       format(100 * x$significance_level), " %\n", sep = "")
-  cat("---\nUse 'get_CLAN()' to further explore CLAN along these variables")
+  cat("---\nUse 'get_CLAN()' to further explore CLAN along these variables\n")
 
   # return object invisibly
   invisible(x)
@@ -188,8 +189,9 @@ print.best <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
 {
   print(x$overview, digits = digits)
   cat("---\n")
-  cat(paste0("The best learner for BLP is ", x$BLP,
-             " with lambda = ", round(x$overview[x$BLP, "lambda"], digits), "."), "\n")
-  cat(paste0("The best learner for GATES and CLAN is ", x$BLP,
-             " with lambda.bar = ", round(x$overview[x$GATES, "lambda.bar"], digits), "."))
+  cat("The best learner for BLP is ", x$BLP,
+      " with lambda = ", round(x$overview[x$BLP, "lambda"], digits), ".\n", sep = "")
+  cat("The best learner for GATES and CLAN is ", x$BLP,
+      " with lambda.bar = ", round(x$overview[x$GATES, "lambda.bar"], digits),
+      ".\n", sep = "")
 }

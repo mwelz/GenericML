@@ -4,10 +4,12 @@
 \alias{print.GenericML}
 \title{Print method for a \code{GenericML} object}
 \usage{
-\method{print}{GenericML}(x, ...)
+\method{print}{GenericML}(x, digits = max(3L, getOption("digits") - 3L), ...)
 }
 \arguments{
 \item{x}{An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.}
+
+\item{digits}{Number of digits to print.}
 
 \item{...}{Additional arguments to be passed down.}
 }
