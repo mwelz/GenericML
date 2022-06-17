@@ -16,6 +16,9 @@
 #'   \item{\code{"significance_level"}}{The level of the significance tests.}
 #'   }
 #'
+#' @seealso
+#' \code{\link{GenericML}()}
+#'
 #' @export
 heterogeneity_CLAN <- function(x, learner = "best", significance_level = 0.05)
 {

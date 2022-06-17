@@ -22,7 +22,7 @@ An object of class \code{"CLAN_info"}, which consists of the following component
 \item{\code{confidence_interval}}{A numeric matrix of the lower and upper confidence bounds for each generic target. The confidence level of the implied confidence interval is equal to \code{1 - 2 * significance_level}.}
 \item{\code{confidence_level}}{The confidence level of the confidence intervals. Equals \code{1 - 2 * significance_level}.}
 \item{\code{learner}}{The argument \code{learner}.}
-\item{\code{plot}}{An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}). Only returned if the argument \code{plot = TRUE}.}
+\item{\code{plot}}{An object of class \code{"\link[ggplot2]{ggplot}"}. Only returned if the argument \code{plot = TRUE}.}
 \item{\code{CLAN_variable}}{The name of the CLAN variable of interest.}
 }
 }
@@ -77,11 +77,11 @@ get_CLAN(x, learner = "mlr3::lrn('ranger', num.trees = 10)",
 
 }
 \seealso{
-\code{\link{GenericML}},
-\code{\link{get_BLP}},
-\code{\link{get_GATES}},
-\code{\link{get_best}},
-\code{\link{print.BLP_info}},
-\code{\link{print.GATES_info}},
-\code{\link{print.CLAN_info}}
+\code{\link{GenericML}()},
+\code{\link{get_BLP}()},
+\code{\link{get_GATES}()},
+\code{\link{get_best}()},
+\code{\link{print.BLP_info}()},
+\code{\link{print.GATES_info}()},
+\code{\link{print.CLAN_info}()}
 }

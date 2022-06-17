@@ -43,7 +43,7 @@ GenericML(
 
 \item{learner_propensity_score}{The estimator of the propensity scores. Either a numeric vector (which is then taken as estimates of the propensity scores) or a string specifying the estimator. In the latter case, the string must either be equal to \code{'constant'} (estimates the propensity scores by \code{mean(D)}), \code{'lasso'}, \code{'random_forest'}, \code{'tree'}, or \code{mlr3} syntax. Note that in case of \code{mlr3} syntax, do \emph{not} specify if the learner is a regression learner or classification learner. Example: \code{'mlr3::lrn("ranger", num.trees = 100)'} for a random forest learner with 100 trees. Note that this is a string and the absence of the \code{classif.} or \code{regr.} keywords. See \url{https://mlr3learners.mlr-org.com} for a list of \code{mlr3} learners.}
 
-\item{num_splits}{Number of sample splits. Default is 100. Must be larger than one. If you want to run \code{GenericML} on a single split, please use \code{\link{GenericML_single}}.}
+\item{num_splits}{Number of sample splits. Default is 100. Must be larger than one. If you want to run \code{GenericML} on a single split, please use \code{\link{GenericML_single}()}.}
 
 \item{Z_CLAN}{A numeric matrix holding variables on which classification analysis (CLAN) shall be performed. CLAN will be performed on each column of the matrix. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.}
 
@@ -51,7 +51,7 @@ GenericML(
 
 \item{quantile_cutoffs}{The cutoff points of the quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.}
 
-\item{X1_BLP}{Specifies the design matrix \eqn{X_1} in the regression. Must be an instance of \code{\link{setup_X1}}. See the documentation of \code{\link{setup_X1}()} for details.}
+\item{X1_BLP}{Specifies the design matrix \eqn{X_1} in the regression. Must be an object of class  \code{"\link{setup_X1}"}. See the documentation of \code{\link{setup_X1}()} for details.}
 
 \item{X1_GATES}{Same as \code{X1_BLP}, just for the GATES regression.}
 
@@ -65,7 +65,7 @@ GenericML(
 
 \item{equal_variances_CLAN}{Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.}
 
-\item{prop_aux}{Proportion of samples that shall be in the auxiliary set in case of random sample splitting. Default is 0.5. The number of samples in the auxiliary set will be equal to \code{floor(prop_aux * length(Y))}. If the data set is large, you can save computing time by choosing \code{prop_aux} to be smaller than 0.5. In case of stratified sampling (controlled through the argument \code{stratify} via \code{\link{setup_stratify}}), \code{prop_aux} does not have an effect, and the number of samples in the auxiliary set is specified via \code{\link{setup_stratify}}.}
+\item{prop_aux}{Proportion of samples that shall be in the auxiliary set in case of random sample splitting. Default is 0.5. The number of samples in the auxiliary set will be equal to \code{floor(prop_aux * length(Y))}. If the data set is large, you can save computing time by choosing \code{prop_aux} to be smaller than 0.5. In case of stratified sampling (controlled through the argument \code{stratify} via \code{\link{setup_stratify}()}), \code{prop_aux} does not have an effect, and the number of samples in the auxiliary set is specified via \code{\link{setup_stratify}()}.}
 
 \item{stratify}{A list that specifies whether or not stratified sample splitting shall be performed. It is recommended to use the returned object of \code{\link{setup_stratify}()} as this list. See the documentation of \code{\link{setup_stratify}()} for details.}
 
@@ -163,15 +163,15 @@ Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic
 Lang M., Binder M., Richter J., Schratz P., Pfisterer F., Coors S., Au Q., Casalicchio G., Kotthoff L., Bischl B. (2019). \dQuote{mlr3: A Modern Object-Oriented Machine Learning Framework in R.} \emph{Journal of Open Source Software}, \bold{4}(44), 1903. \doi{10.21105/joss.01903}.
 }
 \seealso{
-\code{\link{plot.GenericML}}
-\code{\link{print.GenericML}}
-\code{\link{get_BLP}},
-\code{\link{get_GATES}},
-\code{\link{get_CLAN}},
-\code{\link{setup_X1}},
-\code{\link{setup_diff}},
-\code{\link{setup_vcov}},
-\code{\link{setup_stratify}},
-\code{\link{GenericML_single}},
-\code{\link{GenericML_combine}}
+\code{\link{plot.GenericML}()}
+\code{\link{print.GenericML}()}
+\code{\link{get_BLP}()},
+\code{\link{get_GATES}()},
+\code{\link{get_CLAN}()},
+\code{\link{setup_X1}()},
+\code{\link{setup_diff}()},
+\code{\link{setup_vcov}()},
+\code{\link{setup_stratify}()},
+\code{\link{GenericML_single}()},
+\code{\link{GenericML_combine}()}
 }

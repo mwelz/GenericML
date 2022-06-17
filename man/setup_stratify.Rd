@@ -7,7 +7,7 @@
 setup_stratify(...)
 }
 \arguments{
-\item{...}{Named objects that shall be used as arguments in \code{\link[splitstackshape]{stratified}}. If empty (default), ordinary random sampling will be performed.}
+\item{...}{Named objects that shall be used as arguments in \code{\link[splitstackshape]{stratified}()}. If empty (default), ordinary random sampling will be performed.}
 }
 \value{
 A list of named objects (possibly empty) specifying the stratified sampling strategy. If empty, no stratified sampling will be performed and instead ordinary random sampling will be performed.
@@ -39,6 +39,6 @@ setup_stratify()
 
 }
 \seealso{
-\code{\link[splitstackshape]{stratified}}
-\code{\link{GenericML}}
+\code{\link[splitstackshape]{stratified}()}
+\code{\link{GenericML}()}
 }

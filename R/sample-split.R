@@ -2,7 +2,7 @@
 #'
 #' This function controls whether or not stratified sample splitting shall be performed. If no stratified sampling shall be performed, do not pass any arguments to this function (this is the default). If stratified sampling shall be performed, use this function to pass arguments to \code{\link[splitstackshape]{stratified}()} in the package \href{https://CRAN.R-project.org/package=splitstackshape}{"splitstackshape"}. In this case, the specification for \code{prop_aux} in \code{\link{GenericML}()} does not have an effect because the number of samples in the auxiliary set is specified with the \code{size} argument in \code{\link[splitstackshape]{stratified}()}.
 #'
-#' @param ... Named objects that shall be used as arguments in \code{\link[splitstackshape]{stratified}}. If empty (default), ordinary random sampling will be performed.
+#' @param ... Named objects that shall be used as arguments in \code{\link[splitstackshape]{stratified}()}. If empty (default), ordinary random sampling will be performed.
 #'
 #' @return
 #' A list of named objects (possibly empty) specifying the stratified sampling strategy. If empty, no stratified sampling will be performed and instead ordinary random sampling will be performed.
@@ -11,8 +11,8 @@
 #' The output of this setup function is intended to be used as argument \code{stratify} in the function \code{\link{GenericML}()}. If arguments are passed to \code{\link[splitstackshape]{stratified}()} via this function, make sure to  pass the necessary objects that \code{\link[splitstackshape]{stratified}()} in the \href{https://CRAN.R-project.org/package=splitstackshape}{"splitstackshape"} package requires. The necessary objects are called \code{indt}, \code{group}, and \code{size} (see the documentation of  \code{\link[splitstackshape]{stratified}()} for details). If either of these objects is missing, an error is thrown.
 #'
 #' @seealso
-#' \code{\link[splitstackshape]{stratified}}
-#' \code{\link{GenericML}}
+#' \code{\link[splitstackshape]{stratified}()}
+#' \code{\link{GenericML}()}
 #'
 #' @examples
 #' ## sample data of group membership (with two groups)

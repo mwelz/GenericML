@@ -10,7 +10,7 @@
 #'   \item{\code{confidence_interval}}{A numeric matrix of the lower and upper confidence bounds for each generic target. The confidence level of the implied confidence interval is equal to \code{1 - 2 * significance_level}.}
 #'   \item{\code{confidence_level}}{The confidence level of the confidence intervals. Equals \code{1 - 2 * significance_level}.}
 #'   \item{\code{learner}}{The argument \code{learner}.}
-#'   \item{\code{plot}}{An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}). Only returned if the argument \code{plot = TRUE}.}
+#'   \item{\code{plot}}{An object of class \code{"\link[ggplot2]{ggplot}"}. Only returned if the argument \code{plot = TRUE}.}
 #'   }
 #'
 #' @examples
@@ -60,13 +60,13 @@
 #' }
 #'
 #' @seealso
-#' \code{\link{GenericML}},
-#' \code{\link{get_GATES}},
-#' \code{\link{get_CLAN}},
-#' \code{\link{get_best}},
-#' \code{\link{print.BLP_info}},
-#' \code{\link{print.GATES_info}},
-#' \code{\link{print.CLAN_info}}
+#' \code{\link{GenericML}()},
+#' \code{\link{get_GATES}()},
+#' \code{\link{get_CLAN}()},
+#' \code{\link{get_best}()},
+#' \code{\link{print.BLP_info}()},
+#' \code{\link{print.GATES_info}()},
+#' \code{\link{print.CLAN_info}()}
 #'
 #' @export
 get_BLP <- function(x, learner = "best", plot = TRUE){
@@ -100,7 +100,7 @@ get_BLP <- function(x, learner = "best", plot = TRUE){
 #'   \item{\code{confidence_interval}}{A numeric matrix of the lower and upper confidence bounds for each generic target. The confidence level of the implied confidence interval is equal to \code{1 - 2 * significance_level}.}
 #'   \item{\code{confidence_level}}{The confidence level of the confidence intervals. Equals \code{1 - 2 * significance_level}.}
 #'   \item{\code{learner}}{The argument \code{learner}.}
-#'   \item{\code{plot}}{An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}). Only returned if the argument \code{plot = TRUE}.}
+#'   \item{\code{plot}}{An object of class \code{"\link[ggplot2]{ggplot}"}. Only returned if the argument \code{plot = TRUE}.}
 #'   }
 #'
 #' @examples
@@ -150,13 +150,13 @@ get_BLP <- function(x, learner = "best", plot = TRUE){
 #' }
 #'
 #' @seealso
-#' \code{\link{GenericML}},
-#' \code{\link{get_BLP}},
-#' \code{\link{get_CLAN}},
-#' \code{\link{get_best}},
-#' \code{\link{print.BLP_info}},
-#' \code{\link{print.GATES_info}},
-#' \code{\link{print.CLAN_info}}
+#' \code{\link{GenericML}()},
+#' \code{\link{get_BLP}()},
+#' \code{\link{get_CLAN}()},
+#' \code{\link{get_best}()},
+#' \code{\link{print.BLP_info}()},
+#' \code{\link{print.GATES_info}()},
+#' \code{\link{print.CLAN_info}()}
 #'
 #' @export
 get_GATES <- function(x, learner = "best", plot = TRUE){
@@ -189,7 +189,7 @@ get_GATES <- function(x, learner = "best", plot = TRUE){
 #'   \item{\code{confidence_interval}}{A numeric matrix of the lower and upper confidence bounds for each generic target. The confidence level of the implied confidence interval is equal to \code{1 - 2 * significance_level}.}
 #'   \item{\code{confidence_level}}{The confidence level of the confidence intervals. Equals \code{1 - 2 * significance_level}.}
 #'   \item{\code{learner}}{The argument \code{learner}.}
-#'   \item{\code{plot}}{An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}). Only returned if the argument \code{plot = TRUE}.}
+#'   \item{\code{plot}}{An object of class \code{"\link[ggplot2]{ggplot}"}. Only returned if the argument \code{plot = TRUE}.}
 #'   \item{\code{CLAN_variable}}{The name of the CLAN variable of interest.}
 #'   }
 #'
@@ -240,13 +240,13 @@ get_GATES <- function(x, learner = "best", plot = TRUE){
 #' }
 #'
 #' @seealso
-#' \code{\link{GenericML}},
-#' \code{\link{get_BLP}},
-#' \code{\link{get_GATES}},
-#' \code{\link{get_best}},
-#' \code{\link{print.BLP_info}},
-#' \code{\link{print.GATES_info}},
-#' \code{\link{print.CLAN_info}}
+#' \code{\link{GenericML}()},
+#' \code{\link{get_BLP}()},
+#' \code{\link{get_GATES}()},
+#' \code{\link{get_best}()},
+#' \code{\link{print.BLP_info}()},
+#' \code{\link{print.GATES_info}()},
+#' \code{\link{print.CLAN_info}()}
 #'
 #' @export
 get_CLAN <- function(x, variable, learner = "best", plot = TRUE){
@@ -458,10 +458,10 @@ accessor_output <- function(x, accessor_obj, plot, type, learner, CLAN_variable,
 #' }
 #'
 #' @seealso
-#' \code{\link{GenericML}},
-#' \code{\link{get_BLP}},
-#' \code{\link{get_GATES}},
-#' \code{\link{get_CLAN}}
+#' \code{\link{GenericML}()},
+#' \code{\link{get_BLP}()},
+#' \code{\link{get_GATES}()},
+#' \code{\link{get_CLAN}()}
 #'
 #' @export
 get_best <- function(x)

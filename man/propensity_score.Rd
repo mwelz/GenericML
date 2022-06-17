@@ -17,7 +17,7 @@ propensity_score(Z, D, estimator = "constant")
 An object of class \code{"propensity_score"}, consisting of the following components:
 \describe{
 \item{\code{estimates}}{A numeric vector of propensity score estimates.}
-\item{\code{mlr3_objects}}{\code{mlr3} objects used for estimation. Only non-empty if \code{mlr3} was used.}
+\item{\code{mlr3_objects}}{\code{"mlr3"} objects used for estimation. Only non-empty if \code{mlr3} was used.}
 }
 }
 \description{

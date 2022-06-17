@@ -7,7 +7,7 @@
 \method{print}{BLP_info}(x, digits = max(3L, getOption("digits") - 3L), ...)
 }
 \arguments{
-\item{x}{An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.}
+\item{x}{An object of the class \code{"BLP_info"}, as returned by the function \code{\link{get_BLP}()}.}
 
 \item{digits}{Number of digits to print.}
 

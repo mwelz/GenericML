@@ -8,10 +8,10 @@
 #' A\code{"\link{GenericML}"} object as returned by \code{\link{GenericML}()}. In the \code{arguments} component of this object, the objects \code{parallel}, \code{num_cores}, \code{seed}, and \code{store_learners} are set to \code{NULL} as these might differ between the individual \code{GenericML} objects in \code{x}. Moreover, the \code{propensity_scores} component of the returned object is taken from the first \code{"\link{GenericML}"} object in \code{x}.
 #'
 #' @details
-#' To ensure consistency of the estimates, all \code{"\link{GenericML}"} objects in the list \code{x} must have the exact same parameter specifications in their original call to \code{\link{GenericML}}, except for the parameters \code{num_splits}, \code{parallel}, \code{num_cores}, \code{seed}, and \code{store_learners} (i.e. these arguments may vary between the \code{"\link{GenericML}"} objects in the list \code{x}). An error will be thrown if this is not satisfied.
+#' To ensure consistency of the estimates, all \code{"\link{GenericML}"} objects in the list \code{x} must have the exact same parameter specifications in their original call to \code{\link{GenericML}()}, except for the parameters \code{num_splits}, \code{parallel}, \code{num_cores}, \code{seed}, and \code{store_learners} (i.e. these arguments may vary between the \code{"\link{GenericML}"} objects in the list \code{x}). An error will be thrown if this is not satisfied.
 #'
 #' @seealso
-#' \code{\link{GenericML}}
+#' \code{\link{GenericML}()}
 #'
 #' @examples
 #' if (require("glmnet") && require("ranger")) {

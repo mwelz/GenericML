@@ -25,9 +25,9 @@
 
 \item{CLAN_variable}{Name of the CLAN variable to be plotted. Only applicable if \code{type = "CLAN"}.}
 
-\item{groups}{Character vector indicating the per-group parameter estimates that shall be plotted in GATES and CLAN analyses. Default is \code{"all"} for all parameters. If there are \eqn{K} groups, this variable is a subset of \code{c("G1", "G2",...,"GK", "G1-G2", "G1-G2",..., "G1-GK", "GK-G1", "GK-G2",...)}, where Gk denotes the k-th group. Note that this set depends on the choices of the arguments \code{"diff_GATES"} and \code{"diff_CLAN"} of the \code{\link{GenericML}} object.}
+\item{groups}{Character vector indicating the per-group parameter estimates that shall be plotted in GATES and CLAN analyses. Default is \code{"all"} for all parameters. If there are \eqn{K} groups, this variable is a subset of \code{c("G1", "G2",...,"GK", "G1-G2", "G1-G2",..., "G1-GK", "GK-G1", "GK-G2",...)}, where Gk denotes the k-th group. Note that this set depends on the choices of the arguments \code{"diff_GATES"} and \code{"diff_CLAN"} of the \code{"\link{GenericML}"} object.}
 
-\item{ATE}{Logical. If \code{TRUE} (default), then the BLP estimate of the average treatment effect along with confidence bounds will be added to the plot. Only applicable if \code{type} is \code{"CLAN"} or \code{"GATES"}.}
+\item{ATE}{Logical. If \code{TRUE} (default), then the BLP estimate of the average treatment effect along with confidence intervals will be added to the plot. Only applicable if \code{type} is \code{"CLAN"} or \code{"GATES"}.}
 
 \item{limits}{A numeric vector of length two holding the limits of the y-axis of the plot.}
 
@@ -36,10 +36,10 @@
 \item{...}{Additional arguments to be passed down.}
 }
 \value{
-An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}).
+An object of class \code{"\link[ggplot2]{ggplot}"}.
 }
 \description{
-Visualizes the estimates of the generic targets of interest: plots the point estimates as well as the corresponding confidence bounds. The generic targets of interest can be (subsets of) the parameters of the BLP, GATES, or CLAN analysis.
+Visualizes the estimates of the generic targets of interest: plots the point estimates as well as the corresponding confidence intervals. The generic targets of interest can be (subsets of) the parameters of the BLP, GATES, or CLAN analysis.
 }
 \details{
 If you wish to retrieve the data frame that this plot method visualizes, please use \code{\link{setup_plot}()}.
@@ -93,10 +93,10 @@ plot(x, type = "CLAN", CLAN_variable = "V1",
 
 }
 \seealso{
-\code{\link{setup_plot}},
-\code{\link{GenericML}},
-\code{\link{get_BLP}},
-\code{\link{get_GATES}},
-\code{\link{get_CLAN}},
-\code{\link{setup_diff}}
+\code{\link{setup_plot}()},
+\code{\link{GenericML}()},
+\code{\link{get_BLP}()},
+\code{\link{get_GATES}()},
+\code{\link{get_CLAN}()},
+\code{\link{setup_diff}()}
 }

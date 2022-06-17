@@ -21,14 +21,14 @@ setup_plot(
 
 \item{CLAN_variable}{Name of the CLAN variable to be plotted. Only applicable if \code{type = "CLAN"}.}
 
-\item{groups}{Character vector indicating the per-group parameter estimates that shall be plotted in GATES and CLAN analyses. Default is \code{"all"} for all parameters. If there are \eqn{K} groups, this variable is a subset of \code{c("G1", "G2",...,"GK", "G1-G2", "G1-G2",..., "G1-GK", "GK-G1", "GK-G2",...)}, where Gk denotes the k-th group. Note that this set depends on the choices of the arguments \code{"diff_GATES"} and \code{"diff_CLAN"} of the \code{\link{GenericML}} object.}
+\item{groups}{Character vector indicating the per-group parameter estimates that shall be plotted in GATES and CLAN analyses. Default is \code{"all"} for all parameters. If there are \eqn{K} groups, this variable is a subset of \code{c("G1", "G2",...,"GK", "G1-G2", "G1-G2",..., "G1-GK", "GK-G1", "GK-G2",...)}, where Gk denotes the k-th group. Note that this set depends on the choices of the arguments \code{"diff_GATES"} and \code{"diff_CLAN"} of the \code{"\link{GenericML}"} object.}
 }
 \value{
 An object of class \code{"setup_plot"}, which is a list with the following elements.
 \describe{
 \item{\code{data_plot}}{A data frame containing point and interval estimates of the generic target specified in the argument \code{type}.}
 \item{\code{data_BLP}}{A data frame containing point and interval estimates of the BLP analysis.}
-\item{\code{confidence_level}}{The confidence level reflected by the confidence bounds of the interval estimates. The confidence level is equal to  \code{1 - 2 * significance_level}, which is the adjustment proposed in the paper.}}
+\item{\code{confidence_level}}{The confidence level of the confidence intervals. The confidence level is equal to  \code{1 - 2 * significance_level}, which is the adjustment proposed in the paper.}}
 }
 \description{
 Extract the relevant information for visualizing the point and interval estimates of the generic targets of interest. The generic targets of interest can be (subsets of) the parameters of the BLP, GATES, or CLAN analysis.
@@ -91,5 +91,5 @@ ggplot(mapping = aes(x = group,
 
 }
 \seealso{
-\code{\link[=plot.GenericML]{plot}}
+\code{\link{plot.GenericML}()}
 }

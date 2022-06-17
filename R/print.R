@@ -70,7 +70,7 @@ print.GenericML <- function(x, digits = max(3L, getOption("digits") - 3L), ...){
 
 #' Print method for a \code{BLP_info} object
 #'
-#' @param x An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.
+#' @param x An object of the class \code{"BLP_info"}, as returned by the function \code{\link{get_BLP}()}.
 #' @param digits Number of digits to print.
 #' @param ... Additional arguments to be passed down.
 #'
@@ -80,6 +80,10 @@ print.GenericML <- function(x, digits = max(3L, getOption("digits") - 3L), ...){
 #' @export
 print.BLP_info <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
 {
+  if(!inherits(x = x, what = "BLP_info", which = FALSE)){
+    stop("The object 'x' must be of class BLP_info")
+  }
+
   cat("BLP generic targets\n---\n")
   print_accessors(x = x, digits = digits, print_confidence = TRUE, ... = ...)
 } # FUN
@@ -87,7 +91,7 @@ print.BLP_info <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
 
 #' Print method for a \code{GATES_info} object
 #'
-#' @param x An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.
+#' @param x An object of the class \code{"GATES_info"}, as returned by the function \code{\link{get_GATES}()}.
 #' @param digits Number of digits to print.
 #' @param ... Additional arguments to be passed down.
 #'
@@ -97,13 +101,18 @@ print.BLP_info <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
 #' @export
 print.GATES_info <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
 {
+  if(!inherits(x = x, what = "GATES_info", which = FALSE)){
+    stop("The object 'x' must be of class GATES_info")
+  }
+
   cat("GATES generic targets\n---\n")
   print_accessors(x = x, digits = digits, print_confidence = TRUE, ... = ...)
 } # FUN
 
+
 #' Print method for a \code{CLAN_info} object
 #'
-#' @param x An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.
+#' @param x An object of the class \code{"CLAN_info"}, as returned by the function \code{\link{get_CLAN}()}.
 #' @param digits Number of digits to print.
 #' @param ... Additional arguments to be passed down.
 #'
@@ -113,6 +122,10 @@ print.GATES_info <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
 #' @export
 print.CLAN_info <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
 {
+  if(!inherits(x = x, what = "CLAN_info", which = FALSE)){
+    stop("The object 'x' must be of class CLAN_info")
+  }
+
   cat(sprintf("CLAN generic targets for variable '%s' \n---\n", x$CLAN_variable))
   print_accessors(x = x, digits = digits, print_confidence = TRUE, ... = ...)
 } # FUN
@@ -152,7 +165,7 @@ print_accessors <- function(x, digits, print_confidence,...)
 
 
 #' Print method for a \code{"heterogeneity_CLAN"} object
-#'#'
+#'
 #' @param x An object of class \code{"\link{heterogeneity_CLAN}"}.
 #' @param ... Additional arguments to be passed down.
 #'

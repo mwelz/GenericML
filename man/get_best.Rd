@@ -68,8 +68,8 @@ get_CLAN(x, learner = "mlr3::lrn('ranger', num.trees = 10)",
 
 }
 \seealso{
-\code{\link{GenericML}},
-\code{\link{get_BLP}},
-\code{\link{get_GATES}},
-\code{\link{get_CLAN}}
+\code{\link{GenericML}()},
+\code{\link{get_BLP}()},
+\code{\link{get_GATES}()},
+\code{\link{get_CLAN}()}
 }

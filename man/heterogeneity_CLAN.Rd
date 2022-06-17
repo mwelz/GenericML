@@ -26,3 +26,6 @@ An object of class \code{"heterogeneity_CLAN"}, consisting of the following comp
 \description{
 This function tests for statistical significance of all CLAN difference parameters that were specified in the function \code{\link{setup_diff}()}. It reports all CLAN variables along which there are significant difference parameters, which corresponds to evidence for treatment effect heterogeneity along this variable, at the specified significance level.
 }
+\seealso{
+\code{\link{GenericML}()}
+}

@@ -10,7 +10,7 @@
 #' An object of class \code{"propensity_score"}, consisting of the following components:
 #' \describe{
 #'   \item{\code{estimates}}{A numeric vector of propensity score estimates.}
-#'   \item{\code{mlr3_objects}}{\code{mlr3} objects used for estimation. Only non-empty if \code{mlr3} was used.}
+#'   \item{\code{mlr3_objects}}{\code{"mlr3"} objects used for estimation. Only non-empty if \code{mlr3} was used.}
 #'   }
 #'
 #' @details
@@ -149,7 +149,7 @@ propensity_score_mlr3 <- function(Z, D, learner = "random_forest"){
 #' An object of class \code{"proxy_BCA"}, consisting of the following components:
 #' \describe{
 #'   \item{\code{estimates}}{A numeric vector of BCA estimates of each observation.}
-#'   \item{\code{mlr3_objects}}{\code{mlr3} objects used for estimation.}
+#'   \item{\code{mlr3_objects}}{\code{"mlr3"} objects used for estimation.}
 #'   }
 #'
 #' @details
@@ -269,7 +269,7 @@ proxy_BCA_NoChecks <- function(Z, D, Y,
 #' An object of class \code{"proxy_CATE"}, consisting of the following components:
 #' \describe{
 #'   \item{\code{estimates}}{A numeric vector of CATE estimates of each observation.}
-#'   \item{\code{mlr3_objects}}{\code{mlr3} objects used for estimation of \eqn{E[Y | D=1, Z]} (\code{Y1_learner}) and \eqn{E[Y | D=0, Z]} (\code{Y0_learner}). The latter is not available if \code{proxy_BCA = NULL}.}
+#'   \item{\code{mlr3_objects}}{\code{"mlr3"} objects used for estimation of \eqn{E[Y | D=1, Z]} (\code{Y1_learner}) and \eqn{E[Y | D=0, Z]} (\code{Y0_learner}). The latter is not available if \code{proxy_BCA = NULL}.}
 #'   }
 #'
 #' @details

@@ -25,7 +25,7 @@ proxy_CATE(Z, D, Y, A_set, learner, proxy_BCA = NULL, min_variation = 1e-05)
 An object of class \code{"proxy_CATE"}, consisting of the following components:
 \describe{
 \item{\code{estimates}}{A numeric vector of CATE estimates of each observation.}
-\item{\code{mlr3_objects}}{\code{mlr3} objects used for estimation of \eqn{E[Y | D=1, Z]} (\code{Y1_learner}) and \eqn{E[Y | D=0, Z]} (\code{Y0_learner}). The latter is not available if \code{proxy_BCA = NULL}.}
+\item{\code{mlr3_objects}}{\code{"mlr3"} objects used for estimation of \eqn{E[Y | D=1, Z]} (\code{Y1_learner}) and \eqn{E[Y | D=0, Z]} (\code{Y0_learner}). The latter is not available if \code{proxy_BCA = NULL}.}
 }
 }
 \description{

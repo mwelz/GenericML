@@ -120,7 +120,7 @@ quantile_group_NoChecks <- function(x = x,
 #' @param Z_CLAN A numeric matrix holding variables on which classification analysis (CLAN) shall be performed. CLAN will be performed on each column of the matrix. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.
 #' @param HT Logical. If \code{TRUE}, a Horvitz-Thompson (HT) transformation is applied in the BLP and GATES regressions. Default is \code{FALSE}.
 #' @param quantile_cutoffs The cutoff points of the quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.
-#' @param X1_BLP Specifies the design matrix \eqn{X_1} in the regression. Must be an instance of \code{\link{setup_X1}}. See the documentation of \code{\link{setup_X1}()} for details.
+#' @param X1_BLP Specifies the design matrix \eqn{X_1} in the regression. Must be an object of class  \code{"\link{setup_X1}"}. See the documentation of \code{\link{setup_X1}()} for details.
 #' @param X1_GATES Same as \code{X1_BLP}, just for the GATES regression.
 #' @param diff_GATES Specifies the generic targets of GATES. Must be an object of class \code{"\link{setup_diff}"}. See the documentation of \code{\link{setup_diff}()} for details.
 #' @param diff_CLAN Same as \code{diff_GATES}, just for the CLAN generic targets.
@@ -133,12 +133,12 @@ quantile_group_NoChecks <- function(x = x,
 #' @return
 #' A list with the following components:
 #' \describe{
-#' \item{\code{BLP}}{An instance of \code{\link{BLP}}.}
-#' \item{\code{GATES}}{An instance of \code{\link{GATES}}.}
-#' \item{\code{CLAN}}{An instance of \code{\link{CLAN}}.}
-#' \item{\code{proxy_BCA}}{An instance of \code{\link{proxy_BCA}}.}
-#' \item{\code{proxy_CATE}}{An instance of \code{\link{proxy_CATE}}.}
-#' \item{\code{best}}{Estimates of the \eqn{\Lambda} parameters for finding the best learner. returned by \code{\link{lambda_parameters}}.}
+#' \item{\code{BLP}}{An object of class \code{"\link{BLP}"}.}
+#' \item{\code{GATES}}{An object of class \code{"\link{GATES}"}.}
+#' \item{\code{CLAN}}{An object of class \code{"\link{CLAN}"}.}
+#' \item{\code{proxy_BCA}}{An object of class \code{"\link{proxy_BCA}"}.}
+#' \item{\code{proxy_CATE}}{An object of class \code{"\link{proxy_CATE}"}.}
+#' \item{\code{best}}{Estimates of the \eqn{\Lambda} parameters for finding the best learner. Returned by \code{\link{lambda_parameters}()}.}
 #' }
 #'
 #' @details
@@ -150,7 +150,7 @@ quantile_group_NoChecks <- function(x = x,
 #' Lang M., Binder M., Richter J., Schratz P., Pfisterer F., Coors S., Au Q., Casalicchio G., Kotthoff L., Bischl B. (2019). \dQuote{mlr3: A Modern Object-Oriented Machine Learning Framework in R.} \emph{Journal of Open Source Software}, \bold{4}(44), 1903. \doi{10.21105/joss.01903}.
 #'
 #' @seealso
-#' \code{\link{GenericML}}
+#' \code{\link{GenericML}()}
 #'
 #' @examples
 #' if(require("ranger")){

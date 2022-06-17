@@ -2,8 +2,7 @@
 % Please edit documentation in R/print.R
 \name{print.heterogeneity_CLAN}
 \alias{print.heterogeneity_CLAN}
-\title{Print method for a \code{"heterogeneity_CLAN"} object
-#'}
+\title{Print method for a \code{"heterogeneity_CLAN"} object}
 \usage{
 \method{print}{heterogeneity_CLAN}(x, ...)
 }
@@ -17,5 +16,4 @@ A print to the console.
 }
 \description{
 Print method for a \code{"heterogeneity_CLAN"} object
-#'
 }

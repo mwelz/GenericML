@@ -166,12 +166,12 @@ get_clan.3d.ls <- function(num.learners, learners.names, num.generic_targets.cla
 #' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 #'
 #' @seealso
-#' \code{\link{GenericML}},
-#' \code{\link{GenericML_single}},
-#' \code{\link{CLAN}},
-#' \code{\link{GATES}},
-#' \code{\link{setup_X1}},
-#' \code{\link{setup_vcov}}
+#' \code{\link{GenericML}()},
+#' \code{\link{GenericML_single}()},
+#' \code{\link{CLAN}()},
+#' \code{\link{GATES}()},
+#' \code{\link{setup_X1}()},
+#' \code{\link{setup_vcov}()}
 #'
 #' @export
 setup_diff <- function(subtract_from = "most",
@@ -190,7 +190,7 @@ setup_diff <- function(subtract_from = "most",
 
 #' Setup function for \code{vcov_control} arguments
 #'
-#' Returns a list with two elements called \code{estimator} and \code{arguments}. The element \code{estimator} is a string specifying the covariance matrix estimator to be used in the linear regression regression of interest and needs to be a covariance estimator function in the \href{https://CRAN.R-project.org/package=sandwich}{sandwich} package. The second element, \code{arguments}, is a list of arguments that shall be passed to the function specified in the first element, \code{estimator}.
+#' Returns a list with two elements called \code{estimator} and \code{arguments}. The element \code{estimator} is a string specifying the covariance matrix estimator to be used in the linear regression regression of interest and needs to be a covariance estimator function in the \href{https://CRAN.R-project.org/package=sandwich}{"sandwich"} package. The second element, \code{arguments}, is a list of arguments that shall be passed to the function specified in the first element, \code{estimator}.
 #'
 #' @details
 #' The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}()} and \code{\link{GenericML_single}()} (arguments \code{vcov_BLP}, \code{vcov_GATES}), as well as \code{\link{BLP}()} and \code{\link{GATES}()} (argument \code{vcov_control}).
@@ -201,7 +201,7 @@ setup_diff <- function(subtract_from = "most",
 #' @return
 #' An object of class \code{"setup_vcov"}, consisting of the following components:
 #' \describe{
-#'   \item{\code{estimator}}{A character equal to covariance estimation function names in the \href{https://CRAN.R-project.org/package=sandwich}{sandwich} package.}
+#'   \item{\code{estimator}}{A character equal to covariance estimation function names in the \href{https://CRAN.R-project.org/package=sandwich}{"sandwich"} package.}
 #'   \item{\code{arguments}}{A list of arguments that shall be passed to the function specified in the \code{estimator} argument.}
 #'   }
 #' See the description above for details.
@@ -212,12 +212,12 @@ setup_diff <- function(subtract_from = "most",
 #' Zeileis A. (2006). \dQuote{Object-Oriented Computation of Sandwich Estimators.} \emph{Journal of Statistical Software}, \bold{16}(9), 1--16. \doi{10.18637/jss.v016.i09}
 #'
 #' @seealso
-#' \code{\link{GenericML}},
-#' \code{\link{GenericML_single}},
-#' \code{\link{BLP}},
-#' \code{\link{GATES}},
-#' \code{\link{setup_X1}},
-#' \code{\link{setup_diff}}
+#' \code{\link{GenericML}()},
+#' \code{\link{GenericML_single}()},
+#' \code{\link{BLP}()},
+#' \code{\link{GATES}()},
+#' \code{\link{setup_X1}()},
+#' \code{\link{setup_diff}()}
 #'
 #' @examples
 #' # use standard homoskedastic OLS covariance matrix estimate
@@ -341,12 +341,12 @@ setup_vcov_subset <- function(x, idx){
 #' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 #'
 #' @seealso
-#' \code{\link{GenericML}},
-#' \code{\link{GenericML_single}},
-#' \code{\link{BLP}},
-#' \code{\link{GATES}},
-#' \code{\link{setup_vcov}},
-#' \code{\link{setup_diff}}
+#' \code{\link{GenericML}()},
+#' \code{\link{GenericML_single}()},
+#' \code{\link{BLP}()},
+#' \code{\link{GATES}()},
+#' \code{\link{setup_vcov}()},
+#' \code{\link{setup_diff}()}
 #'
 #' @examples
 #' set.seed(1)

@@ -49,10 +49,10 @@ setup_X1(funs_Z = c("B", "p"), covariates = covariates, fixed_effects = NULL)
 Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 }
 \seealso{
-\code{\link{GenericML}},
-\code{\link{GenericML_single}},
-\code{\link{BLP}},
-\code{\link{GATES}},
-\code{\link{setup_vcov}},
-\code{\link{setup_diff}}
+\code{\link{GenericML}()},
+\code{\link{GenericML_single}()},
+\code{\link{BLP}()},
+\code{\link{GATES}()},
+\code{\link{setup_vcov}()},
+\code{\link{setup_diff}()}
 }

@@ -44,10 +44,10 @@ setup_diff(subtract_from = "least", subtracted = c(3,2))
 Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 }
 \seealso{
-\code{\link{GenericML}},
-\code{\link{GenericML_single}},
-\code{\link{CLAN}},
-\code{\link{GATES}},
-\code{\link{setup_X1}},
-\code{\link{setup_vcov}}
+\code{\link{GenericML}()},
+\code{\link{GenericML_single}()},
+\code{\link{CLAN}()},
+\code{\link{GATES}()},
+\code{\link{setup_X1}()},
+\code{\link{setup_vcov}()}
 }

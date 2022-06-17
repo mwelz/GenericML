@@ -23,7 +23,7 @@ proxy_BCA(Z, D, Y, A_set, learner, min_variation = 1e-05)
 An object of class \code{"proxy_BCA"}, consisting of the following components:
 \describe{
 \item{\code{estimates}}{A numeric vector of BCA estimates of each observation.}
-\item{\code{mlr3_objects}}{\code{mlr3} objects used for estimation.}
+\item{\code{mlr3_objects}}{\code{"mlr3"} objects used for estimation.}
 }
 }
 \description{
