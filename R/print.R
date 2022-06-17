@@ -51,7 +51,7 @@ print.GenericML <- function(x, ...){
   cat("\t* Generic ML learners:", paste(x$arguments$learners_GenericML, collapse = ", "), "\n")
   cat("\t* S =", x$arguments$num_splits, "splits are used\n")
   cat("\t*", ifelse(x$arguments$HT, "A", "No"), "HT transformation is used\n")
-  cat("\nThe", 100 * (1-2*x$arguments$significance_level), "% confidence bounds of the best BLP estimates are given by\n")
+  cat("\nThe", 100 * (1-2*x$arguments$significance_level), "% confidence intervals of the best BLP estimates are given by\n")
   cat("\t beta.1: (",
       round(x$VEIN$best_learners$BLP["beta.1", "CB lower"], 3), ",",
       round(x$VEIN$best_learners$BLP["beta.1", "CB upper"], 3), ")")
@@ -128,8 +128,8 @@ print.CLAN_info <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
 print_accessors <- function(x, digits, print_confidence,...)
 {
   # prepare coefficient matrix
-  mat <- cbind(x$estimate, x$confidence_interval, x$pvalue)
-  colnames(mat) <- c("Estimate", "CB lower", "CB upper", "p-value")
+  mat <- cbind(x$estimate, x$confidence_interval, x$p_value)
+  colnames(mat) <- c("Estimate", "CI lower", "CI upper", "p value")
 
   # print it
   stats::printCoefmat(mat, digits = digits, ... = ...)
@@ -137,7 +137,7 @@ print_accessors <- function(x, digits, print_confidence,...)
   # print confidence level if requested
   if(isTRUE(print_confidence))
   {
-    cat("---\nLevel of confidence of the confidence bounds (CB): ",
+    cat("---\nConfidence level of confidence interval [CI lower, CI upper]: ",
         format(100 * x$confidence_level), " %\n", sep = "")
   } # IF
 

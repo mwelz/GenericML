@@ -17,7 +17,7 @@ get_GATES(x, learner = "best", plot = TRUE)
 An object of class \code{"GATES_info"}, which consists of the following components:
 \describe{
 \item{\code{estimate}}{A numeric vector of point estimates of the GATES generic targets.}
-\item{\code{confidence_interval}}{A numeric matrix of the lower and upper confidence bounds for each generic target. The implied confidence level is equal to \code{1 - 2 * significance_level}.}
+\item{\code{confidence_interval}}{A numeric matrix of the lower and upper confidence bounds for each generic target. The confidence level of the implied confidence interval is equal to \code{1 - 2 * significance_level}.}
 \item{\code{confidence_level}}{The confidence level of the confidence intervals. Equals \code{1 - 2 * significance_level}.}
 \item{\code{learner}}{The argument \code{learner}.}
 \item{\code{plot}}{An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}). Only returned if the argument \code{plot = TRUE}.}

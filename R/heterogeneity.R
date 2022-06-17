@@ -9,9 +9,9 @@
 #' @return
 #' An object of class \code{"heterogeneity_CLAN"}, consisting of the following components:
 #' \describe{
-#'   \item{\code{pvalues}}{A matrix of p-values of all CLAN difference parameters for all CLAN variables.}
+#'   \item{\code{p_values}}{A matrix of p values of all CLAN difference parameters for all CLAN variables.}
 #'   \item{\code{significant}}{The names of variables with at least one significant CLAN difference parameter (\code{"variables"}), their number \code{"num_variables"}, and the total number of significant CLAN difference parameters \code{"num_params"}. All significance tests were performed at level \code{significance_level}.}
-#'   \item{\code{min_pval}}{Information on the smallest p-value: Its value (\code{"value"}), the variable in which it was estimated (\code{"variable"}), the CLAN difference parameter it belongs to (\code{"parameter"}), and whether or not it is significant at level \code{significance_level} (\code{"significant"}).}
+#'   \item{\code{min_pval}}{Information on the smallest p value: Its value (\code{"value"}), the variable in which it was estimated (\code{"variable"}), the CLAN difference parameter it belongs to (\code{"parameter"}), and whether or not it is significant at level \code{significance_level} (\code{"significant"}).}
 #'   \item{\code{"learner"}}{Name of the learner whose median estimates we used for the listed results.}
 #'   \item{\code{"significance_level"}}{The level of the significance tests.}
 #'   }
@@ -34,7 +34,7 @@ heterogeneity_CLAN <- function(x, learner = "best", significance_level = 0.05)
   # get CLAN parameters
   CLAN_params <- rownames(x$VEIN$best_learners$CLAN[[1L]])
 
-  # prepare matrix of p-values
+  # prepare matrix of p values
   pvalues_mat <- matrix(NA_real_, nrow = length(CLAN_params) - K,
                         ncol = length(variables))
   rownames(pvalues_mat) <- CLAN_params[-toK]
@@ -48,12 +48,12 @@ heterogeneity_CLAN <- function(x, learner = "best", significance_level = 0.05)
                                       variable = variable,
                                       learner = learner)
 
-    # get the adjusted p-values
+    # get the adjusted p values
     pvalues <- accessor_output(x = x, accessor_obj = results, plot = FALSE,
                                type = "CLAN", learner = learner,
-                               CLAN_variable = variable, ATE = FALSE)$pvalue
+                               CLAN_variable = variable, ATE = FALSE)$p_value
 
-    # get p-values of the difference parameters
+    # get p values of the difference parameters
     pvalues_mat[,variable] <- pvalues[-toK]
 
   } # FOR
@@ -67,16 +67,16 @@ heterogeneity_CLAN <- function(x, learner = "best", significance_level = 0.05)
   # number of significant difference parameters
   num_sig_params <- sum(rowSums(pvalues_mat_sig))
 
-  # smallest p-value of difference parameters
+  # smallest p value of difference parameters
   minpval <- min(pvalues_mat)
   idx <-
     which(pvalues_mat == minpval, arr.ind = TRUE)[1L,]
-  minpval_param <- rownames(pvalues_mat)[idx["row"]] # difference parameter with minimum p-value
-  minpval_var   <- variables[idx["col"]] # variable with minimum p-value
+  minpval_param <- rownames(pvalues_mat)[idx["row"]] # difference parameter with minimum p value
+  minpval_var   <- variables[idx["col"]] # variable with minimum p value
   significant   <- minpval < significance_level # is it significant?
 
   return(
-    structure(list(pvalues = pvalues_mat,
+    structure(list(p_values = pvalues_mat,
                    significant = list(variables = sig_vars,
                                       num_variables = length(sig_vars),
                                       num_params = num_sig_params),

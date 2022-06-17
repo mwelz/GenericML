@@ -51,7 +51,7 @@
 #' data <- setup_plot(x = x, type = "GATES")
 #'
 #' ## define variables to appease the R CMD check
-#' group <- estimate <- cb_lower <- cb_upper <- NULL
+#' group <- estimate <- ci_lower <- ci_upper <- NULL
 #'
 #' ## replicate the plot(x, type = "GATES")
 #' # for simplicity, we skip aligning the colors
@@ -62,14 +62,14 @@
 #'   geom_hline(aes(yintercept = data$data_BLP["beta.1", "estimate"],
 #'                  color = "ATE"),
 #'              linetype = "dashed") +
-#'   geom_hline(aes(yintercept = data$data_BLP["beta.1", "cb_lower"],
-#'                  color = paste0(100*data$confidence_level, "% CB (ATE)")),
+#'   geom_hline(aes(yintercept = data$data_BLP["beta.1", "ci_lower"],
+#'                  color = paste0(100*data$confidence_level, "% CI (ATE)")),
 #'              linetype = "dashed")  +
-#'   geom_hline(yintercept = data$data_BLP["beta.1", "cb_upper"],
+#'   geom_hline(yintercept = data$data_BLP["beta.1", "ci_upper"],
 #'              linetype = "dashed", color = "red") +
-#'   geom_point(aes(color = paste0("GATES with ",  100*data$confidence_level, "% CB")), size = 3) +
-#'   geom_errorbar(mapping = aes(ymin = cb_lower,
-#'                               ymax = cb_upper))
+#'   geom_point(aes(color = paste0("GATES with ",  100*data$confidence_level, "% CI")), size = 3) +
+#'   geom_errorbar(mapping = aes(ymin = ci_lower,
+#'                               ymax = ci_upper))
 #' }
 #'
 #' @seealso
@@ -129,7 +129,7 @@ setup_plot <- function(x,
 
   # subset data frame of BLP to relevant information
   df_blp <- df_blp[,c("Estimate", "CB lower", "CB upper")]
-  colnames(df_blp) <- c("estimate", "cb_lower", "cb_upper")
+  colnames(df_blp) <- c("estimate", "ci_lower", "ci_upper")
 
   # adjusted confidence level
   confidence_level <- 1.0 - 2.0 * x$arguments$significance_level
@@ -146,8 +146,8 @@ setup_plot <- function(x,
 
     # create data frame for ggplot
     df <- data.frame(estimate = data[, "Estimate"],
-                     cb_lower = data[, "CB lower"],
-                     cb_upper = data[, "CB upper"],
+                     ci_lower = data[, "CB lower"],
+                     ci_upper = data[, "CB upper"],
                      group = factor(group.nam, levels = group.nam))
 
     if(all(groups == "all")){
@@ -173,8 +173,8 @@ setup_plot <- function(x,
 
     ## 1.2 data for BLP plot ----
     df <- data.frame(estimate = data[, "Estimate"],
-                     cb_lower = data[, "CB lower"],
-                     cb_upper = data[, "CB upper"],
+                     ci_lower = data[, "CB lower"],
+                     ci_upper = data[, "CB upper"],
                      group = c("beta.1", "beta.2"))
 
   } # IF
@@ -311,27 +311,27 @@ plot.GenericML <- function(x,
 
     if(ATE){
 
-      limits <- c(min(c(0.0, df[, "cb_lower"], df_blp["beta.1", "cb_lower"])),
-                  max(c(0.0, df[, "cb_upper"], df_blp["beta.1", "cb_upper"])))
+      limits <- c(min(c(0.0, df[, "ci_lower"], df_blp["beta.1", "ci_lower"])),
+                  max(c(0.0, df[, "ci_upper"], df_blp["beta.1", "ci_upper"])))
 
     } else{
 
-      limits <- c(min(c(0.0, df[, "cb_lower"])),
-                  max(c(0.0, df[, "cb_upper"])))
+      limits <- c(min(c(0.0, df[, "ci_lower"])),
+                  max(c(0.0, df[, "ci_upper"])))
 
     } # IF
 
   } else if(is.null(limits) & type == "BLP"){
 
-    limits <- c(min(c(0.0, df[, "cb_lower"])),
-                max(c(0.0, df[, "cb_upper"])))
+    limits <- c(min(c(0.0, df[, "ci_lower"])),
+                max(c(0.0, df[, "ci_upper"])))
 
   } # IF
 
 
   ### make plot for GATES or CLAN
   # initialize variables (ugly hack for this R CMD check issue: https://stackoverflow.com/questions/9439256/how-can-i-handle-r-cmd-check-no-visible-binding-for-global-variable-notes-when)
-  group <- estimate <- cb_lower <- cb_upper <- NULL
+  group <- estimate <- ci_lower <- ci_upper <- NULL
 
   if(type != "BLP"){
 
@@ -346,9 +346,9 @@ plot.GenericML <- function(x,
     # prepare the plot
     p <- ggplot(mapping = aes(x = group,
                               y = estimate), data = df) +
-      geom_point(aes(color = paste0(type, " with ",  100*confidence_level, "% CB")), size = 3) +
-      geom_errorbar(mapping = aes(ymin = cb_lower,
-                                  ymax = cb_upper)) +
+      geom_point(aes(color = paste0(type, " with ",  100*confidence_level, "% CI")), size = 3) +
+      geom_errorbar(mapping = aes(ymin = ci_lower,
+                                  ymax = ci_upper)) +
       geom_hline(aes(yintercept = 0),
                  color = "black", linetype = "dotted") +
       theme_light() +
@@ -368,10 +368,10 @@ plot.GenericML <- function(x,
         geom_hline(aes(yintercept = df_blp["beta.1", "estimate"],
                        color = "ATE"),
                    linetype = "dashed") +
-        geom_hline(aes(yintercept = df_blp["beta.1", "cb_lower"],
-                       color = paste0(100*confidence_level, "% CB (ATE)")),
+        geom_hline(aes(yintercept = df_blp["beta.1", "ci_lower"],
+                       color = paste0(100*confidence_level, "% CI (ATE)")),
                    linetype = "dashed")  +
-        geom_hline(yintercept = df_blp["beta.1", "cb_upper"],
+        geom_hline(yintercept = df_blp["beta.1", "ci_upper"],
                    linetype = "dashed", color = "red") +
         scale_colour_manual(values = c("red","blue", "black"))
 
@@ -388,11 +388,11 @@ plot.GenericML <- function(x,
       geom_hline(aes(yintercept = 0),
                      color = "black", linetype = "dotted") +
       geom_point(size = 3) +
-      geom_errorbar(mapping = aes(ymin = cb_lower,
-                                  ymax = cb_upper)) +
+      geom_errorbar(mapping = aes(ymin = ci_lower,
+                                  ymax = ci_upper)) +
       theme_light() +
       ylab("Treatment Effect") +
-      xlab(paste0(type, " with ",  100*confidence_level, "% CB")) +
+      xlab(paste0(type, " with ",  100*confidence_level, "% CI")) +
       ylim(limits[1], limits[2]) +
       ggtitle(title) +
       scale_x_discrete(breaks = c("beta.1", "beta.2"),

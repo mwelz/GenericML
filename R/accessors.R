@@ -7,7 +7,7 @@
 #' @return An object of class \code{"BLP_info"}, which consists of the following components:
 #' \describe{
 #'   \item{\code{estimate}}{A numeric vector of point estimates of the BLP generic targets.}
-#'   \item{\code{confidence_interval}}{A numeric matrix of the lower and upper confidence bounds for each generic target. The implied confidence level is equal to \code{1 - 2 * significance_level}.}
+#'   \item{\code{confidence_interval}}{A numeric matrix of the lower and upper confidence bounds for each generic target. The confidence level of the implied confidence interval is equal to \code{1 - 2 * significance_level}.}
 #'   \item{\code{confidence_level}}{The confidence level of the confidence intervals. Equals \code{1 - 2 * significance_level}.}
 #'   \item{\code{learner}}{The argument \code{learner}.}
 #'   \item{\code{plot}}{An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}). Only returned if the argument \code{plot = TRUE}.}
@@ -97,7 +97,7 @@ get_BLP <- function(x, learner = "best", plot = TRUE){
 #' @return An object of class \code{"GATES_info"}, which consists of the following components:
 #' \describe{
 #'   \item{\code{estimate}}{A numeric vector of point estimates of the GATES generic targets.}
-#'   \item{\code{confidence_interval}}{A numeric matrix of the lower and upper confidence bounds for each generic target. The implied confidence level is equal to \code{1 - 2 * significance_level}.}
+#'   \item{\code{confidence_interval}}{A numeric matrix of the lower and upper confidence bounds for each generic target. The confidence level of the implied confidence interval is equal to \code{1 - 2 * significance_level}.}
 #'   \item{\code{confidence_level}}{The confidence level of the confidence intervals. Equals \code{1 - 2 * significance_level}.}
 #'   \item{\code{learner}}{The argument \code{learner}.}
 #'   \item{\code{plot}}{An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}). Only returned if the argument \code{plot = TRUE}.}
@@ -186,7 +186,7 @@ get_GATES <- function(x, learner = "best", plot = TRUE){
 #' @return An object of class \code{"CLAN_info"}, which consists of the following components:
 #' \describe{
 #'   \item{\code{estimate}}{A numeric vector of point estimates of the CLAN generic targets.}
-#'   \item{\code{confidence_interval}}{A numeric matrix of the lower and upper confidence bounds for each generic target. The implied confidence level is equal to \code{1 - 2 * significance_level}.}
+#'   \item{\code{confidence_interval}}{A numeric matrix of the lower and upper confidence bounds for each generic target. The confidence level of the implied confidence interval is equal to \code{1 - 2 * significance_level}.}
 #'   \item{\code{confidence_level}}{The confidence level of the confidence intervals. Equals \code{1 - 2 * significance_level}.}
 #'   \item{\code{learner}}{The argument \code{learner}.}
 #'   \item{\code{plot}}{An object of class \code{"ggplot"} (see \code{\link[ggplot2]{ggplot}}). Only returned if the argument \code{plot = TRUE}.}
@@ -272,7 +272,7 @@ get_CLAN <- function(x, variable, learner = "best", plot = TRUE){
 #' @param variable Name of variable for which CLAN should be performed
 #' @param learner Learner of the analysis, either \code{"best"} or learners used in \code{x} (error if not)
 #'
-#' @return A matrix of point estimates, confidence bounds, and adjusted p values (upper and lower)
+#' @return A matrix of point estimates, confidence intervals, and adjusted p values (upper and lower)
 #' @noRd
 accessor_CLAN <- function(x, variable, learner)
 {
@@ -325,7 +325,7 @@ accessor_CLAN_noChecks <- function(x, variable, learner)
 #' @param type Type of analysis, either \code{"BLP"} or \code{"GATES"}
 #' @param learner Learner of the analysis, either \code{"best"} or learners used in \code{x} (error if not)
 #'
-#' @return A matrix of point estimates, confidence bounds, and adjusted p values (upper and lower)
+#' @return A matrix of point estimates, confidence intervals, and adjusted p values (upper and lower)
 #' @noRd
 accessor_BLP_GATES <- function(x, type, learner)
 {
@@ -363,7 +363,7 @@ accessor_BLP_GATES <- function(x, type, learner)
 #' @param CLAN_variable Variable along which CLAN shall be performed. Only applicable if \code{type = "CLAN"}
 #' @param ATE Shall ATE be included in plot?
 #'
-#' @return A list of point estimates, confidence bounds, and adjusted p values (minimum of the lower and upper p value estimates)
+#' @return A list of point estimates, confidence intervals, and adjusted p values (minimum of the lower and upper p value estimates)
 #' @noRd
 accessor_output <- function(x, accessor_obj, plot, type, learner, CLAN_variable, ATE)
 {

@@ -68,7 +68,7 @@ plot(x = x, type = "GATES")
 data <- setup_plot(x = x, type = "GATES")
 
 ## define variables to appease the R CMD check
-group <- estimate <- cb_lower <- cb_upper <- NULL
+group <- estimate <- ci_lower <- ci_upper <- NULL
 
 ## replicate the plot(x, type = "GATES")
 # for simplicity, we skip aligning the colors
@@ -79,14 +79,14 @@ ggplot(mapping = aes(x = group,
   geom_hline(aes(yintercept = data$data_BLP["beta.1", "estimate"],
                  color = "ATE"),
              linetype = "dashed") +
-  geom_hline(aes(yintercept = data$data_BLP["beta.1", "cb_lower"],
-                 color = paste0(100*data$confidence_level, "\% CB (ATE)")),
+  geom_hline(aes(yintercept = data$data_BLP["beta.1", "ci_lower"],
+                 color = paste0(100*data$confidence_level, "\% CI (ATE)")),
              linetype = "dashed")  +
-  geom_hline(yintercept = data$data_BLP["beta.1", "cb_upper"],
+  geom_hline(yintercept = data$data_BLP["beta.1", "ci_upper"],
              linetype = "dashed", color = "red") +
-  geom_point(aes(color = paste0("GATES with ",  100*data$confidence_level, "\% CB")), size = 3) +
-  geom_errorbar(mapping = aes(ymin = cb_lower,
-                              ymax = cb_upper))
+  geom_point(aes(color = paste0("GATES with ",  100*data$confidence_level, "\% CI")), size = 3) +
+  geom_errorbar(mapping = aes(ymin = ci_lower,
+                              ymax = ci_upper))
 }
 
 }
