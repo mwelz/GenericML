@@ -74,7 +74,7 @@ VEIN <- function(generic_targets, best.learners.obj){
         apply(generic_targets[[learner]][[type]][,"Pr(>z)",], 1, function(z) Med(z)$lower_median)
       p.left.adj  <- 2 * p.left.raw
       p.right.adj <- 2 * p.right.raw
-      p.left.adj[p.left.adj > 1]   <- 1 # p-values cannot exceed 1
+      p.left.adj[p.left.adj > 1]   <- 1 # p values cannot exceed 1
       p.right.adj[p.right.adj > 1] <- 1
       gen.ml.ls[[type]][[learner]][,"Pr(<z) adjusted"] <- p.left.adj
       gen.ml.ls[[type]][[learner]][,"Pr(>z) adjusted"] <- p.right.adj
@@ -99,7 +99,7 @@ VEIN <- function(generic_targets, best.learners.obj){
         apply(generic_targets[[learner]][["CLAN"]][[z.clan]][,"Pr(>z)",], 1, function(z) Med(z)$lower_median)
       p.left.adj  <- 2 * p.left.raw
       p.right.adj <- 2 * p.right.raw
-      p.left.adj[p.left.adj > 1]   <- 1 # p-values cannot exceed 1
+      p.left.adj[p.left.adj > 1]   <- 1 # p values cannot exceed 1
       p.right.adj[p.right.adj > 1] <- 1
       gen.ml.ls$CLAN[[learner]][[z.clan]][,"Pr(<z) adjusted"] <- p.left.adj
       gen.ml.ls$CLAN[[learner]][[z.clan]][,"Pr(>z) adjusted"] <- p.right.adj
@@ -214,4 +214,30 @@ get_varlist <- function(){
             "min_variation",
             "prop_aux")
   return(c(funs, vars))
+} # FUN
+
+
+#' Internal function that returns the names of variables for which CLAN was performed
+#' @param x A \code{"GenericML"} object
+#' @noRd
+CLAN_names <- function(x)
+{
+  return(names(x$VEIN$best_learners$CLAN))
+} # FUN
+
+# helper that checks if x is a "GenericML" object
+isGenericMLcheck <- function(x)
+{
+  if(!inherits(x = x, what = "GenericML", which = FALSE)){
+    stop("x needs to be instance of the class GenericML")
+  } # IF
+} # FUN
+
+
+#' Internal function that returns the confidence level
+#' @param x A \code{"GenericML"} object
+#' @noRd
+confidence_level <- function(x)
+{
+  return(1.0 - 2 * x$arguments$significance_level)
 } # FUN

@@ -135,13 +135,13 @@ get_clan.3d.ls <- function(num.learners, learners.names, num.generic_targets.cla
 #' This setup function controls how differences of generic target parameters are taken. Returns a list with two components, called \code{subtract_from} and \code{subtracted}. The first element (\code{subtract_from}) denotes what shall be the base group to subtract from in the generic targets of interest (GATES or CLAN); either \code{"most"} or \code{"least"}. The second element (\code{subtracted}) are the groups to be subtracted from \code{subtract_from}, which is a subset of \eqn{{1,2,...,K}}, where \eqn{K} equals the number of groups. The number of groups should be consistent with the number of groups induced by the argument \code{quantile_cutoffs}, which is the cardinality of \code{quantile_cutoffs}, plus one.
 #'
 #' @details
-#' The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}} and \code{\link{GenericML_single}} (arguments \code{diff_GATES}, \code{diff_CLAN}), as well as \code{\link{GATES}} and \code{\link{CLAN}} (argument \code{diff}).
+#' The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}()} and \code{\link{GenericML_single}()} (arguments \code{diff_GATES}, \code{diff_CLAN}), as well as \code{\link{GATES}()} and \code{\link{CLAN}()} (argument \code{diff}).
 #'
 #' @param subtract_from String indicating the base group to subtract from, either \code{"most"} (default) or \code{"least"}. The most affected group corresponds to the \eqn{K}-th group in the paper (there are \eqn{K} groups). The least affected group corresponds to the first group.
 #' @param subtracted Vector indicating the groups to be subtracted from the group specified in \code{subtract_from}. If there are \eqn{K} groups, \code{subtracted} should be a subset of \eqn{{1,2,...,K}}. Be careful to not specify a zero difference: If \code{subtract_from = "most"}, subtracting group K results in a zero difference. Same if \code{subtract_from = "least"} and we subtract group 1.
 #'
 #' @return
-#' An object of class \code{setup_diff}, consisting of the following components:
+#' An object of class \code{"setup_diff"}, consisting of the following components:
 #' \describe{
 #'   \item{\code{subtract_from}}{A character equal to \code{"most"} or \code{"least"}.}
 #'   \item{\code{subtracted}}{A numeric vector of group indices.}
@@ -166,12 +166,12 @@ get_clan.3d.ls <- function(num.learners, learners.names, num.generic_targets.cla
 #' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 #'
 #' @seealso
-#' \code{\link{GenericML}},
-#' \code{\link{GenericML_single}},
-#' \code{\link{CLAN}},
-#' \code{\link{GATES}},
-#' \code{\link{setup_X1}},
-#' \code{\link{setup_vcov}}
+#' \code{\link{GenericML}()},
+#' \code{\link{GenericML_single}()},
+#' \code{\link{CLAN}()},
+#' \code{\link{GATES}()},
+#' \code{\link{setup_X1}()},
+#' \code{\link{setup_vcov}()}
 #'
 #' @export
 setup_diff <- function(subtract_from = "most",
@@ -190,18 +190,18 @@ setup_diff <- function(subtract_from = "most",
 
 #' Setup function for \code{vcov_control} arguments
 #'
-#' Returns a list with two elements called \code{estimator} and \code{arguments}. The element \code{estimator} is a string specifying the covariance matrix estimator to be used in the linear regression regression of interest and needs to be a covariance estimator function in the \href{https://CRAN.R-project.org/package=sandwich}{sandwich} package. The second element, \code{arguments}, is a list of arguments that shall be passed to the function specified in the first element, \code{estimator}.
+#' Returns a list with two elements called \code{estimator} and \code{arguments}. The element \code{estimator} is a string specifying the covariance matrix estimator to be used in the linear regression regression of interest and needs to be a covariance estimator function in the \href{https://CRAN.R-project.org/package=sandwich}{"sandwich"} package. The second element, \code{arguments}, is a list of arguments that shall be passed to the function specified in the first element, \code{estimator}.
 #'
 #' @details
-#' The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}} and \code{\link{GenericML_single}} (arguments \code{vcov_BLP}, \code{vcov_GATES}), as well as \code{\link{BLP}} and \code{\link{GATES}} (argument \code{vcov_control}).
+#' The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}()} and \code{\link{GenericML_single}()} (arguments \code{vcov_BLP}, \code{vcov_GATES}), as well as \code{\link{BLP}()} and \code{\link{GATES}()} (argument \code{vcov_control}).
 #'
-#' @param estimator Character specifying a covariance matrix estimator in the \href{https://CRAN.R-project.org/package=sandwich}{sandwich} package. Default is \code{"vcovHC"}. Supported estimators are \code{"vcovBS"}, \code{"vcovCL"}, \code{"vcovHAC"}, and \code{"vcovHC"}.
-#' @param arguments A list of arguments that are to be passed to the function in the sandwich package that is specified in \code{estimator}. Default is \code{list(type = "const")}, which specifies the homoskedastic ordinary least squares covariance matrix estimator.
+#' @param estimator Character specifying a covariance matrix estimator in the \href{https://CRAN.R-project.org/package=sandwich}{"sandwich"} package. Default is \code{"vcovHC"}. Supported estimators are \code{"vcovBS"}, \code{"vcovCL"}, \code{"vcovHAC"}, and \code{"vcovHC"}.
+#' @param arguments A list of arguments that are to be passed to the function in the \code{"sandwich"} package that is specified in \code{estimator}. Default is \code{list(type = "const")}, which specifies the homoskedastic ordinary least squares covariance matrix estimator.
 #'
 #' @return
-#' An object of class \code{setup_vcov}, consisting of the following components:
+#' An object of class \code{"setup_vcov"}, consisting of the following components:
 #' \describe{
-#'   \item{\code{estimator}}{A character equal to covariance estimation function names in the \href{https://CRAN.R-project.org/package=sandwich}{sandwich} package.}
+#'   \item{\code{estimator}}{A character equal to covariance estimation function names in the \href{https://CRAN.R-project.org/package=sandwich}{"sandwich"} package.}
 #'   \item{\code{arguments}}{A list of arguments that shall be passed to the function specified in the \code{estimator} argument.}
 #'   }
 #' See the description above for details.
@@ -212,12 +212,12 @@ setup_diff <- function(subtract_from = "most",
 #' Zeileis A. (2006). \dQuote{Object-Oriented Computation of Sandwich Estimators.} \emph{Journal of Statistical Software}, \bold{16}(9), 1--16. \doi{10.18637/jss.v016.i09}
 #'
 #' @seealso
-#' \code{\link{GenericML}},
-#' \code{\link{GenericML_single}},
-#' \code{\link{BLP}},
-#' \code{\link{GATES}},
-#' \code{\link{setup_X1}},
-#' \code{\link{setup_diff}}
+#' \code{\link{GenericML}()},
+#' \code{\link{GenericML_single}()},
+#' \code{\link{BLP}()},
+#' \code{\link{GATES}()},
+#' \code{\link{setup_X1}()},
+#' \code{\link{setup_diff}()}
 #'
 #' @examples
 #' # use standard homoskedastic OLS covariance matrix estimate
@@ -322,14 +322,14 @@ setup_vcov_subset <- function(x, idx){
 #' Returns a list with three elements. The first element of the list, \code{funs_Z}, controls which functions of matrix \code{Z} are used as regressors in \eqn{X_1}. The second element, \code{covariates}, is an optional matrix of custom covariates that shall be included in \eqn{X_1}. The third element, \code{fixed_effects}, controls the inclusion of fixed effects.
 #'
 #' @details
-#' The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}} and \code{\link{GenericML_single}} (arguments \code{X1_BLP}, \code{X1_GATES}), as well as \code{\link{BLP}} and \code{\link{GATES}} (argument \code{X1_control}).
+#' The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}()} and \code{\link{GenericML_single}()} (arguments \code{X1_BLP}, \code{X1_GATES}), as well as \code{\link{BLP}()} and \code{\link{GATES}()} (argument \code{X1_control}).
 #'
 #' @param funs_Z Character vector controlling the functions of \code{Z} to be included in \eqn{X_1}. Subset of \code{c("S", "B", "p")}, where \code{"p"} corresponds to the propensity scores, \code{"B"} to the proxy baseline estimates, and \code{"S"} to the proxy CATE estimates. Default is \code{"B"}.
 #' @param covariates Optional numeric matrix containing additional covariates to be included in \eqn{X_1}. Default is \code{NULL}.
 #' @param fixed_effects Numeric vector of integers that indicates cluster membership of the observations: For each cluster, a fixed effect will be added. Default is \code{NULL} for no fixed effects.
 #'
 #' @return
-#' An object of class \code{setup_X1}, consisting of the following components:
+#' An object of class \code{"setup_X1"}, consisting of the following components:
 #' \describe{
 #'   \item{\code{funs_Z}}{A character vector, being a subset of \code{c("S", "B", "p")}.}
 #'   \item{\code{covariates}}{Either \code{NULL} or a numeric matrix.}
@@ -341,12 +341,12 @@ setup_vcov_subset <- function(x, idx){
 #' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 #'
 #' @seealso
-#' \code{\link{GenericML}},
-#' \code{\link{GenericML_single}},
-#' \code{\link{BLP}},
-#' \code{\link{GATES}},
-#' \code{\link{setup_vcov}},
-#' \code{\link{setup_diff}}
+#' \code{\link{GenericML}()},
+#' \code{\link{GenericML_single}()},
+#' \code{\link{BLP}()},
+#' \code{\link{GATES}()},
+#' \code{\link{setup_vcov}()},
+#' \code{\link{setup_diff}()}
 #'
 #' @examples
 #' set.seed(1)

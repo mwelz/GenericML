@@ -4,22 +4,22 @@
 #'
 #' @param Y A numeric vector containing the response variable.
 #' @param D A binary vector of treatment assignment. Value one denotes assignment to the treatment group and value zero assignment to the control group.
-#' @param propensity_scores A numeric vector of propensity scores. We recommend to use the estimates of a \code{\link{propensity_score}} object.
-#' @param proxy_BCA A numeric vector of proxy baseline conditional average (BCA) estimates. We recommend to use the estimates of a \code{\link{proxy_BCA}} object.
-#' @param proxy_CATE A numeric vector of proxy conditional average treatment effect (CATE) estimates. We recommend to use the estimates of a \code{\link{proxy_CATE}} object.
-#' @param membership A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be of type \code{\link{quantile_group}}. Typically, the grouping is based on CATE estimates, which are for instance returned by \code{\link{proxy_CATE}}.
+#' @param propensity_scores A numeric vector of propensity scores. We recommend to use the estimates of a \code{"\link{propensity_score}"} object.
+#' @param proxy_BCA A numeric vector of proxy baseline conditional average (BCA) estimates. We recommend to use the estimates of a \code{"\link{proxy_BCA}"} object.
+#' @param proxy_CATE A numeric vector of proxy conditional average treatment effect (CATE) estimates. We recommend to use the estimates of a \code{"\link{proxy_CATE}"} object.
+#' @param membership A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be of type \code{"\link{quantile_group}"}. Typically, the grouping is based on CATE estimates, which are for instance returned by \code{\link{proxy_CATE}()}.
 #' @param HT Logical. If \code{TRUE}, a Horvitz-Thompson (HT) transformation is applied (GATES2 in the paper). Default is \code{FALSE}.
-#' @param X1_control Specifies the design matrix \eqn{X_1} in the regression. Must be an instance of \code{\link{setup_X1}}. See the documentation of \code{\link{setup_X1}} for details.
-#' @param vcov_control Specifies the covariance matrix estimator. Must be an instance of \code{\link{setup_vcov}}. See the documentation of \code{\link{setup_vcov}} for details.
-#' @param diff Specifies the generic targets of GATES. Must be an instance of \code{\link{setup_diff}}. See the documentation of \code{\link{setup_diff}} for details.
+#' @param X1_control Specifies the design matrix \eqn{X_1} in the regression. Must be an object of class  \code{"\link{setup_X1}"}. See the documentation of \code{\link{setup_X1}()} for details.
+#' @param vcov_control Specifies the covariance matrix estimator. Must be an object of class \code{"\link{setup_vcov}"}. See the documentation of \code{\link{setup_vcov}()} for details.
+#' @param diff Specifies the generic targets of CLAN. Must be an object of class \code{"\link{setup_diff}"}. See the documentation of \code{\link{setup_diff}()} for details.
 #' @param significance_level Significance level. Default is 0.05.
 #'
 #' @return
-#' An object of class \code{GATES}, consisting of the following components:
+#' An object of class \code{"GATES"}, consisting of the following components:
 #' \describe{
 #'   \item{\code{generic_targets}}{A matrix of the inferential results on the GATES generic targets.}
-#'   \item{\code{coefficients}}{An object of class \code{\link[lmtest]{coeftest}}, contains the coefficients of the GATES regression.}
-#'   \item{\code{lm}}{An object of class \code{\link[stats]{lm}} used to fit the linear regression model.}
+#'   \item{\code{coefficients}}{An object of class \code{"\link[lmtest]{coeftest}"}, contains the coefficients of the GATES regression.}
+#'   \item{\code{lm}}{An object of class \code{"\link[stats]{lm}"} used to fit the linear regression model.}
 #'   }
 #'
 #' @references
@@ -41,12 +41,12 @@
 #' GATES(Y, D, propensity_scores, proxy_BCA, proxy_CATE, membership)
 #'
 #' @seealso
-#' \code{\link{setup_X1}},
-#' \code{\link{setup_diff}},
-#' \code{\link{setup_vcov}},
-#' \code{\link{propensity_score}},
-#' \code{\link{proxy_BCA}},
-#' \code{\link{proxy_CATE}}
+#' \code{\link{setup_X1}()},
+#' \code{\link{setup_diff}()},
+#' \code{\link{setup_vcov}()},
+#' \code{\link{propensity_score}()},
+#' \code{\link{proxy_BCA}()},
+#' \code{\link{proxy_CATE}()}
 #'
 #' @export
 GATES <- function(Y, D,
@@ -265,8 +265,8 @@ generic_targets_GATES <- function(coeftest.object, K, vcov,
   z          <- stats::qnorm(1-significance_level/2)
 
   # compute relevant statistics
-  p.right <- stats::pnorm(coefficients.temp[,"z value"], lower.tail = FALSE) # right p-value: Pr(Z>z)
-  p.left  <- stats::pnorm(coefficients.temp[,"z value"], lower.tail = TRUE)  # left p-value: Pr(Z<z)
+  p.right <- stats::pnorm(coefficients.temp[,"z value"], lower.tail = FALSE) # right p value: Pr(Z>z)
+  p.left  <- stats::pnorm(coefficients.temp[,"z value"], lower.tail = TRUE)  # left p value: Pr(Z<z)
   ci.lo   <- coefficients.temp[,"Estimate"] - z * coefficients.temp[,"Std. Error"]
   ci.up   <- coefficients.temp[,"Estimate"] + z * coefficients.temp[,"Std. Error"]
 
@@ -309,8 +309,8 @@ generic_targets_GATES <- function(coeftest.object, K, vcov,
   ci.lo   <- diff. - z * diff.se
   ci.up   <- diff. + z * diff.se
   zstat   <- diff. / diff.se
-  p.right <- stats::pnorm(zstat, lower.tail = FALSE) # right p-value: Pr(Z>z)
-  p.left  <- stats::pnorm(zstat, lower.tail = TRUE)  # left p-value: Pr(Z<z)
+  p.right <- stats::pnorm(zstat, lower.tail = FALSE) # right p value: Pr(Z>z)
+  p.left  <- stats::pnorm(zstat, lower.tail = TRUE)  # left p value: Pr(Z<z)
 
   diff.mat <- cbind(diff., ci.lo, ci.up, diff.se, zstat, p.left, p.right)
   rownames(diff.mat) <- nam

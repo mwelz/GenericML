@@ -3,20 +3,20 @@
 #' Performs Classification Analysis (CLAN) on all variables in a design matrix.
 #'
 #' @param Z_CLAN A numeric matrix holding variables on which classification analysis (CLAN) shall be performed. CLAN will be performed on each column of the matrix.
-#' @param membership A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be of type \code{\link{quantile_group}}. Typically, the grouping is based on CATE estimates, which are for instance returned by \code{proxy_CATE}.
+#' @param membership A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be of type \code{"\link{quantile_group}"}. Typically, the grouping is based on CATE estimates, which are for instance returned by \code{proxy_CATE}.
 #' @param equal_variances If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.
-#' @param diff Specifies the generic targets of CLAN. Must be an instance of \code{\link{setup_diff}}. See the documentation of \code{\link{setup_diff}} for details.
+#' @param diff Specifies the generic targets of CLAN. Must be an object of class \code{"\link{setup_diff}"}. See the documentation of \code{\link{setup_diff}()} for details.
 #' @param significance_level Significance level. Default is 0.05.
 #'
-#' @return An object of the class \code{CLAN}, consisting of the following components:
+#' @return An object of the class \code{"CLAN"}, consisting of the following components:
 #' \describe{
 #'   \item{\code{generic_targets}}{A list of result matrices for each variable in \code{Z_CLAN}. Each matrix contains inferential results on the CLAN generic targets.}
 #'   \item{\code{coefficients}}{A matrix of point estimates of each CLAN generic target parameter.}
 #'   }
 #'
 #' @seealso
-#' \code{\link{quantile_group}},
-#' \code{\link{setup_diff}}
+#' \code{\link{quantile_group}()},
+#' \code{\link{setup_diff}()}
 #'
 #' @references
 #' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
@@ -108,8 +108,8 @@ CLAN_NoChecks <- function(Z_CLAN,
         ttest.deltak <- stats::t.test(Z_CLAN[membership[, k], j])
         ci.lo        <- ttest.deltak$estimate - z * ttest.deltak$stderr
         ci.up        <- ttest.deltak$estimate + z * ttest.deltak$stderr
-        p.right      <- stats::pnorm(ttest.deltak$statistic, lower.tail = FALSE) # right p-value: Pr(Z>z)
-        p.left       <- stats::pnorm(ttest.deltak$statistic, lower.tail = TRUE)  # left p-value: Pr(Z<z)
+        p.right      <- stats::pnorm(ttest.deltak$statistic, lower.tail = FALSE) # right p value: Pr(Z>z)
+        p.left       <- stats::pnorm(ttest.deltak$statistic, lower.tail = TRUE)  # left p value: Pr(Z<z)
         out.mat[ct,] <- c(ttest.deltak$estimate, ci.lo, ci.up,
                           ttest.deltak$stderr, ttest.deltak$statistic, p.left, p.right)
 
@@ -146,8 +146,8 @@ CLAN_NoChecks <- function(Z_CLAN,
         ci.lo        <- diff. - z * diff.se
         ci.up        <- diff. + z * diff.se
         z.diff       <- ttest.diff$statistic
-        p.right      <- stats::pnorm(z.diff, lower.tail = FALSE) # right p-value: Pr(Z>z)
-        p.left       <- stats::pnorm(z.diff, lower.tail = TRUE)  # left p-value: Pr(Z<z)
+        p.right      <- stats::pnorm(z.diff, lower.tail = FALSE) # right p value: Pr(Z>z)
+        p.left       <- stats::pnorm(z.diff, lower.tail = TRUE)  # left p value: Pr(Z<z)
 
       } # IF
 

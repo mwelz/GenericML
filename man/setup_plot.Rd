@@ -13,7 +13,7 @@ setup_plot(
 )
 }
 \arguments{
-\item{x}{An instance of \code{\link{GenericML}}.}
+\item{x}{An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.}
 
 \item{type}{The analysis whose parameters shall be plotted. Either \code{"GATES"}, \code{"BLP"}, or \code{"CLAN"}. Default is \code{"GATES"}.}
 
@@ -21,20 +21,20 @@ setup_plot(
 
 \item{CLAN_variable}{Name of the CLAN variable to be plotted. Only applicable if \code{type = "CLAN"}.}
 
-\item{groups}{Character vector indicating the per-group parameter estimates that shall be plotted in GATES and CLAN analyses. Default is \code{"all"} for all parameters. If there are \eqn{K} groups, this variable is a subset of \code{c("G1", "G2",...,"GK", "G1-G2", "G1-G2",..., "G1-GK", "GK-G1", "GK-G2",...)}, where Gk denotes the k-th group. Note that this set depends on the choices of the arguments \code{"diff_GATES"} and \code{"diff_CLAN"} of the \code{\link{GenericML}} object.}
+\item{groups}{Character vector indicating the per-group parameter estimates that shall be plotted in GATES and CLAN analyses. Default is \code{"all"} for all parameters. If there are \eqn{K} groups, this variable is a subset of \code{c("G1", "G2",...,"GK", "G1-G2", "G1-G2",..., "G1-GK", "GK-G1", "GK-G2",...)}, where Gk denotes the k-th group. Note that this set depends on the choices of the arguments \code{"diff_GATES"} and \code{"diff_CLAN"} of the \code{"\link{GenericML}"} object.}
 }
 \value{
-An object of class \code{setup_plot}, which is a list with the following elements.
+An object of class \code{"setup_plot"}, which is a list with the following elements.
 \describe{
 \item{\code{data_plot}}{A data frame containing point and interval estimates of the generic target specified in the argument \code{type}.}
 \item{\code{data_BLP}}{A data frame containing point and interval estimates of the BLP analysis.}
-\item{\code{confidence_level}}{The confidence level reflected by the confidence bounds of the interval estimates. The confidence level is equal to  \code{1 - 2 * significance_level}, which is the adjustment proposed in the paper.}}
+\item{\code{confidence_level}}{The confidence level of the confidence intervals. The confidence level is equal to  \code{1 - 2 * significance_level}, which is the adjustment proposed in the paper.}}
 }
 \description{
 Extract the relevant information for visualizing the point and interval estimates of the generic targets of interest. The generic targets of interest can be (subsets of) the parameters of the BLP, GATES, or CLAN analysis.
 }
 \details{
-This function is used internally by \code{\link{plot.GenericML}}. It may also be useful for users who want to produce a similar plot, but who want more control over what information to display or how to display that information.
+This function is used internally by \code{\link{plot.GenericML}()}. It may also be useful for users who want to produce a similar plot, but who want more control over what information to display or how to display that information.
 }
 \examples{
 if(require("ranger") && require("ggplot2")) {
@@ -68,7 +68,7 @@ plot(x = x, type = "GATES")
 data <- setup_plot(x = x, type = "GATES")
 
 ## define variables to appease the R CMD check
-group <- estimate <- cb_lower <- cb_upper <- NULL
+group <- estimate <- ci_lower <- ci_upper <- NULL
 
 ## replicate the plot(x, type = "GATES")
 # for simplicity, we skip aligning the colors
@@ -79,17 +79,17 @@ ggplot(mapping = aes(x = group,
   geom_hline(aes(yintercept = data$data_BLP["beta.1", "estimate"],
                  color = "ATE"),
              linetype = "dashed") +
-  geom_hline(aes(yintercept = data$data_BLP["beta.1", "cb_lower"],
-                 color = paste0(100*data$confidence_level, "\% CB (ATE)")),
+  geom_hline(aes(yintercept = data$data_BLP["beta.1", "ci_lower"],
+                 color = paste0(100*data$confidence_level, "\% CI (ATE)")),
              linetype = "dashed")  +
-  geom_hline(yintercept = data$data_BLP["beta.1", "cb_upper"],
+  geom_hline(yintercept = data$data_BLP["beta.1", "ci_upper"],
              linetype = "dashed", color = "red") +
-  geom_point(aes(color = paste0("GATES with ",  100*data$confidence_level, "\% CB")), size = 3) +
-  geom_errorbar(mapping = aes(ymin = cb_lower,
-                              ymax = cb_upper))
+  geom_point(aes(color = paste0("GATES with ",  100*data$confidence_level, "\% CI")), size = 3) +
+  geom_errorbar(mapping = aes(ymin = ci_lower,
+                              ymax = ci_upper))
 }
 
 }
 \seealso{
-\code{\link[=plot.GenericML]{plot}}
+\code{\link{plot.GenericML}()}
 }

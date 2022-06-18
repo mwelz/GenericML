@@ -12,7 +12,7 @@ setup_diff(subtract_from = "most", subtracted = 1)
 \item{subtracted}{Vector indicating the groups to be subtracted from the group specified in \code{subtract_from}. If there are \eqn{K} groups, \code{subtracted} should be a subset of \eqn{{1,2,...,K}}. Be careful to not specify a zero difference: If \code{subtract_from = "most"}, subtracting group K results in a zero difference. Same if \code{subtract_from = "least"} and we subtract group 1.}
 }
 \value{
-An object of class \code{setup_diff}, consisting of the following components:
+An object of class \code{"setup_diff"}, consisting of the following components:
 \describe{
 \item{\code{subtract_from}}{A character equal to \code{"most"} or \code{"least"}.}
 \item{\code{subtracted}}{A numeric vector of group indices.}
@@ -23,7 +23,7 @@ See the description above for details.
 This setup function controls how differences of generic target parameters are taken. Returns a list with two components, called \code{subtract_from} and \code{subtracted}. The first element (\code{subtract_from}) denotes what shall be the base group to subtract from in the generic targets of interest (GATES or CLAN); either \code{"most"} or \code{"least"}. The second element (\code{subtracted}) are the groups to be subtracted from \code{subtract_from}, which is a subset of \eqn{{1,2,...,K}}, where \eqn{K} equals the number of groups. The number of groups should be consistent with the number of groups induced by the argument \code{quantile_cutoffs}, which is the cardinality of \code{quantile_cutoffs}, plus one.
 }
 \details{
-The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}} and \code{\link{GenericML_single}} (arguments \code{diff_GATES}, \code{diff_CLAN}), as well as \code{\link{GATES}} and \code{\link{CLAN}} (argument \code{diff}).
+The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}()} and \code{\link{GenericML_single}()} (arguments \code{diff_GATES}, \code{diff_CLAN}), as well as \code{\link{GATES}()} and \code{\link{CLAN}()} (argument \code{diff}).
 }
 \examples{
 ## specify quantile cutoffs (the 4 quartile groups here)
@@ -44,10 +44,10 @@ setup_diff(subtract_from = "least", subtracted = c(3,2))
 Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 }
 \seealso{
-\code{\link{GenericML}},
-\code{\link{GenericML_single}},
-\code{\link{CLAN}},
-\code{\link{GATES}},
-\code{\link{setup_X1}},
-\code{\link{setup_vcov}}
+\code{\link{GenericML}()},
+\code{\link{GenericML_single}()},
+\code{\link{CLAN}()},
+\code{\link{GATES}()},
+\code{\link{setup_X1}()},
+\code{\link{setup_vcov}()}
 }

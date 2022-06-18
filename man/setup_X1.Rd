@@ -14,7 +14,7 @@ setup_X1(funs_Z = c("B"), covariates = NULL, fixed_effects = NULL)
 \item{fixed_effects}{Numeric vector of integers that indicates cluster membership of the observations: For each cluster, a fixed effect will be added. Default is \code{NULL} for no fixed effects.}
 }
 \value{
-An object of class \code{setup_X1}, consisting of the following components:
+An object of class \code{"setup_X1"}, consisting of the following components:
 \describe{
 \item{\code{funs_Z}}{A character vector, being a subset of \code{c("S", "B", "p")}.}
 \item{\code{covariates}}{Either \code{NULL} or a numeric matrix.}
@@ -26,7 +26,7 @@ See the description above for details.
 Returns a list with three elements. The first element of the list, \code{funs_Z}, controls which functions of matrix \code{Z} are used as regressors in \eqn{X_1}. The second element, \code{covariates}, is an optional matrix of custom covariates that shall be included in \eqn{X_1}. The third element, \code{fixed_effects}, controls the inclusion of fixed effects.
 }
 \details{
-The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}} and \code{\link{GenericML_single}} (arguments \code{X1_BLP}, \code{X1_GATES}), as well as \code{\link{BLP}} and \code{\link{GATES}} (argument \code{X1_control}).
+The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}()} and \code{\link{GenericML_single}()} (arguments \code{X1_BLP}, \code{X1_GATES}), as well as \code{\link{BLP}()} and \code{\link{GATES}()} (argument \code{X1_control}).
 }
 \examples{
 set.seed(1)
@@ -49,10 +49,10 @@ setup_X1(funs_Z = c("B", "p"), covariates = covariates, fixed_effects = NULL)
 Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 }
 \seealso{
-\code{\link{GenericML}},
-\code{\link{GenericML_single}},
-\code{\link{BLP}},
-\code{\link{GATES}},
-\code{\link{setup_vcov}},
-\code{\link{setup_diff}}
+\code{\link{GenericML}()},
+\code{\link{GenericML_single}()},
+\code{\link{BLP}()},
+\code{\link{GATES}()},
+\code{\link{setup_vcov}()},
+\code{\link{setup_diff}()}
 }

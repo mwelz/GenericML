@@ -47,7 +47,7 @@ Med <- function(x){
 #' @param cutoffs A numeric vector denoting the quantile cutoffs for the partition. Default are the quartiles: \code{c(0.25, 0.5, 0.75)}.
 #'
 #' @return
-#' An object of type \code{quantile_group}, which is a logical matrix indicating group membership.
+#' An object of type \code{"quantile_group"}, which is a logical matrix indicating group membership.
 #'
 #' @examples
 #' set.seed(1)
@@ -120,11 +120,11 @@ quantile_group_NoChecks <- function(x = x,
 #' @param Z_CLAN A numeric matrix holding variables on which classification analysis (CLAN) shall be performed. CLAN will be performed on each column of the matrix. If \code{NULL} (default), then \code{Z_CLAN = Z}, i.e. CLAN is performed for all variables in \code{Z}.
 #' @param HT Logical. If \code{TRUE}, a Horvitz-Thompson (HT) transformation is applied in the BLP and GATES regressions. Default is \code{FALSE}.
 #' @param quantile_cutoffs The cutoff points of the quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.
-#' @param X1_BLP Specifies the design matrix \eqn{X_1} in the BLP regression. Must be an instance of \code{\link{setup_X1}}. See the documentation of \code{\link{setup_X1}} for details.
+#' @param X1_BLP Specifies the design matrix \eqn{X_1} in the regression. Must be an object of class  \code{"\link{setup_X1}"}. See the documentation of \code{\link{setup_X1}()} for details.
 #' @param X1_GATES Same as \code{X1_BLP}, just for the GATES regression.
-#' @param diff_GATES Specifies the generic targets of GATES. Must be an instance of \code{\link{setup_diff}}. See the documentation of \code{\link{setup_diff}} for details.
+#' @param diff_GATES Specifies the generic targets of GATES. Must be an object of class \code{"\link{setup_diff}"}. See the documentation of \code{\link{setup_diff}()} for details.
 #' @param diff_CLAN Same as \code{diff_GATES}, just for the CLAN generic targets.
-#' @param vcov_BLP Specifies the covariance matrix estimator in the BLP regression. Must be an instance of \code{\link{setup_vcov}}. See the documentation of \code{\link{setup_vcov}} for details.
+#' @param vcov_BLP Specifies the covariance matrix estimator in the BLP regression. Must be an object of class \code{"\link{setup_vcov}"}. See the documentation of \code{\link{setup_vcov}()} for details.
 #' @param vcov_GATES Same as \code{vcov_BLP}, just for the GATES regression.
 #' @param equal_variances_CLAN Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.
 #' @param significance_level Significance level for VEIN. Default is 0.05.
@@ -133,16 +133,16 @@ quantile_group_NoChecks <- function(x = x,
 #' @return
 #' A list with the following components:
 #' \describe{
-#' \item{\code{BLP}}{An instance of \code{\link{BLP}}.}
-#' \item{\code{GATES}}{An instance of \code{\link{GATES}}.}
-#' \item{\code{CLAN}}{An instance of \code{\link{CLAN}}.}
-#' \item{\code{proxy_BCA}}{An instance of \code{\link{proxy_BCA}}.}
-#' \item{\code{proxy_CATE}}{An instance of \code{\link{proxy_CATE}}.}
-#' \item{\code{best}}{Estimates of the \eqn{\Lambda} parameters for finding the best learner. returned by \code{\link{lambda_parameters}}.}
+#' \item{\code{BLP}}{An object of class \code{"\link{BLP}"}.}
+#' \item{\code{GATES}}{An object of class \code{"\link{GATES}"}.}
+#' \item{\code{CLAN}}{An object of class \code{"\link{CLAN}"}.}
+#' \item{\code{proxy_BCA}}{An object of class \code{"\link{proxy_BCA}"}.}
+#' \item{\code{proxy_CATE}}{An object of class \code{"\link{proxy_CATE}"}.}
+#' \item{\code{best}}{Estimates of the \eqn{\Lambda} parameters for finding the best learner. Returned by \code{\link{lambda_parameters}()}.}
 #' }
 #'
 #' @details
-#' The specifications \code{lasso}, \code{random_forest}, and \code{tree} in \code{learner} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{lasso} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{random_forest} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{tree} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}.
+#' The specifications \code{"lasso"}, \code{"random_forest"}, and \code{"tree"} in \code{learner} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{"lasso"} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{"random_forest"} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{"tree"} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}.
 #'
 #' @references
 #' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
@@ -150,7 +150,7 @@ quantile_group_NoChecks <- function(x = x,
 #' Lang M., Binder M., Richter J., Schratz P., Pfisterer F., Coors S., Au Q., Casalicchio G., Kotthoff L., Bischl B. (2019). \dQuote{mlr3: A Modern Object-Oriented Machine Learning Framework in R.} \emph{Journal of Open Source Software}, \bold{4}(44), 1903. \doi{10.21105/joss.01903}.
 #'
 #' @seealso
-#' \code{\link{GenericML}}
+#' \code{\link{GenericML}()}
 #'
 #' @examples
 #' if(require("ranger")){
@@ -387,10 +387,10 @@ GenericML_single_NoChecks <-
 #'
 #' Estimates the lambda parameters \eqn{\Lambda} and \eqn{\bar{\Lambda}} whose medians are used to find the best ML method.
 #'
-#' @param BLP An instance of \code{\link{BLP}}.
-#' @param GATES An instance of \code{\link{GATES}}.
+#' @param BLP An object of class \code{"\link{BLP}"}.
+#' @param GATES An object of class \code{"\link{GATES}"}.
 #' @param proxy_CATE Proxy estimates of the CATE.
-#' @param membership A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be of type \code{\link{quantile_group}}. Typically, the grouping is based on CATE estimates, which are for instance returned by \code{proxy_CATE}.
+#' @param membership A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be of type \code{"\link{quantile_group}"}. Typically, the grouping is based on CATE estimates, which are for instance returned by \code{\link{proxy_CATE}()}.
 #'
 #' @return
 #' A list containing the estimates of \eqn{\Lambda} and \eqn{\bar{\Lambda}}, denoted \code{lambda} and \code{lambda.bar}, respectively.

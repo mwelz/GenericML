@@ -47,15 +47,15 @@ GenericML_single(
 
 \item{quantile_cutoffs}{The cutoff points of the quantiles that shall be used for GATES grouping. Default is \code{c(0.25, 0.5, 0.75)}, which corresponds to the four quartiles.}
 
-\item{X1_BLP}{Specifies the design matrix \eqn{X_1} in the BLP regression. Must be an instance of \code{\link{setup_X1}}. See the documentation of \code{\link{setup_X1}} for details.}
+\item{X1_BLP}{Specifies the design matrix \eqn{X_1} in the regression. Must be an object of class  \code{"\link{setup_X1}"}. See the documentation of \code{\link{setup_X1}()} for details.}
 
 \item{X1_GATES}{Same as \code{X1_BLP}, just for the GATES regression.}
 
-\item{diff_GATES}{Specifies the generic targets of GATES. Must be an instance of \code{\link{setup_diff}}. See the documentation of \code{\link{setup_diff}} for details.}
+\item{diff_GATES}{Specifies the generic targets of GATES. Must be an object of class \code{"\link{setup_diff}"}. See the documentation of \code{\link{setup_diff}()} for details.}
 
 \item{diff_CLAN}{Same as \code{diff_GATES}, just for the CLAN generic targets.}
 
-\item{vcov_BLP}{Specifies the covariance matrix estimator in the BLP regression. Must be an instance of \code{\link{setup_vcov}}. See the documentation of \code{\link{setup_vcov}} for details.}
+\item{vcov_BLP}{Specifies the covariance matrix estimator in the BLP regression. Must be an object of class \code{"\link{setup_vcov}"}. See the documentation of \code{\link{setup_vcov}()} for details.}
 
 \item{vcov_GATES}{Same as \code{vcov_BLP}, just for the GATES regression.}
 
@@ -68,19 +68,19 @@ GenericML_single(
 \value{
 A list with the following components:
 \describe{
-\item{\code{BLP}}{An instance of \code{\link{BLP}}.}
-\item{\code{GATES}}{An instance of \code{\link{GATES}}.}
-\item{\code{CLAN}}{An instance of \code{\link{CLAN}}.}
-\item{\code{proxy_BCA}}{An instance of \code{\link{proxy_BCA}}.}
-\item{\code{proxy_CATE}}{An instance of \code{\link{proxy_CATE}}.}
-\item{\code{best}}{Estimates of the \eqn{\Lambda} parameters for finding the best learner. returned by \code{\link{lambda_parameters}}.}
+\item{\code{BLP}}{An object of class \code{"\link{BLP}"}.}
+\item{\code{GATES}}{An object of class \code{"\link{GATES}"}.}
+\item{\code{CLAN}}{An object of class \code{"\link{CLAN}"}.}
+\item{\code{proxy_BCA}}{An object of class \code{"\link{proxy_BCA}"}.}
+\item{\code{proxy_CATE}}{An object of class \code{"\link{proxy_CATE}"}.}
+\item{\code{best}}{Estimates of the \eqn{\Lambda} parameters for finding the best learner. Returned by \code{\link{lambda_parameters}()}.}
 }
 }
 \description{
 Performs generic ML inference for a single learning technique and a given split of the data. Can be seen as a single iteration of Algorithm 1 in the paper.
 }
 \details{
-The specifications \code{lasso}, \code{random_forest}, and \code{tree} in \code{learner} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{lasso} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{random_forest} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{tree} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}.
+The specifications \code{"lasso"}, \code{"random_forest"}, and \code{"tree"} in \code{learner} correspond to the following \code{mlr3} specifications (we omit the keywords \code{classif.} and \code{regr.}). \code{"lasso"} is a cross-validated Lasso estimator, which corresponds to \code{'mlr3::lrn("cv_glmnet", s = "lambda.min", alpha = 1)'}. \code{"random_forest"} is a random forest with 500 trees, which corresponds to \code{'mlr3::lrn("ranger", num.trees = 500)'}. \code{"tree"} is a tree learner, which corresponds to \code{'mlr3::lrn("rpart")'}.
 }
 \examples{
 if(require("ranger")){
@@ -108,5 +108,5 @@ Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic
 Lang M., Binder M., Richter J., Schratz P., Pfisterer F., Coors S., Au Q., Casalicchio G., Kotthoff L., Bischl B. (2019). \dQuote{mlr3: A Modern Object-Oriented Machine Learning Framework in R.} \emph{Journal of Open Source Software}, \bold{4}(44), 1903. \doi{10.21105/joss.01903}.
 }
 \seealso{
-\code{\link{GenericML}}
+\code{\link{GenericML}()}
 }

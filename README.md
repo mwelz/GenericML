@@ -182,7 +182,7 @@ x$best$CLAN
 
 ### Best Linear Predictor (BLP) analysis
 
-We use the `get_BLP()` acceessor function to extract the results of the BLP analysis. We can see from the print and plot that the true ATE of about 0.979 is contained in the 90% confidence bounds of `beta.1`. Moreover, we reject the null of no significance of `beta.2` at any reasonable level, which is expected since there is substantial treatment effect heterogeneity.
+We use the `get_BLP()` acceessor function to extract the results of the BLP analysis. We can see from the print and plot that the true ATE of about 0.979 is contained in the 90% confidence interval of `beta.1`. Moreover, we reject the null of no significance of `beta.2` at any reasonable level, which is expected since there is substantial treatment effect heterogeneity.
 
 ```R
 get_BLP(x, plot = FALSE)

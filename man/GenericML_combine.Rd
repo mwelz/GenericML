@@ -7,16 +7,16 @@
 GenericML_combine(x)
 }
 \arguments{
-\item{x}{A list of \code{GenericML} objects returned by \code{\link{GenericML}}.}
+\item{x}{A list of \code{"\link{GenericML}"} objects, as returned by the function \code{\link{GenericML}()}.}
 }
 \value{
-A \code{GenericML} object as returned by \code{\link{GenericML}}. In the \code{arguments} component of this object, the objects \code{parallel}, \code{num_cores}, \code{seed}, and \code{store_learners} are set to \code{NULL} as these might differ between the individual \code{GenericML} objects in \code{x}. Moreover, the \code{propensity_scores} component of the returned object is taken from the first \code{GenericML} object in \code{x}.
+A\code{"\link{GenericML}"} object as returned by \code{\link{GenericML}()}. In the \code{arguments} component of this object, the objects \code{parallel}, \code{num_cores}, \code{seed}, and \code{store_learners} are set to \code{NULL} as these might differ between the individual \code{GenericML} objects in \code{x}. Moreover, the \code{propensity_scores} component of the returned object is taken from the first \code{"\link{GenericML}"} object in \code{x}.
 }
 \description{
-This function combines multiple \code{GenericML} objects into one \code{GenericML} object. Combining several \code{GenericML} objects can be useful when you cannot run \code{\link{GenericML}} for sufficiently many splits due to memory constraints. In this case, you may run \code{\link{GenericML}} multiple times with only a small number of sample splits each and combine the returned \code{GenericML} objects into one \code{GenericML} object with this function.
+This function combines multiple \code{"\link{GenericML}"} objects into one  \code{"\link{GenericML}"} object. Combining several  \code{"\link{GenericML}"} objects can be useful when you cannot run \code{\link{GenericML}()} for sufficiently many splits due to memory constraints. In this case, you may run \code{\link{GenericML}()} multiple times with only a small number of sample splits each and combine the returned \code{"\link{GenericML}"} objects into one \code{GenericML} object with this function.
 }
 \details{
-To ensure consistency of the estimates, all \code{GenericML} objects in the list \code{x} must have the exact same parameter specifications in their original call to \code{\link{GenericML}}, except for the parameters \code{num_splits}, \code{parallel}, \code{num_cores}, \code{seed}, and \code{store_learners} (i.e. these arguments may vary between the \code{GenericML} objects in the list \code{x}). An error will be thrown if this is not satisfied.
+To ensure consistency of the estimates, all \code{"\link{GenericML}"} objects in the list \code{x} must have the exact same parameter specifications in their original call to \code{\link{GenericML}()}, except for the parameters \code{num_splits}, \code{parallel}, \code{num_cores}, \code{seed}, and \code{store_learners} (i.e. these arguments may vary between the \code{"\link{GenericML}"} objects in the list \code{x}). An error will be thrown if this is not satisfied.
 }
 \examples{
 if (require("glmnet") && require("ranger")) {
@@ -54,5 +54,5 @@ get_BLP(genML, plot = TRUE)
 
 }
 \seealso{
-\code{\link{GenericML}}
+\code{\link{GenericML}()}
 }
