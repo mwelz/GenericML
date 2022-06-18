@@ -17,7 +17,7 @@
 A print to the console.
 }
 \description{
-Prints key results of the analyses conducted in \code{\link{GenericML}}.
+Prints key results of the analyses conducted in \code{\link{GenericML}()}.
 }
 \examples{
 if(require("ranger")){

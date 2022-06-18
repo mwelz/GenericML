@@ -2,7 +2,7 @@
 % Please edit documentation in R/print.R
 \name{print.BLP_info}
 \alias{print.BLP_info}
-\title{Print method for a \code{BLP_info} object}
+\title{Print method for a \code{"BLP_info"} object}
 \usage{
 \method{print}{BLP_info}(x, digits = max(3L, getOption("digits") - 3L), ...)
 }
@@ -17,5 +17,5 @@
 A print to the console.
 }
 \description{
-Print method for a \code{BLP_info} object
+Print method for a \code{"BLP_info"} object
 }

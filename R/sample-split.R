@@ -11,7 +11,7 @@
 #' The output of this setup function is intended to be used as argument \code{stratify} in the function \code{\link{GenericML}()}. If arguments are passed to \code{\link[splitstackshape]{stratified}()} via this function, make sure to  pass the necessary objects that \code{\link[splitstackshape]{stratified}()} in the \href{https://CRAN.R-project.org/package=splitstackshape}{"splitstackshape"} package requires. The necessary objects are called \code{indt}, \code{group}, and \code{size} (see the documentation of  \code{\link[splitstackshape]{stratified}()} for details). If either of these objects is missing, an error is thrown.
 #'
 #' @seealso
-#' \code{\link[splitstackshape]{stratified}()}
+#' \code{\link[splitstackshape]{stratified}()},
 #' \code{\link{GenericML}()}
 #'
 #' @examples

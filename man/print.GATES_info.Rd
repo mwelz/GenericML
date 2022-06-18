@@ -2,7 +2,7 @@
 % Please edit documentation in R/print.R
 \name{print.GATES_info}
 \alias{print.GATES_info}
-\title{Print method for a \code{GATES_info} object}
+\title{Print method for a \code{"GATES_info"} object}
 \usage{
 \method{print}{GATES_info}(x, digits = max(3L, getOption("digits") - 3L), ...)
 }
@@ -17,5 +17,5 @@
 A print to the console.
 }
 \description{
-Print method for a \code{GATES_info} object
+Print method for a \code{"GATES_info"} object
 }

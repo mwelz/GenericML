@@ -39,6 +39,6 @@ setup_stratify()
 
 }
 \seealso{
-\code{\link[splitstackshape]{stratified}()}
+\code{\link[splitstackshape]{stratified}()},
 \code{\link{GenericML}()}
 }

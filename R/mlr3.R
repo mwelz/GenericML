@@ -160,7 +160,7 @@ propensity_score_mlr3 <- function(Z, D, learner = "random_forest"){
 #'
 #' Lang M., Binder M., Richter J., Schratz P., Pfisterer F., Coors S., Au Q., Casalicchio G., Kotthoff L., Bischl B. (2019). \dQuote{mlr3: A Modern Object-Oriented Machine Learning Framework in R.} \emph{Journal of Open Source Software}, \bold{4}(44), 1903. \doi{10.21105/joss.01903}.
 #'
-#' @seealso \code{\link{proxy_CATE}}
+#' @seealso \code{\link{proxy_CATE}()}
 #'
 #' @examples
 #' if(require("ranger")){
@@ -280,7 +280,7 @@ proxy_BCA_NoChecks <- function(Z, D, Y,
 #'
 #' Lang M., Binder M., Richter J., Schratz P., Pfisterer F., Coors S., Au Q., Casalicchio G., Kotthoff L., Bischl B. (2019). \dQuote{mlr3: A Modern Object-Oriented Machine Learning Framework in R.} \emph{Journal of Open Source Software}, \bold{4}(44), 1903. \doi{10.21105/joss.01903}.
 #'
-#' @seealso \code{\link{proxy_BCA}}
+#' @seealso \code{\link{proxy_BCA}()}
 #'
 #' @examples
 #' if(require("ranger")){

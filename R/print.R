@@ -1,6 +1,6 @@
 #' Print method for a \code{GenericML} object
 #'
-#' Prints key results of the analyses conducted in \code{\link{GenericML}}.
+#' Prints key results of the analyses conducted in \code{\link{GenericML}()}.
 #'
 #' @param x An object of the class \code{"\link{GenericML}"}, as returned by the function \code{\link{GenericML}()}.
 #' @param digits Number of digits to print.
@@ -68,7 +68,7 @@ print.GenericML <- function(x, digits = max(3L, getOption("digits") - 3L), ...){
 } # FUN
 
 
-#' Print method for a \code{BLP_info} object
+#' Print method for a \code{"BLP_info"} object
 #'
 #' @param x An object of the class \code{"BLP_info"}, as returned by the function \code{\link{get_BLP}()}.
 #' @param digits Number of digits to print.
@@ -89,7 +89,7 @@ print.BLP_info <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
 } # FUN
 
 
-#' Print method for a \code{GATES_info} object
+#' Print method for a \code{"GATES_info"} object
 #'
 #' @param x An object of the class \code{"GATES_info"}, as returned by the function \code{\link{get_GATES}()}.
 #' @param digits Number of digits to print.
@@ -110,7 +110,7 @@ print.GATES_info <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
 } # FUN
 
 
-#' Print method for a \code{CLAN_info} object
+#' Print method for a \code{"CLAN_info"} object
 #'
 #' @param x An object of the class \code{"CLAN_info"}, as returned by the function \code{\link{get_CLAN}()}.
 #' @param digits Number of digits to print.

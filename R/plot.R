@@ -1,4 +1,4 @@
-#' Set up information for a GenericML() plot
+#' Set up information for a \code{GenericML()} plot
 #'
 #' Extract the relevant information for visualizing the point and interval estimates of the generic targets of interest. The generic targets of interest can be (subsets of) the parameters of the BLP, GATES, or CLAN analysis.
 #'

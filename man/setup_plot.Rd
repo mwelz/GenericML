@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.R
 \name{setup_plot}
 \alias{setup_plot}
-\title{Set up information for a GenericML() plot}
+\title{Set up information for a \code{GenericML()} plot}
 \usage{
 setup_plot(
   x,
