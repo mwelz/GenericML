@@ -146,7 +146,7 @@ print_accessors <- function(x, digits, print_confidence,...)
   colnames(mat) <- c("Estimate", "CI lower", "CI upper", "p value")
 
   # print it
-  stats::printCoefmat(mat, digits = digits, ... = ...)
+  stats::printCoefmat(mat, digits = digits, has.Pvalue = TRUE, ... = ...)
 
   # print confidence level if requested
   if(isTRUE(print_confidence))

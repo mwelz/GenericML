@@ -11,10 +11,11 @@
 # -------------------------------------------------------------------------------
 
 # install (if applicable) and load relevant packages
-required_packages <- c("ranger", "glmnet", "e1071", "xgboost", "GenericML")
+required_packages <- c("ranger", "glmnet", "e1071", "xgboost", "GenericML", "devtools")
 missing <- required_packages[!(required_packages %in% installed.packages()[,"Package"])]
 if(length(missing) > 0L) install.packages(missing)
 
+devtools::install_github("mwelz/GenericML") # version 0.2.3, not yet on CRAN!
 library("GenericML")
 
 # load data, available in GitHub repo mwelz/GenericML
@@ -58,14 +59,19 @@ x <- GenericML(
 save(x, file = "slides/replication/GenericML_object.Rdata")
 
 # BLP
-get_BLP(x, plot = TRUE)
+get_BLP <- get_BLP(x, plot = TRUE)
+get_BLP       # print method
+plot(get_BLP) # plot method
 
 # GATES
-get_GATES(x, plot = TRUE)
+get_GATES <- get_GATES(x, plot = TRUE)
+get_GATES
+plot(get_GATES)
 
 # CLAN
-get_CLAN(x, variable = "head_age_bl", plot = TRUE)
-get_CLAN(x, variable = "act_business_bl", plot = TRUE)
+get_CLAN <- get_CLAN(x, variable = "head_age_bl", plot = TRUE)
+get_CLAN
+plot(get_CLAN)
 
 # best learners
 get_best(x)
