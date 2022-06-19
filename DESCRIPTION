@@ -1,6 +1,6 @@
 Package: GenericML
 Title: Generic Machine Learning Inference
-Version: 0.2.2
+Version: 0.2.3
 Authors@R: 
     c(person(given = "Max",
            family = "Welz",

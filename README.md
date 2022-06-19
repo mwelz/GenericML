@@ -7,7 +7,7 @@
 
 To cite `GenericML` in publications, please use:
 
-> Welz M., Alfons, A., Demirer, M. and Chernozhukov, V. (2022). `GenericML`: Generic Machine Learning Inference. `R` package version 0.2.2. URL: https://CRAN.R-project.org/package=GenericML.
+> Welz M., Alfons, A., Demirer, M. and Chernozhukov, V. (2022). `GenericML`: Generic Machine Learning Inference. `R` package version 0.2.3. URL: https://CRAN.R-project.org/package=GenericML.
 
 
 ## Summary
