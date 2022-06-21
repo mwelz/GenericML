@@ -13,13 +13,19 @@
 # install (if applicable) and load relevant packages
 required_packages <- c("ranger", "glmnet", "e1071", "xgboost", "GenericML", "devtools")
 missing <- required_packages[!(required_packages %in% installed.packages()[,"Package"])]
-if(length(missing) > 0L) install.packages(missing)
+# if(length(missing) > 0L) install.packages(missing) # uncomment to install
 
-devtools::install_github("mwelz/GenericML") # version 0.2.3, not yet on CRAN!
+# install version 0.2.3 which is not yet on CRAN
+# devtools::install_github("mwelz/GenericML")
 library("GenericML")
 
 # load data, available in GitHub repo mwelz/GenericML
-load("slides/data/morocco_preprocessed.Rdata")
+url_data <-
+  url(paste0(
+    "https://github.com/mwelz/GenericML/blob/main/slides",
+    "/data/morocco_preprocessed.Rdata?raw=true"
+  ))
+load(url_data)
 
 # specify learners
 learners <-
@@ -43,7 +49,7 @@ vcov <- setup_vcov(estimator = "vcovCL",
 
 # run GenericML()
 # load("slides/replication/GenericML_object.Rdata") # uncomment if you want to load the object below
-x <- GenericML(
+genML <- GenericML(
   Z = Z, D = D, Y = Y,                      # observed data
   learners_GenericML = learners,            # learners
   learner_propensity_score = "constant",    # = 0.5 (RCT)
@@ -55,23 +61,23 @@ x <- GenericML(
   parallel = TRUE, num_cores = 6L,          # parallelization
   seed = 20220621)                          # RNG seed
 
-# save GenericML() object
-save(x, file = "slides/replication/GenericML_object.Rdata")
+# save GenericML() object to the repo
+# save(genML, file = "slides/replication/GenericML_object.Rdata")
 
 # BLP
-get_BLP <- get_BLP(x, plot = TRUE)
-get_BLP       # print method
-plot(get_BLP) # plot method
+results_BLP <- get_BLP(genML, plot = TRUE)
+results_BLP       # print method
+plot(results_BLP) # plot method
 
 # GATES
-get_GATES <- get_GATES(x, plot = TRUE)
-get_GATES
-plot(get_GATES)
+results_GATES <- get_GATES(genML, plot = TRUE)
+results_GATES
+plot(results_GATES)
 
 # CLAN
-get_CLAN <- get_CLAN(x, variable = "head_age_bl", plot = TRUE)
-get_CLAN
-plot(get_CLAN)
+results_CLAN <- get_CLAN(genML, variable = "head_age_bl", plot = TRUE)
+results_CLAN
+plot(results_CLAN)
 
 # best learners
-get_best(x)
+get_best(genML)
