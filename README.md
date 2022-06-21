@@ -1,7 +1,6 @@
 # GenericML: Generic Machine Learning Inference
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![R-CMD-check](https://github.com/mwelz/GenericML/workflows/R-CMD-check/badge.svg)](https://github.com/mwelz/GenericML/actions)
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/GenericML)](https://cran.r-project.org/package=GenericML)
 [![metacran downloads](https://cranlogs.r-pkg.org/badges/GenericML)](https://cran.r-project.org/package=GenericML)
 
@@ -162,20 +161,30 @@ x <- GenericML(Z = Z, D = D, Y = Y,
                
 
 ### 4. General results ----
+
 ## print
-x
+genML
+# GenericML object with the following specifications:
+# 	* Propensity score learner: mlr3::lrn('glmnet', lambda = 0, alpha = 1) 
+# 	* Generic ML learners: lasso, mlr3::lrn('ranger', num.trees = 100), mlr3::lrn('svm') 
+# 	* S = 1000 splits are used
+# 	* No HT transformation is used
+# 
+# The 90 % confidence intervals of the best BLP estimates are given by
+# 	 beta.1: ( 0.894 , 1.056 )	 beta.2: ( 0.944 , 1.095 )
+# The best learner for the BLP is mlr3::lrn('svm') (lambda of 1.172)
+# The best learner for the GATES and CLAN is mlr3::lrn('ranger', num.trees = 100) (lambda.bar of 2.0818)
 
-## the line below returns the medians of the estimated  \Lambda and \bar{\Lambda}
-x$best$overview
 
-## get best learner for BLP
-x$best$BLP
-# "mlr3::lrn('svm')"
-
-## get best learner for GATES and CLAN (this is the same learner)
-x$best$GATES
-x$best$CLAN
-# "mlr3::lrn('ranger', num.trees = 100)"
+## get the medians of the estimated  \Lambda and \bar{\Lambda} to find best learners
+get_best(genML)
+#                                      lambda lambda.bar
+# lasso                                 1.119      2.005
+# mlr3::lrn('ranger', num.trees = 100)  1.167      2.082
+# mlr3::lrn('svm')                      1.172      2.063
+# ---
+# The best learner for BLP is mlr3::lrn('svm') with lambda = 1.172.
+# The best learner for GATES and CLAN is mlr3::lrn('ranger', num.trees = 100) with lambda.bar = 2.0818.
 ```
 
 *We emphasize that the number of cores and your type of operating system affect the random number stream. Thus, different choices of `num_cores` may lead to different results. Moreover, results of parallel processes are reproducible across all Unix systems, but might deviate on Windows systems. Consequently, the results below are only reproducible on Unix systems for `num_cores = 8`.*
@@ -185,13 +194,19 @@ x$best$CLAN
 We use the `get_BLP()` acceessor function to extract the results of the BLP analysis. We can see from the print and plot that the true ATE of about 0.979 is contained in the 90% confidence interval of `beta.1`. Moreover, we reject the null of no significance of `beta.2` at any reasonable level, which is expected since there is substantial treatment effect heterogeneity.
 
 ```R
-get_BLP(x, plot = FALSE)
-#          Estimate  CB lower CB upper      Pr(>|z|)
-#  beta.1 0.9749574 0.8938969 1.056229 7.139626e-123
-#  beta.2 1.0198128 0.9441887 1.095462 2.449502e-151
+results_BLP <- get_BLP(genML)
+results_BLP # print method
+# BLP generic targets
+# ---
+#        Estimate CI lower CI upper p value
+# beta.1   0.9750   0.8939    1.056  <2e-16 ***
+# beta.2   1.0198   0.9442    1.095  <2e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# ---
+# Confidence level of confidence interval [CI lower, CI upper]: 90 %
 
-# plot.GenericML() method
-plot(x, type = "BLP") 
+plot(results_BLP) # plot method
 ```
 
 <img src="./inst/doc/repo_plots/BLP.svg" width="67%" style="display: block; margin: auto;" />
@@ -201,17 +216,24 @@ plot(x, type = "BLP")
 There is treatment effect heterogeneity in the data generating process, so we expect a trend in the GATES per-group estimates as well as significance of all group differences. This is indeed the case.
 
 ```R
-get_GATES(x, plot = FALSE)
-#                    Estimate   CB lower   CB upper      Pr(>|z|)
-# gamma.1         -0.4475040 -0.6487809 -0.2472104  1.122755e-05
-# gamma.2          0.4996515  0.2975745  0.7050852  1.177253e-06
-# gamma.3          1.4307723  1.2297730  1.6343969  3.172517e-44
-# gamma.4          2.4079056  2.2063489  2.6122009 1.436515e-120
-# gamma.4-gamma.1  2.8603125  2.5732088  3.1418296  6.205413e-87
-# gamma.4-gamma.2  1.9055797  1.6212383  2.1923933  3.878327e-39
-# gamma.4-gamma.3  0.9824218  0.6923124  1.2681665  1.915117e-11
+results_GATES <- get_GATES(genML)
+results_GATES # print method
+# GATES generic targets
+# ---
+#                 Estimate CI lower CI upper  p value
+# gamma.1          -0.4475  -0.6488   -0.247 1.12e-05 ***
+# gamma.2           0.4997   0.2976    0.705 1.18e-06 ***
+# gamma.3           1.4308   1.2298    1.634  < 2e-16 ***
+# gamma.4           2.4079   2.2063    2.612  < 2e-16 ***
+# gamma.4-gamma.1   2.8603   2.5732    3.142  < 2e-16 ***
+# gamma.4-gamma.2   1.9056   1.6212    2.192  < 2e-16 ***
+# gamma.4-gamma.3   0.9824   0.6923    1.268 1.92e-11 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# ---
+# Confidence level of confidence interval [CI lower, CI upper]: 90 %
 
-plot(x, type = "GATES")
+plot(results_GATES) # plot method
 ```
 
 <img src="./inst/doc/repo_plots/GATES.svg" width="67%" style="display: block; margin: auto;" />
@@ -231,7 +253,8 @@ plot(y = Z_CLAN[, "z1"], x = HTE, xlab = "True HTE", ylab = "Value of z1")
 The heterogeneity exhibits a jump pattern along the first variable. We thus expect that `G1 < G3`, `G2 < G4`, `G1 = G2`, `G3 = G4`, where the `G` denote the variable’s within-group averages. The groups are formed by treatment effect strength. Let’s see what CLAN suggests:
 
 ```R
-get_CLAN(x, plot = TRUE, variable = "z1")
+results_CLAN_z1 <- get_CLAN(genML, variable = "z1")
+plot(results_CLAN_z1)
 ```
 
 <img src="./inst/doc/repo_plots/CLAN_z1.svg" width="67%" style="display: block; margin: auto;" />
@@ -251,7 +274,8 @@ plot(y = Z_CLAN[, "z2"], x = HTE, xlab = "True HTE", ylab = "Value of z2")
 We clearly see the level shift at (1, 0.5). Thus, we expect that the two most affected groups should have a much stronger value of `z2` than the two least affected groups. Moreover, the two groups `G1` and `G2` should have the same value of `z2` and the two groups `G3` and `G4` should also have the same value. CLAN indeed captures this pattern:
 
 ```R
-get_CLAN(x, plot = TRUE, variable = "z2")
+results_CLAN_z2 <- get_CLAN(genML, variable = "z2")
+plot(results_CLAN_z2)
 ```
 
 <img src="./inst/doc/repo_plots/CLAN_z2.svg" width="67%" style="display: block; margin: auto;" />
@@ -269,7 +293,8 @@ plot(y = Z_CLAN[, "z3"], x = HTE, xlab = "True HTE", ylab = "Value of z3")
 There is no heterogeneity pattern along `z3`, so all CLAN groups should have roughly the same value. This is indeed the case:
 
 ```R
-get_CLAN(x, plot = TRUE, variable = "z3")
+results_CLAN_z3 <- get_CLAN(genML, variable = "z3")
+plot(results_CLAN_z3)
 ```
 
 <img src="./inst/doc/repo_plots/CLAN_z3.svg" width="67%" style="display: block; margin: auto;" />
@@ -287,7 +312,8 @@ plot(y = Z_CLAN[, "random"], x = HTE, xlab = "True HTE", ylab = "Value of 'rando
 There is no heterogeneity along `random`, so all CLAN groups should have roughly the same value. This is indeed the case:
 
 ```R
-get_CLAN(x, plot = TRUE, variable = "random")
+results_CLAN_random <- get_CLAN(genML, variable = "random")
+plot(results_CLAN_random)
 ```
 
 <img src="./inst/doc/repo_plots/CLAN_random.svg" width="67%" style="display: block; margin: auto;" />

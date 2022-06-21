@@ -1,4 +1,3 @@
-rm(list = ls()) ; cat("\014")
 library(GenericML)
 
 ### 1. Data Generation ----
@@ -78,29 +77,31 @@ seed      <- 123456
 
 
 ### 3. Run the GenericML() functions with these arguments ----
-# runtime: ~90 seconds with R version 4.1.2 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 21.10. Returns a GenericML object.
-x <- GenericML(Z = Z, D = D, Y = Y,
-               learner_propensity_score = learner_propensity_score,
-               learners_GenericML = learners_GenericML,
-               num_splits = num_splits,
-               Z_CLAN = Z_CLAN,
-               HT = HT,
-               X1_BLP = X1_BLP,
-               X1_GATES = X1_GATES,
-               vcov_BLP = vcov_BLP,
-               vcov_GATES = vcov_GATES,
-               quantile_cutoffs = quantile_cutoffs,
-               diff_GATES = diff_GATES,
-               diff_CLAN = diff_CLAN,
-               equal_variances_CLAN = equal_variances_CLAN,
-               prop_aux = prop_aux,
-               significance_level = significance_level,
-               min_variation = min_variation,
-               parallel = parallel,
-               num_cores = num_cores,
-               seed = seed,
-               store_splits = store_splits,
-               store_learners = store_learners)
+# runtime: ~90 seconds with R version 4.2.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 21.10. Returns a GenericML object.
+genML <- GenericML(
+  Z = Z, D = D, Y = Y,
+  learner_propensity_score = learner_propensity_score,
+  learners_GenericML = learners_GenericML,
+  num_splits = num_splits,
+  Z_CLAN = Z_CLAN,
+  HT = HT,
+  X1_BLP = X1_BLP,
+  X1_GATES = X1_GATES,
+  vcov_BLP = vcov_BLP,
+  vcov_GATES = vcov_GATES,
+  quantile_cutoffs = quantile_cutoffs,
+  diff_GATES = diff_GATES,
+  diff_CLAN = diff_CLAN,
+  equal_variances_CLAN = equal_variances_CLAN,
+  prop_aux = prop_aux,
+  significance_level = significance_level,
+  min_variation = min_variation,
+  parallel = parallel,
+  num_cores = num_cores,
+  seed = seed,
+  store_splits = store_splits,
+  store_learners = store_learners
+)
 
 # save
-save(x, HTE, Z_CLAN, file = paste0(getwd(), "/inst/doc/repo_plots/plot_data.Rdata"))
+save(genML, HTE, Z_CLAN, file = "inst/doc/repo_plots/plot_data.Rdata")
