@@ -10,6 +10,7 @@
 #' @param HT Logical. If \code{TRUE}, a Horvitz-Thompson (HT) transformation is applied (BLP2 in the paper). Default is \code{FALSE}.
 #' @param X1_control Specifies the design matrix \eqn{X_1} in the regression. Must be an object of class \code{"\link{setup_X1}"}. See the documentation of \code{\link{setup_X1}()} for details.
 #' @param vcov_control Specifies the covariance matrix estimator. Must be an object of class \code{"\link{setup_vcov}"}. See the documentation of \code{\link{setup_vcov}()} for details.
+#' @param external_weights Optional vector of external numeric weights for weighted regression (in addition to the standard weights used when \code{HT = FALSE}).
 #' @param significance_level Significance level. Default is 0.05.
 #'
 #' @return
@@ -53,6 +54,7 @@ BLP <- function(Y, D,
                 HT                 = FALSE,
                 X1_control         = setup_X1(),
                 vcov_control       = setup_vcov(),
+                external_weights   = NULL,
                 significance_level = 0.05){
 
 
@@ -72,14 +74,16 @@ BLP <- function(Y, D,
   stopifnot(is.numeric(propensity_scores))
   InputChecks_equal.length2(Y, propensity_scores)
   InputChecks_propensity_scores(propensity_scores)
+  InputChecks_external_weights(external_weights, length(Y))
 
   # fit model according to strategy 1 or 2 in the paper
   BLP_NoChecks(D = D, Y = Y,
                propensity_scores  = propensity_scores,
-               proxy_BCA     = proxy_BCA,
+               proxy_BCA          = proxy_BCA,
                proxy_CATE         = proxy_CATE,
                X1_control         = X1_control,
                vcov_control       = vcov_control,
+               external_weights   = external_weights,
                significance_level = significance_level)
 
 } # FUN
@@ -93,6 +97,7 @@ BLP_NoChecks <- function(D, Y,
                          HT                 = FALSE,
                          X1_control         = setup_X1(),
                          vcov_control       = setup_vcov(),
+                         external_weights   = external_weights,
                          significance_level = 0.05){
 
   # fit model according to strategy 1 or 2 in the paper
@@ -103,6 +108,7 @@ BLP_NoChecks <- function(D, Y,
                       proxy_CATE         = proxy_CATE,
                       X1_control         = X1_control,
                       vcov_control       = vcov_control,
+                      external_weights   = external_weights,
                       significance_level = significance_level))
 
 } # FUN
@@ -113,10 +119,17 @@ BLP.classic <- function(D, Y, propensity_scores,
                         proxy_BCA, proxy_CATE,
                         X1_control         = setup_X1(),
                         vcov_control       = setup_vcov(),
+                        external_weights   = NULL,
                         significance_level = 0.05){
 
   # prepare weights
   weights <- 1 / (propensity_scores * (1 - propensity_scores))
+
+  # if external weights are supplied, include them in the weighting
+  if(!is.null(external_weights))
+  {
+    weights <- weights * external_weights
+  } # IF
 
   # prepare covariate matrix X
   X <- data.frame(get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy_CATE,
@@ -153,6 +166,7 @@ BLP.HT <- function(D, Y, propensity_scores,
                    proxy_BCA, proxy_CATE,
                    X1_control         = setup_X1(),
                    vcov_control       = setup_vcov(),
+                   external_weights   = NULL,
                    significance_level = 0.05){
 
   # HT transformation
@@ -186,8 +200,16 @@ BLP.HT <- function(D, Y, propensity_scores,
   X <- data.frame(X1H,
                   beta.2 = proxy_CATE - mean(proxy_CATE))
 
+  # prepare the external weights (if applicable)
+  if(is.null(external_weights))
+  {
+    weights <- NULL
+  } else{
+    weights <- external_weights
+  }
+
   # fit linear regression by OLS (intercept is beta.1)
-  blp.obj <- stats::lm(YH ~., data = data.frame(YH = Y*H, X))
+  blp.obj <- stats::lm(YH ~., data = data.frame(YH = Y*H, X), weights = weights)
   names(blp.obj$coefficients) <- c("beta.1", names(blp.obj$coefficients)[-1])
 
   # get estimate of covariance matrix of the error terms

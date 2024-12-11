@@ -15,6 +15,7 @@ GATES(
   X1_control = setup_X1(),
   vcov_control = setup_vcov(),
   diff = setup_diff(),
+  external_weights = NULL,
   significance_level = 0.05
 )
 }
@@ -38,6 +39,8 @@ GATES(
 \item{vcov_control}{Specifies the covariance matrix estimator. Must be an object of class \code{"\link{setup_vcov}"}. See the documentation of \code{\link{setup_vcov}()} for details.}
 
 \item{diff}{Specifies the generic targets of CLAN. Must be an object of class \code{"\link{setup_diff}"}. See the documentation of \code{\link{setup_diff}()} for details.}
+
+\item{external_weights}{Optional vector of external numeric weights for weighted regression (in addition to the standard weights used when \code{HT = FALSE}).}
 
 \item{significance_level}{Significance level. Default is 0.05.}
 }

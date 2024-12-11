@@ -20,6 +20,7 @@
 #' @param equal_variances_CLAN Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.
 #' @param prop_aux Proportion of samples that shall be in the auxiliary set in case of random sample splitting. Default is 0.5. The number of samples in the auxiliary set will be equal to \code{floor(prop_aux * length(Y))}. If the data set is large, you can save computing time by choosing \code{prop_aux} to be smaller than 0.5. In case of stratified sampling (controlled through the argument \code{stratify} via \code{\link{setup_stratify}()}), \code{prop_aux} does not have an effect, and the number of samples in the auxiliary set is specified via \code{\link{setup_stratify}()}.
 #' @param stratify A list that specifies whether or not stratified sample splitting shall be performed. It is recommended to use the returned object of \code{\link{setup_stratify}()} as this list. See the documentation of \code{\link{setup_stratify}()} for details.
+#' @param external_weights Optional vector of external numeric weights for weighted means in CLAN and weighted regression in BLP and GATES (in addition to the standard weights used when \code{HT = FALSE}).
 #' @param significance_level Significance level for VEIN. Default is 0.05.
 #' @param min_variation Specifies a threshold for the minimum variation of the BCA/CATE predictions. If the variation of a BCA/CATE prediction falls below this threshold, random noise with distribution \eqn{N(0, var(Y)/20)} is added to it. Default is \code{1e-05}.
 #' @param parallel Logical. If \code{TRUE}, parallel computing will be used. Default is \code{FALSE}. On Unix systems, this will be done via forking (shared memory across threads). On non-Unix systems, this will be done through parallel socket clusters.
@@ -130,6 +131,7 @@ GenericML <- function(Z, D, Y,
                       diff_CLAN                = setup_diff(),
                       vcov_BLP                 = setup_vcov(),
                       vcov_GATES               = setup_vcov(),
+                      external_weights         =  NULL,
                       equal_variances_CLAN     = FALSE,
                       prop_aux                 = 0.5,
                       stratify                 = setup_stratify(),
@@ -166,6 +168,7 @@ GenericML <- function(Z, D, Y,
   stopifnot(is.character(learners_GenericML))
   stopifnot(is.character(learner_propensity_score) | is.numeric(learner_propensity_score))
   InputChecks_stratify(stratify)
+  InputChecks_external_weights(external_weights, nrow(Z))
 
   # if no input provided, set Z_CLAN equal to Z
   if(is.null(Z_CLAN)) Z_CLAN <- Z
@@ -238,6 +241,7 @@ GenericML <- function(Z, D, Y,
                                quantile_cutoffs           = quantile_cutoffs,
                                diff_GATES                 = diff_GATES,
                                diff_CLAN                  = diff_CLAN,
+                               external_weights           = external_weights,
                                significance_level         = significance_level,
                                min_variation              = min_variation,
                                parallel                   = parallel,
@@ -277,6 +281,7 @@ GenericML <- function(Z, D, Y,
                            diff_CLAN                = diff_CLAN,
                            vcov_BLP                 = vcov_BLP,
                            vcov_GATES               = vcov_GATES,
+                           external_weights         = external_weights,
                            equal_variances_CLAN     = equal_variances_CLAN,
                            prop_aux                 = prop_aux,
                            significance_level       = significance_level,

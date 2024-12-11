@@ -127,6 +127,7 @@ quantile_group_NoChecks <- function(x = x,
 #' @param vcov_BLP Specifies the covariance matrix estimator in the BLP regression. Must be an object of class \code{"\link{setup_vcov}"}. See the documentation of \code{\link{setup_vcov}()} for details.
 #' @param vcov_GATES Same as \code{vcov_BLP}, just for the GATES regression.
 #' @param equal_variances_CLAN Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.
+#' @param external_weights Optional vector of external numeric weights for weighted means in CLAN and weighted regression in BLP and GATES (in addition to the standard weights used when \code{HT = FALSE}).
 #' @param significance_level Significance level for VEIN. Default is 0.05.
 #' @param min_variation Specifies a threshold for the minimum variation of the BCA/CATE predictions. If the variation of a BCA/CATE prediction falls below this threshold, random noise with distribution \eqn{N(0, var(Y)/20)} is added to it. Default is \code{1e-05}.
 #'
@@ -187,6 +188,7 @@ GenericML_single <- function(Z, D, Y,
                              vcov_BLP             = setup_vcov(),
                              vcov_GATES           = setup_vcov(),
                              equal_variances_CLAN = FALSE,
+                             external_weights     = NULL,
                              significance_level   = 0.05,
                              min_variation        = 1e-05){
 
@@ -219,6 +221,7 @@ GenericML_single <- function(Z, D, Y,
   stopifnot(is.numeric(propensity_scores))
   InputChecks_equal.length2(Y, propensity_scores)
   InputChecks_propensity_scores(propensity_scores)
+  InputChecks_external_weights(external_weights, N)
 
 
 
@@ -255,6 +258,7 @@ GenericML_single <- function(Z, D, Y,
                             diff_GATES                 = diff_GATES,
                             diff_CLAN                  = diff_CLAN,
                             significance_level         = significance_level,
+                            external_weights           = external_weights,
                             min_variation              = min_variation)
 
 } # END FUN
@@ -276,6 +280,7 @@ GenericML_single_NoChecks <-
            quantile_cutoffs           = c(0.25, 0.5, 0.75),
            diff_GATES                 = setup_diff(),
            diff_CLAN                  = setup_diff(),
+           external_weights           = NULL,
            significance_level         = 0.05,
            min_variation              = 1e-05){
 
@@ -332,6 +337,7 @@ GenericML_single_NoChecks <-
       HT                 = HT,
       X1_control         = X1_BLP_M,
       vcov_control       = vcov_BLP_M,
+      external_weights   = external_weights[M_set],
       significance_level = significance_level)
 
 
@@ -352,6 +358,7 @@ GenericML_single_NoChecks <-
       X1_control          = X1_GATES_M,
       vcov_control        = vcov_GATES_M,
       diff                = diff_GATES,
+      external_weights    = external_weights[M_set],
       significance_level  = significance_level)
 
 
@@ -361,6 +368,7 @@ GenericML_single_NoChecks <-
       membership         = membership_M,
       equal_variances    = equal_variances_CLAN,
       diff               = diff_CLAN,
+      external_weights   = external_weights[M_set],
       significance_level = significance_level)
 
 

@@ -12,6 +12,7 @@
 #' @param X1_control Specifies the design matrix \eqn{X_1} in the regression. Must be an object of class  \code{"\link{setup_X1}"}. See the documentation of \code{\link{setup_X1}()} for details.
 #' @param vcov_control Specifies the covariance matrix estimator. Must be an object of class \code{"\link{setup_vcov}"}. See the documentation of \code{\link{setup_vcov}()} for details.
 #' @param diff Specifies the generic targets of CLAN. Must be an object of class \code{"\link{setup_diff}"}. See the documentation of \code{\link{setup_diff}()} for details.
+#' @param external_weights Optional vector of external numeric weights for weighted regression (in addition to the standard weights used when \code{HT = FALSE}).
 #' @param significance_level Significance level. Default is 0.05.
 #'
 #' @return
@@ -58,6 +59,7 @@ GATES <- function(Y, D,
                   X1_control         = setup_X1(),
                   vcov_control       = setup_vcov(),
                   diff               = setup_diff(),
+                  external_weights   = NULL,
                   significance_level = 0.05){
 
   # input check
@@ -77,6 +79,7 @@ GATES <- function(Y, D,
   stopifnot(is.logical(HT))
   stopifnot(is.numeric(significance_level) & length(significance_level) == 1)
   stopifnot(0.0 < significance_level & significance_level < 0.5)
+  InputChecks_external_weights(external_weights, length(Y))
 
   # fit model according to strategy 1 or 2 in the paper
   GATES_NoChecks(D = D, Y = Y,
@@ -87,6 +90,7 @@ GATES <- function(Y, D,
                  X1_control          = X1_control,
                  diff                = diff,
                  vcov_control        = vcov_control,
+                 external_weights    = external_weights,
                  significance_level  = significance_level)
 
 } # FUN
@@ -102,6 +106,7 @@ GATES_NoChecks <- function(D, Y,
                            X1_control          = setup_X1(),
                            diff                = setup_diff(),
                            vcov_control        = setup_vcov(),
+                           external_weights    = NULL,
                            significance_level  = 0.05){
 
   # fit model according to strategy 1 or 2 in the paper
@@ -114,6 +119,7 @@ GATES_NoChecks <- function(D, Y,
                       X1_control          = X1_control,
                       diff                = diff,
                       vcov_control        = vcov_control,
+                      external_weights    = external_weights,
                       significance_level  = significance_level))
 
 } # FUN
@@ -127,6 +133,7 @@ GATES.classic <- function(D, Y,
                           X1_control         = setup_X1(),
                           diff               = setup_diff(),
                           vcov_control       = setup_vcov(),
+                          external_weights   = NULL,
                           significance_level = 0.05){
 
   # make the group membership a binary matrix
@@ -137,6 +144,12 @@ GATES.classic <- function(D, Y,
 
   # prepare weights
   weights <- 1 / (propensity_scores * (1 - propensity_scores))
+
+  # if external weights are supplied, include them in the weighting
+  if(!is.null(external_weights))
+  {
+    weights <- weights * external_weights
+  } # IF
 
   # prepare matrix X1
   X1     <- get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy_CATE,
@@ -181,6 +194,7 @@ GATES.HT <- function(D, Y,
                      X1_control         = setup_X1(),
                      diff               = setup_diff(),
                      vcov_control       = setup_vcov(),
+                     external_weights   = NULL,
                      significance_level = 0.05){
 
   # make the group membership a binary matrix
@@ -223,9 +237,17 @@ GATES.HT <- function(D, Y,
   X <- data.frame(X1H,  groups)
   colnames(X) <- c(colnames(X1H), paste0("gamma.", 1:K))
 
+  # prepare the external weights (if applicable)
+  if(is.null(external_weights))
+  {
+    weights <- NULL
+  } else{
+    weights <- external_weights
+  }
+
   # fit linear regression by OLS (no intercept!)
   gates.obj <- stats::lm(formula =  stats::as.formula(paste0("YH ~ ", paste0(colnames(X), collapse = " + "), " + 0")),
-                data = data.frame(YH = Y*H, X))
+                data = data.frame(YH = Y*H, X), weights = weights)
 
   # get estimate of covariance matrix of the error terms
   vcov. <- get.vcov(x              = gates.obj,

@@ -13,6 +13,7 @@ BLP(
   HT = FALSE,
   X1_control = setup_X1(),
   vcov_control = setup_vcov(),
+  external_weights = NULL,
   significance_level = 0.05
 )
 }
@@ -32,6 +33,8 @@ BLP(
 \item{X1_control}{Specifies the design matrix \eqn{X_1} in the regression. Must be an object of class \code{"\link{setup_X1}"}. See the documentation of \code{\link{setup_X1}()} for details.}
 
 \item{vcov_control}{Specifies the covariance matrix estimator. Must be an object of class \code{"\link{setup_vcov}"}. See the documentation of \code{\link{setup_vcov}()} for details.}
+
+\item{external_weights}{Optional vector of external numeric weights for weighted regression (in addition to the standard weights used when \code{HT = FALSE}).}
 
 \item{significance_level}{Significance level. Default is 0.05.}
 }

@@ -22,6 +22,7 @@ GenericML_single(
   vcov_BLP = setup_vcov(),
   vcov_GATES = setup_vcov(),
   equal_variances_CLAN = FALSE,
+  external_weights = NULL,
   significance_level = 0.05,
   min_variation = 1e-05
 )
@@ -60,6 +61,8 @@ GenericML_single(
 \item{vcov_GATES}{Same as \code{vcov_BLP}, just for the GATES regression.}
 
 \item{equal_variances_CLAN}{Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.}
+
+\item{external_weights}{Optional vector of external numeric weights for weighted means in CLAN and weighted regression in BLP and GATES (in addition to the standard weights used when \code{HT = FALSE}).}
 
 \item{significance_level}{Significance level for VEIN. Default is 0.05.}
 

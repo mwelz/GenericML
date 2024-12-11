@@ -16,6 +16,7 @@ generic.ml.across.learners <- function(Z, D, Y,
                                        quantile_cutoffs     = c(0.25, 0.5, 0.75),
                                        diff_GATES           = setup_diff(),
                                        diff_CLAN            = setup_diff(),
+                                       external_weights     = NULL,
                                        significance_level   = 0.05,
                                        min_variation        = 1e-05,
                                        parallel             = TrueIfUnix(),
@@ -52,6 +53,7 @@ generic.ml.across.learners <- function(Z, D, Y,
                       quantile_cutoffs           = quantile_cutoffs,
                       diff_GATES                 = diff_GATES,
                       diff_CLAN                  = diff_CLAN,
+                      external_weights           = external_weights,
                       significance_level         = significance_level,
                       min_variation              = min_variation,
                       num_cores                  = num_cores,
@@ -80,6 +82,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
                                               quantile_cutoffs     = c(0.25, 0.5, 0.75),
                                               diff_GATES           = setup_diff(),
                                               diff_CLAN            = setup_diff(),
+                                              external_weights     = NULL,
                                               significance_level   = 0.05,
                                               min_variation        = 1e-05,
                                               num_cores            = parallel::detectCores(), # dead argument here
@@ -108,7 +111,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
   num.vars.in.Z_CLAN <- ncol(Z_CLAN)
   genericML.by.split <- list()
   N     <- length(Y)
-  N_set <- 1:N
+  N_set <- seq_len(N)
   prop  <- floor(prop_aux * N)
 
 
@@ -157,6 +160,7 @@ generic.ml.across.learners_serial <- function(Z, D, Y,
                                   quantile_cutoffs             = quantile_cutoffs,
                                   diff_GATES                   = diff_GATES,
                                   diff_CLAN                    = diff_CLAN,
+                                  external_weights             = external_weights,
                                   significance_level           = significance_level,
                                   min_variation                = min_variation)
 
@@ -206,6 +210,7 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
                                               quantile_cutoffs     = c(0.25, 0.5, 0.75),
                                               diff_GATES           = setup_diff(),
                                               diff_CLAN            = setup_diff(),
+                                              external_weights     = NULL,
                                               significance_level   = 0.05,
                                               min_variation        = 1e-05,
                                               num_cores            = parallel::detectCores(),
@@ -239,7 +244,7 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
   num.generic_targets.gates <- K + length(diff_GATES$subtracted)
   num.generic_targets.clan <- K + length(diff_CLAN$subtracted)
   N     <- length(Y)
-  N_set <- 1:N
+  N_set <- seq_len(N)
   num.learners <- length(learners)
   prop <- floor(prop_aux * N)
   namZ_CLAN <- colnames(Z_CLAN)
@@ -337,6 +342,7 @@ generic.ml.across.learners_parallel <- function(Z, D, Y,
                                   quantile_cutoffs             = quantile_cutoffs,
                                   diff_GATES                   = diff_GATES,
                                   diff_CLAN                    = diff_CLAN,
+                                  external_weights             = external_weights,
                                   significance_level           = significance_level,
                                   min_variation                = min_variation)
 

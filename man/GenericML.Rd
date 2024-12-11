@@ -20,6 +20,7 @@ GenericML(
   diff_CLAN = setup_diff(),
   vcov_BLP = setup_vcov(),
   vcov_GATES = setup_vcov(),
+  external_weights = NULL,
   equal_variances_CLAN = FALSE,
   prop_aux = 0.5,
   stratify = setup_stratify(),
@@ -62,6 +63,8 @@ GenericML(
 \item{vcov_BLP}{Specifies the covariance matrix estimator in the BLP regression. Must be an object of class \code{"\link{setup_vcov}"}. See the documentation of \code{\link{setup_vcov}()} for details.}
 
 \item{vcov_GATES}{Same as \code{vcov_BLP}, just for the GATES regression.}
+
+\item{external_weights}{Optional vector of external numeric weights for weighted means in CLAN and weighted regression in BLP and GATES (in addition to the standard weights used when \code{HT = FALSE}).}
 
 \item{equal_variances_CLAN}{Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.}
 

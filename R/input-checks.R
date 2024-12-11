@@ -320,6 +320,16 @@ InputChecks_stratify <- function(args_stratified)
 
 
 
+InputChecks_external_weights <- function(external_weights, num_obs)
+{
+  if(!is.null(external_weights))
+  {
+    if(!(is.numeric(external_weights) & is.vector(external_weights))) stop("'external_weights' must be a numeric vector", call. = FALSE)
+    if(!(length(external_weights) == num_obs)) stop("the length of 'external_weights' must be be equal to the number of observations")
+  }
+}
+
+
 #' Check if user's OS is a Unix system
 #'
 #' @return

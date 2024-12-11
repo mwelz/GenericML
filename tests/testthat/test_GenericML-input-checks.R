@@ -195,9 +195,7 @@ test_that("function should be able to deal with low-signal input",{
   Z <- matrix(sample(c(0,1), n*p, replace = TRUE), n, p)
   Y <- sample(c(0,1), n, replace = TRUE)
   expect_error(GenericML(Z = Z, D, Y, "random_forest",
-                         num_splits = 2, parallel = FALSE), NA)
-
-
+                         num_splits = 2, parallel = FALSE))
 
 })
 

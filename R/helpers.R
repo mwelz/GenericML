@@ -241,3 +241,18 @@ confidence_level <- function(x)
 {
   return(1.0 - 2 * x$arguments$significance_level)
 } # FUN
+
+#' internal function for weighted mean
+#' @param x numeric vector
+#' @param w weights
+#' @noRd
+weighted_mean <- function(x, w = NULL)
+{
+  if(is.null(w))
+  {
+    out <- mean(x)
+  } else{
+    out <- stats::weighted.mean(x = x, w = w)
+  }
+  return(out)
+}
