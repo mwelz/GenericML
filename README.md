@@ -163,7 +163,7 @@ x <- GenericML(Z = Z, D = D, Y = Y,
 ### 4. General results ----
 
 ## print
-genML
+x
 # GenericML object with the following specifications:
 # 	* Propensity score learner: mlr3::lrn('glmnet', lambda = 0, alpha = 1) 
 # 	* Generic ML learners: lasso, mlr3::lrn('ranger', num.trees = 100), mlr3::lrn('svm') 
@@ -177,7 +177,7 @@ genML
 
 
 ## get the medians of the estimated  \Lambda and \bar{\Lambda} to find best learners
-get_best(genML)
+get_best(x)
 #                                      lambda lambda.bar
 # lasso                                 1.119      2.005
 # mlr3::lrn('ranger', num.trees = 100)  1.167      2.082
@@ -194,7 +194,7 @@ get_best(genML)
 We use the `get_BLP()` acceessor function to extract the results of the BLP analysis. We can see from the print and plot that the true ATE of about 0.979 is contained in the 90% confidence interval of `beta.1`. Moreover, we reject the null of no significance of `beta.2` at any reasonable level, which is expected since there is substantial treatment effect heterogeneity.
 
 ```R
-results_BLP <- get_BLP(genML)
+results_BLP <- get_BLP(x)
 results_BLP # print method
 # BLP generic targets
 # ---
@@ -216,7 +216,7 @@ plot(results_BLP) # plot method
 There is treatment effect heterogeneity in the data generating process, so we expect a trend in the GATES per-group estimates as well as significance of all group differences. This is indeed the case.
 
 ```R
-results_GATES <- get_GATES(genML)
+results_GATES <- get_GATES(x)
 results_GATES # print method
 # GATES generic targets
 # ---
@@ -253,7 +253,7 @@ plot(y = Z_CLAN[, "z1"], x = HTE, xlab = "True HTE", ylab = "Value of z1")
 The heterogeneity exhibits a jump pattern along the first variable. We thus expect that `G1 < G3`, `G2 < G4`, `G1 = G2`, `G3 = G4`, where the `G` denote the variable’s within-group averages. The groups are formed by treatment effect strength. Let’s see what CLAN suggests:
 
 ```R
-results_CLAN_z1 <- get_CLAN(genML, variable = "z1")
+results_CLAN_z1 <- get_CLAN(x, variable = "z1")
 plot(results_CLAN_z1)
 ```
 
@@ -274,7 +274,7 @@ plot(y = Z_CLAN[, "z2"], x = HTE, xlab = "True HTE", ylab = "Value of z2")
 We clearly see the level shift at (1, 0.5). Thus, we expect that the two most affected groups should have a much stronger value of `z2` than the two least affected groups. Moreover, the two groups `G1` and `G2` should have the same value of `z2` and the two groups `G3` and `G4` should also have the same value. CLAN indeed captures this pattern:
 
 ```R
-results_CLAN_z2 <- get_CLAN(genML, variable = "z2")
+results_CLAN_z2 <- get_CLAN(x, variable = "z2")
 plot(results_CLAN_z2)
 ```
 
@@ -293,7 +293,7 @@ plot(y = Z_CLAN[, "z3"], x = HTE, xlab = "True HTE", ylab = "Value of z3")
 There is no heterogeneity pattern along `z3`, so all CLAN groups should have roughly the same value. This is indeed the case:
 
 ```R
-results_CLAN_z3 <- get_CLAN(genML, variable = "z3")
+results_CLAN_z3 <- get_CLAN(x, variable = "z3")
 plot(results_CLAN_z3)
 ```
 
@@ -312,7 +312,7 @@ plot(y = Z_CLAN[, "random"], x = HTE, xlab = "True HTE", ylab = "Value of 'rando
 There is no heterogeneity along `random`, so all CLAN groups should have roughly the same value. This is indeed the case:
 
 ```R
-results_CLAN_random <- get_CLAN(genML, variable = "random")
+results_CLAN_random <- get_CLAN(x, variable = "random")
 plot(results_CLAN_random)
 ```
 
