@@ -256,3 +256,18 @@ weighted_mean <- function(x, w = NULL)
   }
   return(out)
 }
+
+
+## format the group labeling
+# this is taken from the source code of base::cut()
+# see e.g. https://github.com/SurajGupta/r-source/blob/a28e609e72ed7c47f6ddfbb86c85279a0750f0b7/src/library/base/R/cut.R#L43
+breaks_format <- function(breaks, dig.lab = 3L)
+{
+  nb <- length(breaks)
+  for(dig in dig.lab:max(12L, dig.lab)) {
+    ## 0+ avoids printing signed zeros as "-0"
+    ch.br <- formatC(0+breaks, digits = dig, width = 1L)
+    if(ok <- all(ch.br[-1L] != ch.br[-nb])) break
+  }
+  return(ch.br)
+}

@@ -76,34 +76,90 @@ quantile_group <- function(x,
 quantile_group_NoChecks <- function(x = x,
                                     cutoffs = cutoffs){
 
-  # get quantiles
-  q         <- stats::quantile(x, cutoffs)
-  q         <- c(-Inf, q, Inf)
+  ## number of groups
+  num_groups <- length(cutoffs) + 1L
 
-  # check if breaks are unique: if x exhibits low variation, there might be empty quantile bins, which can cause an error in the cut() function. In this case, we add random noise to x to induce variation. NB: this bug has been spotted and fixed by Lucas Kitzmueller. All credits for this fix go to him!
-  if(length(unique(q)) != length(q)){
-    # specify standard deviation of the noise (x may have zero variation)
-    sd <- ifelse(stats::var(x) == 0, 0.001, sqrt(stats::var(x) / 20))
-    # add noise and updare quantiles
-    x <- x + stats::rnorm(length(x), mean = 0, sd = sd)
+  # to have non-zero within-group variation, we require at least 2 observations per group
+  n              <- length(x)
+  group_size_min <- 2L
+
+  ### obtain the grouping
+  # we require a while loop here because grouping on the raw x might be illegal, that is, the groups' sizes do not correspond to what one would expect under a continuous variable (see above). Such violations can happen when sufficiently large subsets of x have zero variation. To overcome this problem (if it is present), we add tiny random noise to x and repeat the grouping until a legal grouping is found.
+  # NB: this problem was first spotted by Lukas Kitzmueller, who proposed the original bugfix (which we have adapted since). Many thanks to Lukas!
+  grouping_unifinished <- TRUE
+  ct <- 0L
+
+  while(grouping_unifinished)
+  {
+    # get empirical quantiles
     q <- stats::quantile(x, cutoffs)
-    q <- c(-Inf, q, Inf)
-  } # IF
 
-  groups    <- as.character(cut(x, breaks = q, include.lowest = TRUE, right = FALSE, dig.lab = 3))
-  group.nam <- unique(groups)
-  group.nam <- group.nam[order(
-    as.numeric(substr(sub("\\,.*", "", group.nam), 2, stop = 1e8L)),
-    decreasing = FALSE)] # ensure the order is correct
+    # get names of breaks
+    qnam <- breaks_format(breaks = q, dig.lab = 3L)
 
-  # get the grouping matrix
-  group.mat <- sapply(1:length(group.nam), function(j) groups == group.nam[j])
-  colnames(group.mat) <- gsub(",", ", ", gsub(" ", "", group.nam))
+    # initialize out matrix and helper objects
+    out <- matrix(NA, n, num_groups)
+    legal_grouping <- rep(TRUE, num_groups)
+    groupnam <- rep(NA_character_, num_groups)
+
+    for(k in seq_len(num_groups))
+    {
+      ## get the grouping
+      if(k == 1L)
+      {
+        bool_k <- x < q[k]
+        groupnam[k] <- paste0("(-Inf, ", qnam[k], ")")
+
+      } else if(k == num_groups)
+      {
+        bool_k <- x >= q[k-1L]
+        groupnam[k] <- paste0("[", qnam[k-1L], ", Inf)")
+      } else
+      {
+        bool_k <- q[k-1L] <= x & x < q[k]
+        groupnam[k] <- paste0("[", qnam[k-1L], ", ",  qnam[k], ")")
+      } # IF
+
+      ## check if grouping is legal
+      # a grouping is illegal if group doesn't have minimum size
+      # this can happen if there is very little variation in x
+      size_k <- sum(bool_k)
+      if(size_k < group_size_min)
+      {
+        legal_grouping[k] <- FALSE
+      } # IF
+
+      ## store the candidate grouping
+      out[,k] <- bool_k
+    } # FOR k
+
+    ## column naming
+    colnames(out) <- groupnam
+
+    ## check if the grouping is complete and legal
+    if(all(legal_grouping))
+    {
+      grouping_unifinished <- FALSE # legal grouping -> will break the while loop
+    } else
+    {
+      ## illegal grouping: induce tiny noise to increase variation
+      x <- x + stats::rnorm(n, mean = 0.0, sd = 0.001)
+    } # IF
+
+    ## update counter
+    ct <- ct + 1L
+
+    if(ct > 3L)
+    {
+      stop("The specified quantile cutoffs do not allow for a grouping that results in groups with nonzero within-group variation. Increase the expected group size through the quantile cutoffs argument.")
+    } # IF
+  } # WHILE
 
   # return
-  return(structure(group.mat, type = "quantile_group"))
+  return(structure(out, type = "quantile_group"))
 
 } # FUN
+
 
 
 #' Single iteration of the GenericML algorithm
