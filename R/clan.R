@@ -111,7 +111,7 @@ CLAN_NoChecks <- function(Z_CLAN,
       if(stats::var(clan_k) == 0)
       {
         # in case of zero variation, t.test() will throw an error. In this case, return uninformative out.mat[ct,]. NB: this bug has been spotted and fixed by Lucas Kitzmueller. All credits for this fix go to him!
-        mean.estimate <- weighted_mean(x = clan_k, w = clan_k)
+        mean.estimate <- weighted_mean(x = clan_k, w = weights_k)
         out.mat[ct,]  <- c(mean.estimate, mean.estimate, mean.estimate,
                            0.0, 0.0, 0.5, 0.5)
 
