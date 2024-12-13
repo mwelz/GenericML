@@ -218,30 +218,29 @@ get.learner_regr <- function(learner){
 InputChecks_propensity_scores <- function(propensity_scores){
 
   # check if data is from a randomized experiment
-  if(any(propensity_scores > 0.65 | propensity_scores < 0.35)){
-    warning(paste0("Some propensity scores are outside the ",
-                   "interval [0.35, 0.65]. In a randomized experiment, we would ",
-                   "expect all propensity scores to be equal to roughly 0.5. ",
+  if(any(propensity_scores > 0.8 | propensity_scores < 0.2)){
+    message(paste0("Some propensity scores are outside the ",
+                   "interval [0.2, 0.8]. ",
                    "The theory of the paper ",
-                   "is only valid for randomized experiments. Are ",
-                   "you sure your data is from a randomomized experiment ",
-                   "and the estimator of the scores has been chosen appropriately?"),
-            call. = FALSE)
+                   "is only valid for randomized experiments, where ",
+                   "propensity scores outside this interval are unusual. Are ",
+                   "you sure your data are from a randomomized experiment ",
+                   "and the estimator of the scores has been chosen appropriately?"))
   } # IF
 
-  if(any(propensity_scores > 0.95)){
+  if(any(propensity_scores > 0.99)){
 
-    stop(paste0("Some estimated propensity scores are higher than 0.95, ",
+    stop(paste0("Some estimated propensity scores are higher than 0.99, ",
                 " which is not sufficiently bounded away from one.",
-                " Are you sure your data is from a randomomized experiment ",
+                " Are you sure your data are from a randomomized experiment ",
                 "and the estimator of the scores has been chosen appropriately?"))
   } # IF
 
-  if(any(propensity_scores < 0.05)){
+  if(any(propensity_scores < 0.01)){
 
-    stop(paste0("Some estimated propensity scores are lower than 0.05, ",
+    stop(paste0("Some estimated propensity scores are lower than 0.01, ",
                 " which is not sufficiently bounded away from zero.",
-                " Are you sure your data is from a randomomized experiment ",
+                " Are you sure your data are from a randomomized experiment ",
                 "and the estimator of the scores has been chosen appropriately?"))
   } # IF
 
