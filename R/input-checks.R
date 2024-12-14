@@ -338,3 +338,23 @@ InputChecks_external_weights <- function(external_weights, num_obs)
 TrueIfUnix <- function(){
   .Platform$OS.type == "unix"
 }
+
+
+# print a message to notify users of changes in default arguments
+message_changes <- function()
+{
+  message(
+    paste0("Compared to version 0.2.2, there are two changes in the default behavior of GenericML(): ",
+           "First, the argument 'monotonize' was added, which, if TRUE (default) ensures monotonicty of GATES parameters. ",
+           "Second, the argument 'equal_variances_CLAN' was deprecated and will be removed in a future release."
+           )
+  )
+}
+
+message_equal_variances <- function()
+{
+  message(
+    paste0("The argument 'equal_variances' was deprecated and will be removed in a future release because unequal CLAN variances will be assumed."
+    )
+  )
+}

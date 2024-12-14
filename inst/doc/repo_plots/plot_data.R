@@ -13,7 +13,7 @@ Y0 <- as.numeric(Z %*% rexp(p)) # potential outcome without treatment
 ## simulate heterogeneous treatment effect
 # treatment effect increases with Z1, has a level shift along Z2 (at 0.5), and has no pattern along Z3
 HTE <- 2 * Z[,1] + ifelse(Z[,2] >= 0.5, 1, -1)
-ATE <- mean(HTE)                # average treatment effect
+ATE <- mean(HTE)                # average treatment effect (about 0.979 here)
 Y1  <- HTE + Y0                 # potential outcome under treatment
 Y   <- ifelse(D == 1, Y1, Y0)   # observed outcome
 
@@ -59,8 +59,14 @@ min_variation <- 1e-05
 vcov_BLP   <- setup_vcov()
 vcov_GATES <- setup_vcov()
 
-# specify whether of not it should be assumed that the group variances of the most and least affected groups are equal in CLAN.
-equal_variances_CLAN <- FALSE
+# ensure that GATES parameters are monotonically increasing (required by theory)
+monotonize <- TRUE
+
+# the package allows for stratified sampling (don't use it here by keeping the arguments empty)
+stratify <- setup_stratify()
+
+# specify that there are no external weights to be used in the analysis
+external_weights <- NULL
 
 # specify the proportion of samples that shall be selected in the auxiliary set
 prop_aux <- 0.5
@@ -77,7 +83,8 @@ seed      <- 123456
 
 
 ### 3. Run the GenericML() functions with these arguments ----
-# runtime: ~90 seconds with R version 4.2.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 21.10. Returns a GenericML object.
+# runtime: ~40 seconds with R version 4.4.1 on a Dell XPS 13 9340 (CPU: Intel Core Ultra 7 165H × 22, RAM: 32GB), running on Ubuntu 24.04 LTS. Returns a GenericML object.
+start. <- Sys.time()
 genML <- GenericML(
   Z = Z, D = D, Y = Y,
   learner_propensity_score = learner_propensity_score,
@@ -92,9 +99,11 @@ genML <- GenericML(
   quantile_cutoffs = quantile_cutoffs,
   diff_GATES = diff_GATES,
   diff_CLAN = diff_CLAN,
-  equal_variances_CLAN = equal_variances_CLAN,
+  monotonize = monotonize,
+  external_weights = external_weights,
   prop_aux = prop_aux,
   significance_level = significance_level,
+  stratify = stratify,
   min_variation = min_variation,
   parallel = parallel,
   num_cores = num_cores,
@@ -102,6 +111,8 @@ genML <- GenericML(
   store_splits = store_splits,
   store_learners = store_learners
 )
+
+Sys.time() - start.
 
 # save
 save(genML, HTE, Z_CLAN, file = "inst/doc/repo_plots/plot_data.Rdata")

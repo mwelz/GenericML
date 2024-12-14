@@ -182,7 +182,8 @@ quantile_group_NoChecks <- function(x = x,
 #' @param diff_CLAN Same as \code{diff_GATES}, just for the CLAN generic targets.
 #' @param vcov_BLP Specifies the covariance matrix estimator in the BLP regression. Must be an object of class \code{"\link{setup_vcov}"}. See the documentation of \code{\link{setup_vcov}()} for details.
 #' @param vcov_GATES Same as \code{vcov_BLP}, just for the GATES regression.
-#' @param equal_variances_CLAN Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.
+#' @param monotonize Logical. Should GATES point estimates and confidence bounds be rearranged to be monotonically increasing following the monotonization method of Chernozhukov et al. (2009, Biometrika)? Default is \code{TRUE}.
+#' @param equal_variances_CLAN \bold{(deprecated and will be removed in a future release)} Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.
 #' @param external_weights Optional vector of external numeric weights for weighted means in CLAN and weighted regression in BLP and GATES (in addition to the standard weights used when \code{HT = FALSE}).
 #' @param significance_level Significance level for VEIN. Default is 0.05.
 #' @param min_variation Specifies a threshold for the minimum variation of the BCA/CATE predictions. If the variation of a BCA/CATE prediction falls below this threshold, random noise with distribution \eqn{N(0, var(Y)/20)} is added to it. Default is \code{1e-05}.
@@ -205,6 +206,8 @@ quantile_group_NoChecks <- function(x = x,
 #' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 #'
 #' Lang M., Binder M., Richter J., Schratz P., Pfisterer F., Coors S., Au Q., Casalicchio G., Kotthoff L., Bischl B. (2019). \dQuote{mlr3: A Modern Object-Oriented Machine Learning Framework in R.} \emph{Journal of Open Source Software}, \bold{4}(44), 1903. \doi{10.21105/joss.01903}.
+#'
+#' Chernozhukov V., Fernández-Val I., Galichon, A. (2009). \dQuote{Improving Point and Interval Estimators of Monotone Functions by Rearrangement.} \emph{Biometrika}, \bold{96}(3), 559--575. \doi{10.1093/biomet/asp030}.
 #'
 #' @seealso
 #' \code{\link{GenericML}()}
@@ -243,6 +246,7 @@ GenericML_single <- function(Z, D, Y,
                              diff_CLAN            = setup_diff(),
                              vcov_BLP             = setup_vcov(),
                              vcov_GATES           = setup_vcov(),
+                             monotonize           = TRUE,
                              equal_variances_CLAN = FALSE,
                              external_weights     = NULL,
                              significance_level   = 0.05,
@@ -269,6 +273,7 @@ GenericML_single <- function(Z, D, Y,
   stopifnot(0 < min(quantile_cutoffs) & max(quantile_cutoffs) < 1)
   stopifnot(is.logical(equal_variances_CLAN))
   stopifnot(is.logical(HT))
+  stopifnot(is.logical(monotonize))
   stopifnot(is.numeric(significance_level) & length(significance_level) == 1)
   stopifnot(0.0 < significance_level & significance_level < 0.5)
   stopifnot(is.numeric(min_variation) & min_variation > 0)
@@ -278,7 +283,7 @@ GenericML_single <- function(Z, D, Y,
   InputChecks_equal.length2(Y, propensity_scores)
   InputChecks_propensity_scores(propensity_scores)
   InputChecks_external_weights(external_weights, N)
-
+  message_changes()
 
 
   # if no input provided, set Z_CLAN equal to Z
@@ -313,6 +318,7 @@ GenericML_single <- function(Z, D, Y,
                             quantile_cutoffs           = quantile_cutoffs,
                             diff_GATES                 = diff_GATES,
                             diff_CLAN                  = diff_CLAN,
+                            monotonize                 = monotonize,
                             significance_level         = significance_level,
                             external_weights           = external_weights,
                             min_variation              = min_variation)
@@ -336,6 +342,7 @@ GenericML_single_NoChecks <-
            quantile_cutoffs           = c(0.25, 0.5, 0.75),
            diff_GATES                 = setup_diff(),
            diff_CLAN                  = setup_diff(),
+           monotonize                 = TRUE,
            external_weights           = NULL,
            significance_level         = 0.05,
            min_variation              = 1e-05){
@@ -413,6 +420,7 @@ GenericML_single_NoChecks <-
       HT                  = HT,
       X1_control          = X1_GATES_M,
       vcov_control        = vcov_GATES_M,
+      monotonize          = monotonize,
       diff                = diff_GATES,
       external_weights    = external_weights[M_set],
       significance_level  = significance_level)

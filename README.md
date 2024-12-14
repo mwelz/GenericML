@@ -66,7 +66,7 @@ Y0 <- as.numeric(Z %*% rexp(p)) # potential outcome without treatment
 ## simulate heterogeneous treatment effect
 # treatment effect increases with Z1, has a level shift along Z2 (at 0.5), and has no pattern along Z3
 HTE <- 2 * Z[,1] + ifelse(Z[,2] >= 0.5, 1, -1)
-ATE <- mean(HTE)                # average treatment effect
+ATE <- mean(HTE)                # average treatment effect (about 0.979 here)
 Y1  <- HTE + Y0                 # potential outcome under treatment
 Y   <- ifelse(D == 1, Y1, Y0)   # observed outcome
 
@@ -112,8 +112,14 @@ min_variation <- 1e-05
 vcov_BLP   <- setup_vcov()
 vcov_GATES <- setup_vcov()
 
-# specify whether of not it should be assumed that the group variances of the most and least affected groups are equal in CLAN.
-equal_variances_CLAN <- FALSE
+# ensure that GATES parameters are monotonically increasing (required by theory)
+monotonize <- TRUE
+
+# the package allows for stratified sampling (don't use it here by keeping the arguments empty)
+stratify <- setup_stratify()
+
+# specify that there are no external weights to be used in the analysis
+external_weights <- NULL
 
 # specify the proportion of samples that shall be selected in the auxiliary set
 prop_aux <- 0.5
@@ -134,8 +140,8 @@ seed      <- 123456
 
 
 ### 3. Run the GenericML() function with these arguments ----
-# runtime: ~90 seconds with R version 4.2.0 on a Dell Latitude 5300 (i5-8265U CPU @ 1.60GHz × 8, 32GB RAM), running on Ubuntu 21.10. Returns a GenericML object.
-x <- GenericML(Z = Z, D = D, Y = Y,
+# runtime: ~40 seconds with R version 4.4.1 on a Dell XPS 13 9340 (CPU: Intel Core Ultra 7 165H × 22, RAM: 32GB), running on Ubuntu 24.04 LTS. Returns a GenericML object.
+genML <- GenericML(Z = Z, D = D, Y = Y,
                learner_propensity_score = learner_propensity_score,
                learners_GenericML = learners_GenericML,
                num_splits = num_splits,
@@ -163,7 +169,7 @@ x <- GenericML(Z = Z, D = D, Y = Y,
 ### 4. General results ----
 
 ## print
-x
+genML
 # GenericML object with the following specifications:
 # 	* Propensity score learner: mlr3::lrn('glmnet', lambda = 0, alpha = 1) 
 # 	* Generic ML learners: lasso, mlr3::lrn('ranger', num.trees = 100), mlr3::lrn('svm') 
@@ -177,7 +183,7 @@ x
 
 
 ## get the medians of the estimated  \Lambda and \bar{\Lambda} to find best learners
-get_best(x)
+get_best(genML)
 #                                      lambda lambda.bar
 # lasso                                 1.119      2.005
 # mlr3::lrn('ranger', num.trees = 100)  1.167      2.082
@@ -194,7 +200,7 @@ get_best(x)
 We use the `get_BLP()` acceessor function to extract the results of the BLP analysis. We can see from the print and plot that the true ATE of about 0.979 is contained in the 90% confidence interval of `beta.1`. Moreover, we reject the null of no significance of `beta.2` at any reasonable level, which is expected since there is substantial treatment effect heterogeneity.
 
 ```R
-results_BLP <- get_BLP(x)
+results_BLP <- get_BLP(genML)
 results_BLP # print method
 # BLP generic targets
 # ---
@@ -216,7 +222,7 @@ plot(results_BLP) # plot method
 There is treatment effect heterogeneity in the data generating process, so we expect a trend in the GATES per-group estimates as well as significance of all group differences. This is indeed the case.
 
 ```R
-results_GATES <- get_GATES(x)
+results_GATES <- get_GATES(genML)
 results_GATES # print method
 # GATES generic targets
 # ---
@@ -253,7 +259,7 @@ plot(y = Z_CLAN[, "z1"], x = HTE, xlab = "True HTE", ylab = "Value of z1")
 The heterogeneity exhibits a jump pattern along the first variable. We thus expect that `G1 < G3`, `G2 < G4`, `G1 = G2`, `G3 = G4`, where the `G` denote the variable’s within-group averages. The groups are formed by treatment effect strength. Let’s see what CLAN suggests:
 
 ```R
-results_CLAN_z1 <- get_CLAN(x, variable = "z1")
+results_CLAN_z1 <- get_CLAN(genML, variable = "z1")
 plot(results_CLAN_z1)
 ```
 
@@ -274,7 +280,7 @@ plot(y = Z_CLAN[, "z2"], x = HTE, xlab = "True HTE", ylab = "Value of z2")
 We clearly see the level shift at (1, 0.5). Thus, we expect that the two most affected groups should have a much stronger value of `z2` than the two least affected groups. Moreover, the two groups `G1` and `G2` should have the same value of `z2` and the two groups `G3` and `G4` should also have the same value. CLAN indeed captures this pattern:
 
 ```R
-results_CLAN_z2 <- get_CLAN(x, variable = "z2")
+results_CLAN_z2 <- get_CLAN(genML, variable = "z2")
 plot(results_CLAN_z2)
 ```
 
@@ -293,7 +299,7 @@ plot(y = Z_CLAN[, "z3"], x = HTE, xlab = "True HTE", ylab = "Value of z3")
 There is no heterogeneity pattern along `z3`, so all CLAN groups should have roughly the same value. This is indeed the case:
 
 ```R
-results_CLAN_z3 <- get_CLAN(x, variable = "z3")
+results_CLAN_z3 <- get_CLAN(genML, variable = "z3")
 plot(results_CLAN_z3)
 ```
 
@@ -312,7 +318,7 @@ plot(y = Z_CLAN[, "random"], x = HTE, xlab = "True HTE", ylab = "Value of 'rando
 There is no heterogeneity along `random`, so all CLAN groups should have roughly the same value. This is indeed the case:
 
 ```R
-results_CLAN_random <- get_CLAN(x, variable = "random")
+results_CLAN_random <- get_CLAN(genML, variable = "random")
 plot(results_CLAN_random)
 ```
 
@@ -320,4 +326,4 @@ plot(results_CLAN_random)
 
 
 ## Authors
-Max Welz (welz@ese.eur.nl), Andreas Alfons (alfons@ese.eur.nl), Mert Demirer (mdemirer@mit.edu), and Victor Chernozhukov (vchern@mit.edu).
+Max Welz (max.welz@uzh.ch), Andreas Alfons (alfons@ese.eur.nl), Mert Demirer (mdemirer@mit.edu), and Victor Chernozhukov (vchern@mit.edu).
