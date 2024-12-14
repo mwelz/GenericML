@@ -356,8 +356,8 @@ plot.GenericML <- function(x,
       xlab("Group by HTE Score") +
       theme(legend.title = element_blank(),
             legend.position = "bottom") +
-      guides(color = guide_legend(override.aes = list(
-        linetype = 0, size = 4, shape = 15, alpha = 1))) +
+      # guides(color = guide_legend(override.aes = list(
+      #   linetype = 0, size = 4, shape = 15, alpha = 1))) +
       ylim(limits[1], limits[2]) +
       ggtitle(title)
 
@@ -373,7 +373,8 @@ plot.GenericML <- function(x,
                    linetype = "dashed")  +
         geom_hline(yintercept = df_blp["beta.1", "ci_upper"],
                    linetype = "dashed", color = "red") +
-        scale_colour_manual(values = c("red","blue", "black"))
+        scale_colour_manual(values = c("red","blue", "black"),
+                            guide = guide_legend(reverse = TRUE)) # swap order of legend entries
 
     } else{
       p <- p + scale_colour_manual(values = "black")

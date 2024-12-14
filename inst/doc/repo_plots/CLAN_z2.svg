@@ -406,7 +406,7 @@
 </g>
 <path fill-rule="nonzero" fill="rgb(100%, 100%, 100%)" fill-opacity="1" d="M 215.976562 498.519531 L 319.695312 498.519531 L 319.695312 470.28125 L 215.976562 470.28125 Z M 215.976562 498.519531 "/>
 <path fill-rule="nonzero" fill="rgb(100%, 100%, 100%)" fill-opacity="1" d="M 221.457031 493.042969 L 238.738281 493.042969 L 238.738281 475.761719 L 221.457031 475.761719 Z M 221.457031 493.042969 "/>
-<path fill-rule="nonzero" fill="rgb(0%, 0%, 0%)" fill-opacity="1" d="M 225.472656 489.023438 L 234.71875 489.023438 L 234.71875 479.777344 L 225.472656 479.777344 Z M 225.472656 489.023438 "/>
+<path fill-rule="nonzero" fill="rgb(0%, 0%, 0%)" fill-opacity="1" stroke-width="0.708661" stroke-linecap="round" stroke-linejoin="round" stroke="rgb(0%, 0%, 0%)" stroke-opacity="1" stroke-miterlimit="10" d="M 233.652344 484.402344 C 233.652344 489.140625 226.539062 489.140625 226.539062 484.402344 C 226.539062 479.660156 233.652344 479.660156 233.652344 484.402344 "/>
 <g fill="rgb(0%, 0%, 0%)" fill-opacity="1">
 <use xlink:href="#glyph-0-9" x="244.214844" y="487.317383"/>
 <use xlink:href="#glyph-0-10" x="250.214844" y="487.317383"/>
