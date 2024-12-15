@@ -76,34 +76,90 @@ quantile_group <- function(x,
 quantile_group_NoChecks <- function(x = x,
                                     cutoffs = cutoffs){
 
-  # get quantiles
-  q         <- stats::quantile(x, cutoffs)
-  q         <- c(-Inf, q, Inf)
+  ## number of groups
+  num_groups <- length(cutoffs) + 1L
 
-  # check if breaks are unique: if x exhibits low variation, there might be empty quantile bins, which can cause an error in the cut() function. In this case, we add random noise to x to induce variation. NB: this bug has been spotted and fixed by Lucas Kitzmueller. All credits for this fix go to him!
-  if(length(unique(q)) != length(q)){
-    # specify standard deviation of the noise (x may have zero variation)
-    sd <- ifelse(stats::var(x) == 0, 0.001, sqrt(stats::var(x) / 20))
-    # add noise and updare quantiles
-    x <- x + stats::rnorm(length(x), mean = 0, sd = sd)
+  # to have non-zero within-group variation, we require at least 2 observations per group
+  n              <- length(x)
+  group_size_min <- 2L
+
+  ### obtain the grouping
+  # we require a while loop here because grouping on the raw x might be illegal, that is, the groups' sizes do not correspond to what one would expect under a continuous variable (see above). Such violations can happen when sufficiently large subsets of x have zero variation. To overcome this problem (if it is present), we add tiny random noise to x and repeat the grouping until a legal grouping is found.
+  # NB: this problem was first spotted by Lukas Kitzmueller, who proposed the original bugfix (which we have adapted since). Many thanks to Lukas!
+  grouping_unifinished <- TRUE
+  ct <- 0L
+
+  while(grouping_unifinished)
+  {
+    # get empirical quantiles
     q <- stats::quantile(x, cutoffs)
-    q <- c(-Inf, q, Inf)
-  } # IF
 
-  groups    <- as.character(cut(x, breaks = q, include.lowest = TRUE, right = FALSE, dig.lab = 3))
-  group.nam <- unique(groups)
-  group.nam <- group.nam[order(
-    as.numeric(substr(sub("\\,.*", "", group.nam), 2, stop = 1e8L)),
-    decreasing = FALSE)] # ensure the order is correct
+    # get names of breaks
+    qnam <- breaks_format(breaks = q, dig.lab = 3L)
 
-  # get the grouping matrix
-  group.mat <- sapply(1:length(group.nam), function(j) groups == group.nam[j])
-  colnames(group.mat) <- gsub(",", ", ", gsub(" ", "", group.nam))
+    # initialize out matrix and helper objects
+    out <- matrix(NA, n, num_groups)
+    legal_grouping <- rep(TRUE, num_groups)
+    groupnam <- rep(NA_character_, num_groups)
+
+    for(k in seq_len(num_groups))
+    {
+      ## get the grouping
+      if(k == 1L)
+      {
+        bool_k <- x < q[k]
+        groupnam[k] <- paste0("(-Inf, ", qnam[k], ")")
+
+      } else if(k == num_groups)
+      {
+        bool_k <- x >= q[k-1L]
+        groupnam[k] <- paste0("[", qnam[k-1L], ", Inf)")
+      } else
+      {
+        bool_k <- q[k-1L] <= x & x < q[k]
+        groupnam[k] <- paste0("[", qnam[k-1L], ", ",  qnam[k], ")")
+      } # IF
+
+      ## check if grouping is legal
+      # a grouping is illegal if group doesn't have minimum size
+      # this can happen if there is very little variation in x
+      size_k <- sum(bool_k)
+      if(size_k < group_size_min)
+      {
+        legal_grouping[k] <- FALSE
+      } # IF
+
+      ## store the candidate grouping
+      out[,k] <- bool_k
+    } # FOR k
+
+    ## column naming
+    colnames(out) <- groupnam
+
+    ## check if the grouping is complete and legal
+    if(all(legal_grouping))
+    {
+      grouping_unifinished <- FALSE # legal grouping -> will break the while loop
+    } else
+    {
+      ## illegal grouping: induce tiny noise to increase variation
+      x <- x + stats::rnorm(n, mean = 0.0, sd = 0.001)
+    } # IF
+
+    ## update counter
+    ct <- ct + 1L
+
+    if(ct > 3L)
+    {
+      stop("The specified quantile cutoffs do not allow for a grouping that results in groups with nonzero within-group variation. Increase the expected group size through the quantile cutoffs argument.")
+    } # IF
+  } # WHILE
 
   # return
-  return(structure(group.mat, type = "quantile_group"))
+  return(structure(out, type = "quantile_group"))
 
 } # FUN
+
 
 
 #' Single iteration of the GenericML algorithm
@@ -126,7 +182,9 @@ quantile_group_NoChecks <- function(x = x,
 #' @param diff_CLAN Same as \code{diff_GATES}, just for the CLAN generic targets.
 #' @param vcov_BLP Specifies the covariance matrix estimator in the BLP regression. Must be an object of class \code{"\link{setup_vcov}"}. See the documentation of \code{\link{setup_vcov}()} for details.
 #' @param vcov_GATES Same as \code{vcov_BLP}, just for the GATES regression.
-#' @param equal_variances_CLAN Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.
+#' @param monotonize Logical. Should GATES point estimates and confidence bounds be rearranged to be monotonically increasing following the monotonization method of Chernozhukov et al. (2009, Biometrika)? Default is \code{TRUE}.
+#' @param equal_variances_CLAN \bold{(deprecated and will be removed in a future release)} Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.
+#' @param external_weights Optional vector of external numeric weights for weighted means in CLAN and weighted regression in BLP and GATES (in addition to the standard weights used when \code{HT = FALSE}).
 #' @param significance_level Significance level for VEIN. Default is 0.05.
 #' @param min_variation Specifies a threshold for the minimum variation of the BCA/CATE predictions. If the variation of a BCA/CATE prediction falls below this threshold, random noise with distribution \eqn{N(0, var(Y)/20)} is added to it. Default is \code{1e-05}.
 #'
@@ -148,6 +206,8 @@ quantile_group_NoChecks <- function(x = x,
 #' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 #'
 #' Lang M., Binder M., Richter J., Schratz P., Pfisterer F., Coors S., Au Q., Casalicchio G., Kotthoff L., Bischl B. (2019). \dQuote{mlr3: A Modern Object-Oriented Machine Learning Framework in R.} \emph{Journal of Open Source Software}, \bold{4}(44), 1903. \doi{10.21105/joss.01903}.
+#'
+#' Chernozhukov V., Fernández-Val I., Galichon, A. (2009). \dQuote{Improving Point and Interval Estimators of Monotone Functions by Rearrangement.} \emph{Biometrika}, \bold{96}(3), 559--575. \doi{10.1093/biomet/asp030}.
 #'
 #' @seealso
 #' \code{\link{GenericML}()}
@@ -186,7 +246,9 @@ GenericML_single <- function(Z, D, Y,
                              diff_CLAN            = setup_diff(),
                              vcov_BLP             = setup_vcov(),
                              vcov_GATES           = setup_vcov(),
+                             monotonize           = TRUE,
                              equal_variances_CLAN = FALSE,
+                             external_weights     = NULL,
                              significance_level   = 0.05,
                              min_variation        = 1e-05){
 
@@ -211,6 +273,7 @@ GenericML_single <- function(Z, D, Y,
   stopifnot(0 < min(quantile_cutoffs) & max(quantile_cutoffs) < 1)
   stopifnot(is.logical(equal_variances_CLAN))
   stopifnot(is.logical(HT))
+  stopifnot(is.logical(monotonize))
   stopifnot(is.numeric(significance_level) & length(significance_level) == 1)
   stopifnot(0.0 < significance_level & significance_level < 0.5)
   stopifnot(is.numeric(min_variation) & min_variation > 0)
@@ -219,7 +282,8 @@ GenericML_single <- function(Z, D, Y,
   stopifnot(is.numeric(propensity_scores))
   InputChecks_equal.length2(Y, propensity_scores)
   InputChecks_propensity_scores(propensity_scores)
-
+  InputChecks_external_weights(external_weights, N)
+  message_changes()
 
 
   # if no input provided, set Z_CLAN equal to Z
@@ -254,7 +318,9 @@ GenericML_single <- function(Z, D, Y,
                             quantile_cutoffs           = quantile_cutoffs,
                             diff_GATES                 = diff_GATES,
                             diff_CLAN                  = diff_CLAN,
+                            monotonize                 = monotonize,
                             significance_level         = significance_level,
+                            external_weights           = external_weights,
                             min_variation              = min_variation)
 
 } # END FUN
@@ -276,6 +342,8 @@ GenericML_single_NoChecks <-
            quantile_cutoffs           = c(0.25, 0.5, 0.75),
            diff_GATES                 = setup_diff(),
            diff_CLAN                  = setup_diff(),
+           monotonize                 = TRUE,
+           external_weights           = NULL,
            significance_level         = 0.05,
            min_variation              = 1e-05){
 
@@ -332,6 +400,7 @@ GenericML_single_NoChecks <-
       HT                 = HT,
       X1_control         = X1_BLP_M,
       vcov_control       = vcov_BLP_M,
+      external_weights   = external_weights[M_set],
       significance_level = significance_level)
 
 
@@ -351,7 +420,9 @@ GenericML_single_NoChecks <-
       HT                  = HT,
       X1_control          = X1_GATES_M,
       vcov_control        = vcov_GATES_M,
+      monotonize          = monotonize,
       diff                = diff_GATES,
+      external_weights    = external_weights[M_set],
       significance_level  = significance_level)
 
 
@@ -361,6 +432,7 @@ GenericML_single_NoChecks <-
       membership         = membership_M,
       equal_variances    = equal_variances_CLAN,
       diff               = diff_CLAN,
+      external_weights   = external_weights[M_set],
       significance_level = significance_level)
 
 

@@ -9,6 +9,7 @@ CLAN(
   membership,
   equal_variances = FALSE,
   diff = setup_diff(),
+  external_weights = NULL,
   significance_level = 0.05
 )
 }
@@ -17,9 +18,11 @@ CLAN(
 
 \item{membership}{A logical matrix that indicates the group membership of each observation in \code{Z_CLAN}. Needs to be of type \code{"\link{quantile_group}"}. Typically, the grouping is based on CATE estimates, which are for instance returned by \code{proxy_CATE}.}
 
-\item{equal_variances}{If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.}
+\item{equal_variances}{\bold{(deprecated and will be removed in a future release)} If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.}
 
 \item{diff}{Specifies the generic targets of CLAN. Must be an object of class \code{"\link{setup_diff}"}. See the documentation of \code{\link{setup_diff}()} for details.}
+
+\item{external_weights}{Optional vector of external numeric weights for weighted means.}
 
 \item{significance_level}{Significance level. Default is 0.05.}
 }

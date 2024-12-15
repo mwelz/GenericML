@@ -218,30 +218,29 @@ get.learner_regr <- function(learner){
 InputChecks_propensity_scores <- function(propensity_scores){
 
   # check if data is from a randomized experiment
-  if(any(propensity_scores > 0.65 | propensity_scores < 0.35)){
-    warning(paste0("Some propensity scores are outside the ",
-                   "interval [0.35, 0.65]. In a randomized experiment, we would ",
-                   "expect all propensity scores to be equal to roughly 0.5. ",
+  if(any(propensity_scores > 0.8 | propensity_scores < 0.2)){
+    message(paste0("Some propensity scores are outside the ",
+                   "interval [0.2, 0.8]. ",
                    "The theory of the paper ",
-                   "is only valid for randomized experiments. Are ",
-                   "you sure your data is from a randomomized experiment ",
-                   "and the estimator of the scores has been chosen appropriately?"),
-            call. = FALSE)
+                   "is only valid for randomized experiments, where ",
+                   "propensity scores outside this interval are unusual. Are ",
+                   "you sure your data are from a randomomized experiment ",
+                   "and the estimator of the scores has been chosen appropriately?"))
   } # IF
 
-  if(any(propensity_scores > 0.95)){
+  if(any(propensity_scores > 0.99)){
 
-    stop(paste0("Some estimated propensity scores are higher than 0.95, ",
+    stop(paste0("Some estimated propensity scores are higher than 0.99, ",
                 " which is not sufficiently bounded away from one.",
-                " Are you sure your data is from a randomomized experiment ",
+                " Are you sure your data are from a randomomized experiment ",
                 "and the estimator of the scores has been chosen appropriately?"))
   } # IF
 
-  if(any(propensity_scores < 0.05)){
+  if(any(propensity_scores < 0.01)){
 
-    stop(paste0("Some estimated propensity scores are lower than 0.05, ",
+    stop(paste0("Some estimated propensity scores are lower than 0.01, ",
                 " which is not sufficiently bounded away from zero.",
-                " Are you sure your data is from a randomomized experiment ",
+                " Are you sure your data are from a randomomized experiment ",
                 "and the estimator of the scores has been chosen appropriately?"))
   } # IF
 
@@ -320,6 +319,16 @@ InputChecks_stratify <- function(args_stratified)
 
 
 
+InputChecks_external_weights <- function(external_weights, num_obs)
+{
+  if(!is.null(external_weights))
+  {
+    if(!(is.numeric(external_weights) & is.vector(external_weights))) stop("'external_weights' must be a numeric vector", call. = FALSE)
+    if(!(length(external_weights) == num_obs)) stop("the length of 'external_weights' must be be equal to the number of observations")
+  }
+}
+
+
 #' Check if user's OS is a Unix system
 #'
 #' @return
@@ -328,4 +337,24 @@ InputChecks_stratify <- function(args_stratified)
 #' @export
 TrueIfUnix <- function(){
   .Platform$OS.type == "unix"
+}
+
+
+# print a message to notify users of changes in default arguments
+message_changes <- function()
+{
+  message(
+    paste0("Compared to version 0.2.2, there are two changes in the default behavior of GenericML(): ",
+           "First, the argument 'monotonize' was added, which, if TRUE (default) ensures monotonicty of GATES parameters. ",
+           "Second, the argument 'equal_variances_CLAN' was deprecated and will be removed in a future release."
+           )
+  )
+}
+
+message_equal_variances <- function()
+{
+  message(
+    paste0("The argument 'equal_variances' was deprecated and will be removed in a future release because unequal CLAN variances will be assumed."
+    )
+  )
 }

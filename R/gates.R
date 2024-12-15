@@ -12,6 +12,8 @@
 #' @param X1_control Specifies the design matrix \eqn{X_1} in the regression. Must be an object of class  \code{"\link{setup_X1}"}. See the documentation of \code{\link{setup_X1}()} for details.
 #' @param vcov_control Specifies the covariance matrix estimator. Must be an object of class \code{"\link{setup_vcov}"}. See the documentation of \code{\link{setup_vcov}()} for details.
 #' @param diff Specifies the generic targets of CLAN. Must be an object of class \code{"\link{setup_diff}"}. See the documentation of \code{\link{setup_diff}()} for details.
+#' @param monotonize Logical. Should GATES point estimates and confidence bounds be rearranged to be monotonically increasing following the monotonization method of Chernozhukov et al. (2009, Biometrika)? Default is \code{TRUE}.
+#' @param external_weights Optional vector of external numeric weights for weighted regression (in addition to the standard weights used when \code{HT = FALSE}).
 #' @param significance_level Significance level. Default is 0.05.
 #'
 #' @return
@@ -24,6 +26,7 @@
 #'
 #' @references
 #' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
+#' Chernozhukov V., Fernández-Val I., Galichon, A. (2009). \dQuote{Improving Point and Interval Estimators of Monotone Functions by Rearrangement.} \emph{Biometrika}, \bold{96}(3), 559--575. \doi{10.1093/biomet/asp030}.
 #'
 #' @examples
 #' ## generate data
@@ -58,6 +61,8 @@ GATES <- function(Y, D,
                   X1_control         = setup_X1(),
                   vcov_control       = setup_vcov(),
                   diff               = setup_diff(),
+                  monotonize         = TRUE,
+                  external_weights   = NULL,
                   significance_level = 0.05){
 
   # input check
@@ -75,8 +80,10 @@ GATES <- function(Y, D,
   stopifnot(is.numeric(proxy_BCA))
   stopifnot(is.numeric(proxy_CATE))
   stopifnot(is.logical(HT))
+  stopifnot(is.logical(monotonize))
   stopifnot(is.numeric(significance_level) & length(significance_level) == 1)
   stopifnot(0.0 < significance_level & significance_level < 0.5)
+  InputChecks_external_weights(external_weights, length(Y))
 
   # fit model according to strategy 1 or 2 in the paper
   GATES_NoChecks(D = D, Y = Y,
@@ -87,6 +94,8 @@ GATES <- function(Y, D,
                  X1_control          = X1_control,
                  diff                = diff,
                  vcov_control        = vcov_control,
+                 monotonize          = monotonize,
+                 external_weights    = external_weights,
                  significance_level  = significance_level)
 
 } # FUN
@@ -102,18 +111,22 @@ GATES_NoChecks <- function(D, Y,
                            X1_control          = setup_X1(),
                            diff                = setup_diff(),
                            vcov_control        = setup_vcov(),
+                           monotonize          = TRUE,
+                           external_weights    = NULL,
                            significance_level  = 0.05){
 
   # fit model according to strategy 1 or 2 in the paper
   do.call(what = get(ifelse(HT, "GATES.HT", "GATES.classic")),
           args = list(D = D, Y = Y,
                       propensity_scores   = propensity_scores,
-                      proxy_BCA      = proxy_BCA,
+                      proxy_BCA           = proxy_BCA,
                       proxy_CATE          = proxy_CATE,
                       membership          = membership,
                       X1_control          = X1_control,
                       diff                = diff,
                       vcov_control        = vcov_control,
+                      monotonize          = monotonize,
+                      external_weights    = external_weights,
                       significance_level  = significance_level))
 
 } # FUN
@@ -127,6 +140,8 @@ GATES.classic <- function(D, Y,
                           X1_control         = setup_X1(),
                           diff               = setup_diff(),
                           vcov_control       = setup_vcov(),
+                          monotonize         = TRUE,
+                          external_weights   = NULL,
                           significance_level = 0.05){
 
   # make the group membership a binary matrix
@@ -137,6 +152,12 @@ GATES.classic <- function(D, Y,
 
   # prepare weights
   weights <- 1 / (propensity_scores * (1 - propensity_scores))
+
+  # if external weights are supplied, include them in the weighting
+  if(!is.null(external_weights))
+  {
+    weights <- weights * external_weights
+  } # IF
 
   # prepare matrix X1
   X1     <- get.df.from.X1_control(functions.of.Z_mat = cbind(S = proxy_CATE,
@@ -164,6 +185,7 @@ GATES.classic <- function(D, Y,
     list(generic_targets = generic_targets_GATES(coeftest.object = coefficients,
                                                  K = K,
                                                  vcov = vcov.,
+                                                 monotonize = monotonize,
                                                  significance_level = significance_level,
                                                  diff = diff),
          coefficients = coefficients,
@@ -181,6 +203,8 @@ GATES.HT <- function(D, Y,
                      X1_control         = setup_X1(),
                      diff               = setup_diff(),
                      vcov_control       = setup_vcov(),
+                     monotonize         = TRUE,
+                     external_weights   = NULL,
                      significance_level = 0.05){
 
   # make the group membership a binary matrix
@@ -223,9 +247,17 @@ GATES.HT <- function(D, Y,
   X <- data.frame(X1H,  groups)
   colnames(X) <- c(colnames(X1H), paste0("gamma.", 1:K))
 
+  # prepare the external weights (if applicable)
+  if(is.null(external_weights))
+  {
+    weights <- NULL
+  } else{
+    weights <- external_weights
+  }
+
   # fit linear regression by OLS (no intercept!)
   gates.obj <- stats::lm(formula =  stats::as.formula(paste0("YH ~ ", paste0(colnames(X), collapse = " + "), " + 0")),
-                data = data.frame(YH = Y*H, X))
+                data = data.frame(YH = Y*H, X), weights = weights)
 
   # get estimate of covariance matrix of the error terms
   vcov. <- get.vcov(x              = gates.obj,
@@ -239,6 +271,7 @@ GATES.HT <- function(D, Y,
     list(generic_targets = generic_targets_GATES(coeftest.object = coefficients,
                                                  K = K,
                                                  vcov = vcov.,
+                                                 monotonize = monotonize,
                                                  significance_level = significance_level,
                                                  diff = diff),
          coefficients = coefficients,
@@ -249,9 +282,13 @@ GATES.HT <- function(D, Y,
 
 
 # helper function to calculate the generic targets of BLP (vcov is estimate, not list)
-generic_targets_GATES <- function(coeftest.object, K, vcov,
+generic_targets_GATES <- function(coeftest.object, K, vcov, monotonize,
                                   significance_level = 0.05,
                                   diff = diff){
+
+  # only gamma covariances are relevant here
+  gammanam <- paste0("gamma.", seq_len(K))
+  vcov <- vcov[gammanam, gammanam]
 
   # extract controls
   subtract_from  <- diff$subtract_from
@@ -270,6 +307,29 @@ generic_targets_GATES <- function(coeftest.object, K, vcov,
   ci.lo   <- coefficients.temp[,"Estimate"] - z * coefficients.temp[,"Std. Error"]
   ci.up   <- coefficients.temp[,"Estimate"] + z * coefficients.temp[,"Std. Error"]
 
+
+  # monotonize GATES point estimates and confidence bounds if requested
+  if(monotonize)
+  {
+    ## rearrange point estimates to be monotonic following Chernozhukov et al. (2009, https://doi.org/10.1093/biomet/asp030)
+    order_gamma <- order(coefficients.temp[,"Estimate"], decreasing = FALSE)
+    nam <- rownames(coefficients.temp)
+    coefficients.temp <- coefficients.temp[order_gamma,]
+    rownames(coefficients.temp) <- nam
+    p.left <-  structure(p.left[order_gamma], names = nam)
+    p.right <- structure(p.right[order_gamma], names = nam)
+
+    ## same for confidence bounds; see paragraph 3 Chernozhukov et al. (2009, https://doi.org/10.1093/biomet/asp030)
+    ci.lo <- structure(sort(ci.lo, decreasing = FALSE), names = nam)
+    ci.up <- structure(sort(ci.up, decreasing = FALSE), names = nam)
+
+    ## adjust order in covariance matrix accordingly
+    vcov_gamma <- vcov[order_gamma,order_gamma]
+    colnames(vcov_gamma) <- rownames(vcov_gamma) <- gammanam
+    vcov <- vcov_gamma
+  }
+
+
   # prepare generic targets of the gammas
   generic_targets <- cbind(coefficients.temp, ci.lo, ci.up, p.left, p.right)
   colnames(generic_targets) <- c("Estimate", "Std. Error", "z value",
@@ -280,8 +340,8 @@ generic_targets_GATES <- function(coeftest.object, K, vcov,
   # GATES differences: estimate mean and variance of a difference
   if(subtract_from == "least"){
 
-    diff. <- coeftest.object["gamma.1", "Estimate"] -
-      coeftest.object[paste0("gamma.", subtracted), "Estimate"]
+    diff. <- generic_targets["gamma.1", "Estimate"] -
+      generic_targets[paste0("gamma.", subtracted), "Estimate"]
 
     diff.se <- as.numeric(
       sqrt(vcov["gamma.1", "gamma.1"] +
@@ -293,8 +353,8 @@ generic_targets_GATES <- function(coeftest.object, K, vcov,
 
   } else{
 
-    diff. <- coeftest.object[paste0("gamma.", K), "Estimate"] -
-      coeftest.object[paste0("gamma.", subtracted), "Estimate"]
+    diff. <- generic_targets[paste0("gamma.", K), "Estimate"] -
+      generic_targets[paste0("gamma.", subtracted), "Estimate"]
 
     diff.se <- as.numeric(
       sqrt(vcov[paste0("gamma.", K), paste0("gamma.", K)] +

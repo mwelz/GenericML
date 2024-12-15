@@ -17,9 +17,11 @@
 #' @param diff_CLAN Same as \code{diff_GATES}, just for the CLAN generic targets.
 #' @param vcov_BLP Specifies the covariance matrix estimator in the BLP regression. Must be an object of class \code{"\link{setup_vcov}"}. See the documentation of \code{\link{setup_vcov}()} for details.
 #' @param vcov_GATES Same as \code{vcov_BLP}, just for the GATES regression.
-#' @param equal_variances_CLAN Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.
+#' @param monotonize Logical. Should GATES point estimates and confidence bounds be rearranged to be monotonically increasing following the monotonization method of Chernozhukov et al. (2009, Biometrika)? Default is \code{TRUE}.
+#' @param equal_variances_CLAN \bold{(deprecated and will be removed in a future release)} Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.
 #' @param prop_aux Proportion of samples that shall be in the auxiliary set in case of random sample splitting. Default is 0.5. The number of samples in the auxiliary set will be equal to \code{floor(prop_aux * length(Y))}. If the data set is large, you can save computing time by choosing \code{prop_aux} to be smaller than 0.5. In case of stratified sampling (controlled through the argument \code{stratify} via \code{\link{setup_stratify}()}), \code{prop_aux} does not have an effect, and the number of samples in the auxiliary set is specified via \code{\link{setup_stratify}()}.
 #' @param stratify A list that specifies whether or not stratified sample splitting shall be performed. It is recommended to use the returned object of \code{\link{setup_stratify}()} as this list. See the documentation of \code{\link{setup_stratify}()} for details.
+#' @param external_weights Optional vector of external numeric weights for weighted means in CLAN and weighted regression in BLP and GATES (in addition to the standard weights used when \code{HT = FALSE}).
 #' @param significance_level Significance level for VEIN. Default is 0.05.
 #' @param min_variation Specifies a threshold for the minimum variation of the BCA/CATE predictions. If the variation of a BCA/CATE prediction falls below this threshold, random noise with distribution \eqn{N(0, var(Y)/20)} is added to it. Default is \code{1e-05}.
 #' @param parallel Logical. If \code{TRUE}, parallel computing will be used. Default is \code{FALSE}. On Unix systems, this will be done via forking (shared memory across threads). On non-Unix systems, this will be done through parallel socket clusters.
@@ -50,6 +52,8 @@
 #' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 #'
 #' Lang M., Binder M., Richter J., Schratz P., Pfisterer F., Coors S., Au Q., Casalicchio G., Kotthoff L., Bischl B. (2019). \dQuote{mlr3: A Modern Object-Oriented Machine Learning Framework in R.} \emph{Journal of Open Source Software}, \bold{4}(44), 1903. \doi{10.21105/joss.01903}.
+#'
+#' Chernozhukov V., Fernández-Val I., Galichon, A. (2009). \dQuote{Improving Point and Interval Estimators of Monotone Functions by Rearrangement.} \emph{Biometrika}, \bold{96}(3), 559--575. \doi{10.1093/biomet/asp030}.
 #'
 #' @seealso
 #' \code{\link{plot.GenericML}()}
@@ -130,6 +134,8 @@ GenericML <- function(Z, D, Y,
                       diff_CLAN                = setup_diff(),
                       vcov_BLP                 = setup_vcov(),
                       vcov_GATES               = setup_vcov(),
+                      monotonize               = TRUE,
+                      external_weights         = NULL,
                       equal_variances_CLAN     = FALSE,
                       prop_aux                 = 0.5,
                       stratify                 = setup_stratify(),
@@ -158,6 +164,7 @@ GenericML <- function(Z, D, Y,
   stopifnot(0 < min(quantile_cutoffs) & max(quantile_cutoffs) < 1)
   stopifnot(is.logical(equal_variances_CLAN))
   stopifnot(is.logical(HT))
+  stopifnot(is.logical(monotonize))
   stopifnot(is.numeric(significance_level) & length(significance_level) == 1)
   stopifnot(0.0 < significance_level & significance_level < 0.5)
   stopifnot(is.numeric(prop_aux) & length(prop_aux) == 1)
@@ -166,6 +173,8 @@ GenericML <- function(Z, D, Y,
   stopifnot(is.character(learners_GenericML))
   stopifnot(is.character(learner_propensity_score) | is.numeric(learner_propensity_score))
   InputChecks_stratify(stratify)
+  InputChecks_external_weights(external_weights, nrow(Z))
+  message_changes()
 
   # if no input provided, set Z_CLAN equal to Z
   if(is.null(Z_CLAN)) Z_CLAN <- Z
@@ -238,6 +247,8 @@ GenericML <- function(Z, D, Y,
                                quantile_cutoffs           = quantile_cutoffs,
                                diff_GATES                 = diff_GATES,
                                diff_CLAN                  = diff_CLAN,
+                               monotonize                 = monotonize,
+                               external_weights           = external_weights,
                                significance_level         = significance_level,
                                min_variation              = min_variation,
                                parallel                   = parallel,
@@ -277,6 +288,8 @@ GenericML <- function(Z, D, Y,
                            diff_CLAN                = diff_CLAN,
                            vcov_BLP                 = vcov_BLP,
                            vcov_GATES               = vcov_GATES,
+                           monotonize               = monotonize,
+                           external_weights         = external_weights,
                            equal_variances_CLAN     = equal_variances_CLAN,
                            prop_aux                 = prop_aux,
                            significance_level       = significance_level,

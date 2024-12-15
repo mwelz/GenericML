@@ -21,7 +21,9 @@ GenericML_single(
   diff_CLAN = setup_diff(),
   vcov_BLP = setup_vcov(),
   vcov_GATES = setup_vcov(),
+  monotonize = TRUE,
   equal_variances_CLAN = FALSE,
+  external_weights = NULL,
   significance_level = 0.05,
   min_variation = 1e-05
 )
@@ -59,7 +61,11 @@ GenericML_single(
 
 \item{vcov_GATES}{Same as \code{vcov_BLP}, just for the GATES regression.}
 
-\item{equal_variances_CLAN}{Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.}
+\item{monotonize}{Logical. Should GATES point estimates and confidence bounds be rearranged to be monotonically increasing following the monotonization method of Chernozhukov et al. (2009, Biometrika)? Default is \code{TRUE}.}
+
+\item{equal_variances_CLAN}{\bold{(deprecated and will be removed in a future release)} Logical. If \code{TRUE}, then all within-group variances of the CLAN groups are assumed to be equal. Default is \code{FALSE}. This specification is required for heteroskedasticity-robust variance estimation on the difference of two CLAN generic targets (i.e. variance of the difference of two means). If \code{TRUE} (corresponds to homoskedasticity assumption), the pooled variance is used. If \code{FALSE} (heteroskedasticity), the variance of Welch's t-test is used.}
+
+\item{external_weights}{Optional vector of external numeric weights for weighted means in CLAN and weighted regression in BLP and GATES (in addition to the standard weights used when \code{HT = FALSE}).}
 
 \item{significance_level}{Significance level for VEIN. Default is 0.05.}
 
@@ -106,6 +112,8 @@ GenericML_single(Z, D, Y, learner, propensity_scores, M_set)
 Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
 
 Lang M., Binder M., Richter J., Schratz P., Pfisterer F., Coors S., Au Q., Casalicchio G., Kotthoff L., Bischl B. (2019). \dQuote{mlr3: A Modern Object-Oriented Machine Learning Framework in R.} \emph{Journal of Open Source Software}, \bold{4}(44), 1903. \doi{10.21105/joss.01903}.
+
+Chernozhukov V., Fernández-Val I., Galichon, A. (2009). \dQuote{Improving Point and Interval Estimators of Monotone Functions by Rearrangement.} \emph{Biometrika}, \bold{96}(3), 559--575. \doi{10.1093/biomet/asp030}.
 }
 \seealso{
 \code{\link{GenericML}()}

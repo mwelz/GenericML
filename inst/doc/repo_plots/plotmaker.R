@@ -54,18 +54,17 @@ results_GATES <- get_GATES(genML)
 results_GATES # print method
 # GATES generic targets
 # ---
-#                 Estimate CI lower CI upper  p value
 # gamma.1          -0.4475  -0.6488   -0.247 1.12e-05 ***
 # gamma.2           0.4997   0.2976    0.705 1.18e-06 ***
 # gamma.3           1.4308   1.2298    1.634  < 2e-16 ***
 # gamma.4           2.4079   2.2063    2.612  < 2e-16 ***
 # gamma.4-gamma.1   2.8603   2.5732    3.142  < 2e-16 ***
-# gamma.4-gamma.2   1.9056   1.6212    2.192  < 2e-16 ***
-# gamma.4-gamma.3   0.9824   0.6923    1.268 1.92e-11 ***
 # ---
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # ---
 # Confidence level of confidence interval [CI lower, CI upper]: 90 %
+
+plot(results_GATES) # plot method
 
 svg(file = "inst/doc/repo_plots/GATES.svg")
 plot(results_GATES) # plot method

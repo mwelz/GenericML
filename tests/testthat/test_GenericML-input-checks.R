@@ -197,8 +197,6 @@ test_that("function should be able to deal with low-signal input",{
   expect_error(GenericML(Z = Z, D, Y, "random_forest",
                          num_splits = 2, parallel = FALSE), NA)
 
-
-
 })
 
 

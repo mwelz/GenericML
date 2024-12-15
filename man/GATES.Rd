@@ -15,6 +15,8 @@ GATES(
   X1_control = setup_X1(),
   vcov_control = setup_vcov(),
   diff = setup_diff(),
+  monotonize = TRUE,
+  external_weights = NULL,
   significance_level = 0.05
 )
 }
@@ -38,6 +40,10 @@ GATES(
 \item{vcov_control}{Specifies the covariance matrix estimator. Must be an object of class \code{"\link{setup_vcov}"}. See the documentation of \code{\link{setup_vcov}()} for details.}
 
 \item{diff}{Specifies the generic targets of CLAN. Must be an object of class \code{"\link{setup_diff}"}. See the documentation of \code{\link{setup_diff}()} for details.}
+
+\item{monotonize}{Logical. Should GATES point estimates and confidence bounds be rearranged to be monotonically increasing following the monotonization method of Chernozhukov et al. (2009, Biometrika)? Default is \code{TRUE}.}
+
+\item{external_weights}{Optional vector of external numeric weights for weighted regression (in addition to the standard weights used when \code{HT = FALSE}).}
 
 \item{significance_level}{Significance level. Default is 0.05.}
 }
@@ -70,6 +76,7 @@ GATES(Y, D, propensity_scores, proxy_BCA, proxy_CATE, membership)
 }
 \references{
 Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
+Chernozhukov V., Fernández-Val I., Galichon, A. (2009). \dQuote{Improving Point and Interval Estimators of Monotone Functions by Rearrangement.} \emph{Biometrika}, \bold{96}(3), 559--575. \doi{10.1093/biomet/asp030}.
 }
 \seealso{
 \code{\link{setup_X1}()},
