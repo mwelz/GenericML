@@ -5,7 +5,7 @@
 #' @param x A numeric vector.
 #'
 #' @return
-#' A list with the upper and lower median and the Med statistic (which is their mean).
+#' A list with the upper, lower, and usual median (where the latter is the average of the former two).
 #'
 #' @references
 #' Chernozhukov V., Demirer M., Duflo E., Fernández-Val I. (2020). \dQuote{Generic Machine Learning Inference on Heterogenous Treatment Effects in Randomized Experiments.} \emph{arXiv preprint arXiv:1712.04802}. URL: \url{https://arxiv.org/abs/1712.04802}.
@@ -18,24 +18,26 @@
 #' @export
 Med <- function(x){
 
-  # get the empirical CDF of X
-  ecdf.x <- stats::ecdf(x)
-
-  # evaluate the ensuing probabilities
-  F.x <- ecdf.x(x)
-
   # get lower median and upper median
-  lower       <- min(x[F.x >= 0.5])
-  upper.array <- x[(1 - F.x) >= 0.5]
-  upper       <- ifelse(length(upper.array) == 0,
-                        lower,
-                        max(upper.array)) # account for case where upper.array is empty
+  lower <- med_lo(x)
+  upper <- med_up(x)
 
   return(list(lower_median = lower,
               upper_median = upper,
-              Med = mean(c(lower, upper))))
+              median = mean(c(lower, upper))))
 
 } # END FUN
+
+
+## lower median
+med_lo <- function(x) stats::quantile(x, probs = 0.5, type = 1, names = FALSE)
+
+## upper median
+med_up <- function(x)
+{
+  x_rev <- -x # reverse order
+  -stats::quantile(x_rev, probs = 0.5, type = 1, names = FALSE) # undo reversing
+}
 
 
 

@@ -63,7 +63,7 @@ VEIN <- function(generic_targets, best.learners.obj){
     for(type in c("BLP", "GATES")){
 
       gen.ml.ls[[type]][[learner]][,"Estimate"] <-
-        apply(generic_targets[[learner]][[type]][,"Estimate",], 1, function(z) Med(z)$Med)
+        apply(generic_targets[[learner]][[type]][,"Estimate",], 1, function(z) Med(z)$median)
       gen.ml.ls[[type]][[learner]][,"CB lower"] <-
         apply(generic_targets[[learner]][[type]][,"CB lower",], 1, function(z) Med(z)$upper_median)
       gen.ml.ls[[type]][[learner]][,"CB upper"] <-
@@ -88,7 +88,7 @@ VEIN <- function(generic_targets, best.learners.obj){
     for(z.clan in z.clan.nam){
 
       gen.ml.ls$CLAN[[learner]][[z.clan]][,"Estimate"] <-
-        apply(generic_targets[[learner]][["CLAN"]][[z.clan]][,"Estimate",], 1, function(z) Med(z)$Med)
+        apply(generic_targets[[learner]][["CLAN"]][[z.clan]][,"Estimate",], 1, function(z) Med(z)$median)
       gen.ml.ls$CLAN[[learner]][[z.clan]][,"CB lower"] <-
         apply(generic_targets[[learner]][["CLAN"]][[z.clan]][,"CB lower",], 1, function(z) Med(z)$upper_median)
       gen.ml.ls$CLAN[[learner]][[z.clan]][,"CB upper"] <-

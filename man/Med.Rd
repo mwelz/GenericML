@@ -10,7 +10,7 @@ Med(x)
 \item{x}{A numeric vector.}
 }
 \value{
-A list with the upper and lower median and the Med statistic (which is their mean).
+A list with the upper, lower, and usual median (where the latter is the average of the former two).
 }
 \description{
 Calculates the lower and and median of a vector as proposed in Comment 4.2 in the paper.
