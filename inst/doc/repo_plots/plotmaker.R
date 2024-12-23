@@ -22,7 +22,7 @@ genML
 get_best(genML)
 # lambda lambda.bar
 # lasso                                 1.119      2.005
-# mlr3::lrn('ranger', num.trees = 100)  1.167      2.082
+# mlr3::lrn('ranger', num.trees = 100)  1.162      2.082
 # mlr3::lrn('svm')                      1.172      2.063
 # ---
 #   The best learner for BLP is mlr3::lrn('svm') with lambda = 1.172.
@@ -35,7 +35,7 @@ results_BLP # print method
 # BLP generic targets
 # ---
 #        Estimate CI lower CI upper p value
-# beta.1   0.9750   0.8939    1.056  <2e-16 ***
+# beta.1   0.9750   0.8941    1.056  <2e-16 ***
 # beta.2   1.0198   0.9442    1.095  <2e-16 ***
 # ---
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
@@ -54,15 +54,16 @@ results_GATES <- get_GATES(genML)
 results_GATES # print method
 # GATES generic targets
 # ---
-# gamma.1          -0.4475  -0.6488   -0.247 1.12e-05 ***
-# gamma.2           0.4997   0.2976    0.705 1.18e-06 ***
-# gamma.3           1.4308   1.2298    1.634  < 2e-16 ***
-# gamma.4           2.4079   2.2063    2.612  < 2e-16 ***
-# gamma.4-gamma.1   2.8603   2.5732    3.142  < 2e-16 ***
-# ---
+#                 Estimate CI lower CI upper  p value
+#  gamma.1          -0.4518  -0.6519   -0.256 8.16e-06 ***
+#  gamma.2           0.4986   0.2974    0.697 1.07e-06 ***
+#  gamma.3           1.4294   1.2280    1.631  < 2e-16 ***
+#  gamma.4           2.4103   2.2066    2.612  < 2e-16 ***
+#  gamma.4-gamma.1   2.8587   2.5754    3.142  < 2e-16 ***
+#  ---
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-# ---
-# Confidence level of confidence interval [CI lower, CI upper]: 90 %
+#  ---
+#  Confidence level of confidence interval [CI lower, CI upper]: 90 %
 
 plot(results_GATES) # plot method
 
