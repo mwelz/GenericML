@@ -69,9 +69,9 @@ VEIN <- function(generic_targets, best.learners.obj){
       gen.ml.ls[[type]][[learner]][,"CB upper"] <-
         apply(generic_targets[[learner]][[type]][,"CB upper",], 1, function(z) Med(z)$lower_median)
       p.left.raw <-
-        apply(generic_targets[[learner]][[type]][,"Pr(<z)",], 1, function(z) Med(z)$lower_median)
+        apply(generic_targets[[learner]][[type]][,"Pr(<z)",], 1, function(z) Med(z)$median)
       p.right.raw <-
-        apply(generic_targets[[learner]][[type]][,"Pr(>z)",], 1, function(z) Med(z)$lower_median)
+        apply(generic_targets[[learner]][[type]][,"Pr(>z)",], 1, function(z) Med(z)$median)
       p.left.adj  <- 2 * p.left.raw
       p.right.adj <- 2 * p.right.raw
       p.left.adj[p.left.adj > 1]   <- 1 # p values cannot exceed 1
@@ -92,11 +92,11 @@ VEIN <- function(generic_targets, best.learners.obj){
       gen.ml.ls$CLAN[[learner]][[z.clan]][,"CB lower"] <-
         apply(generic_targets[[learner]][["CLAN"]][[z.clan]][,"CB lower",], 1, function(z) Med(z)$upper_median)
       gen.ml.ls$CLAN[[learner]][[z.clan]][,"CB upper"] <-
-        apply(generic_targets[[learner]][["CLAN"]][[z.clan]][,"CB upper",], 1, function(z) Med(z)$upper_median)
+        apply(generic_targets[[learner]][["CLAN"]][[z.clan]][,"CB upper",], 1, function(z) Med(z)$lower_median)
       p.left.raw <-
-        apply(generic_targets[[learner]][["CLAN"]][[z.clan]][,"Pr(<z)",], 1, function(z) Med(z)$lower_median)
+        apply(generic_targets[[learner]][["CLAN"]][[z.clan]][,"Pr(<z)",], 1, function(z) Med(z)$median)
       p.right.raw <-
-        apply(generic_targets[[learner]][["CLAN"]][[z.clan]][,"Pr(>z)",], 1, function(z) Med(z)$lower_median)
+        apply(generic_targets[[learner]][["CLAN"]][[z.clan]][,"Pr(>z)",], 1, function(z) Med(z)$median)
       p.left.adj  <- 2 * p.left.raw
       p.right.adj <- 2 * p.right.raw
       p.left.adj[p.left.adj > 1]   <- 1 # p values cannot exceed 1
