@@ -1,0 +1,36 @@
+#' Make fixed effects identifiers
+#'
+#' Create a vector of possibly multiway fixed-effects identifiers for each observation. Expects group membership ID variables as input. Passing \code{k} vectors of group memberships will create fixed-effect idenifiers for \code{k}-way fixed effects.
+#' The returned vector may be passed as input to \code{\link{GenericML}()}.
+#'
+#' @param ... Vectors of group memberships
+#' @examples
+#'
+#' ## create 2-way fixed effects (cluster-time) for 5 observations
+#' cluster <- c(1, 1, 2, 2, 1)
+#' time <- c("time1", "time1", "time2", "time1", "time2")
+#' make_fixedeffects(cluster, time)
+#'
+#' @returns A vector of unique fixed-effect identifiers
+#' @export
+make_fixedeffects <- function(...)
+{
+  if(missing(...)) return(NULL)
+
+  ## input checks
+  inputs <- list(...)
+  all_vector <- all(sapply(inputs, function(x) is.vector(x)))
+  if(!all_vector) stop("All inputs of make_fixedeffects() must be vectors")
+  lengths <- sapply(inputs, function(x) length(x))
+  if(length(unique(lengths)) > 1L) stop("All vectors need to be of the same length")
+
+  ## define pipe operator in local environment to avoid loading dplyr
+  `%>%` <- magrittr::`%>%`
+
+  ## make fixed effect identifier
+  fixed_effects <-
+    dplyr::group_by_all(as.data.frame(inputs), as.factor) %>%
+    dplyr::group_indices()
+
+  return(fixed_effects)
+}

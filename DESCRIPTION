@@ -34,6 +34,8 @@ Depends:
     ggplot2, mlr3, mlr3learners
 Imports: 
     sandwich,
+    dplyr,
+    magrittr,
     lmtest,
     splitstackshape,
     stats,
