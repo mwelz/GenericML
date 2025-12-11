@@ -48,21 +48,25 @@ print.GenericML <- function(x, digits = max(3L, getOption("digits") - 3L), ...){
   }
 
   cat("GenericML object with the following specifications:\n")
-  cat("\t* Propensity score learner:", prop.lrn, "\n")
-  cat("\t* Generic ML learners:", paste(x$arguments$learners_GenericML, collapse = ", "), "\n")
-  cat("\t* S =", x$arguments$num_splits, "splits are used\n")
-  cat("\t*", ifelse(x$arguments$HT, "A", "No"), "HT transformation is used\n")
-  cat("\nThe", 100 * (1-2*x$arguments$significance_level), "% confidence intervals of the best BLP estimates are given by\n")
-  cat("\t beta.1: (",
+  cat("  * Propensity score learner:", prop.lrn, "\n")
+  cat("  * S =", x$arguments$num_splits, "splits are used\n")
+  cat("  *", ifelse(x$arguments$HT, "A", "No"), "HT transformation is used\n")
+  cat("  *", "Chosen significance level is alpha =", x$arguments$significance_level,
+      "\n    => inference will be at level 2*alpha =", 2*x$arguments$significance_level, "\n")
+  cat("  * Generic ML learners:\n",
+      "  ",
+      paste(x$arguments$learners_GenericML, collapse = "\n    "), "\n")
+  cat("\nThe", 100 * (1-2*x$arguments$significance_level), "% confidence intervals of the best BLP estimates are\n")
+  cat("  beta.1: (",
       round(x$VEIN$best_learners$BLP["beta.1", "CB lower"], 3), ",",
-      round(x$VEIN$best_learners$BLP["beta.1", "CB upper"], 3), ")")
-  cat("\t beta.2: (",
+      round(x$VEIN$best_learners$BLP["beta.1", "CB upper"], 3), ")\n")
+  cat("  beta.2: (",
       round(x$VEIN$best_learners$BLP["beta.2", "CB lower"], 3), ",",
       round(x$VEIN$best_learners$BLP["beta.2", "CB upper"], 3), ")\n")
-  cat("The best learner for the BLP is ", x$best$BLP,
-      " (lambda of ", round(max(x$best$overview[,"lambda"]), digits), ")\n",
-      "The best learner for the GATES and CLAN is ", x$best$GATES,
-      " (lambda.bar of ", round(max(x$best$overview[,"lambda.bar"]), digits), ")", sep = "")
+  cat("\nThe best learner for BLP is ", x$best$BLP,
+      ":\n  lambda of ", round(max(x$best$overview[,"lambda"]), digits), "\n",
+      "The best learner for GATES and CLAN is ", x$best$GATES,
+      ":\n  lambda.bar of ", round(max(x$best$overview[,"lambda.bar"]), digits), sep = "")
   cat("\n")
 
 } # FUN
