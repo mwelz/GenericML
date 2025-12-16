@@ -5,7 +5,7 @@
 \alias{immunization}
 \title{Immunization data}
 \format{
-An object of class \code{data.frame} with 843 rows and 38 columns.
+An object of class \code{data.frame} with 843 rows and 39 columns.
 }
 \usage{
 immunization

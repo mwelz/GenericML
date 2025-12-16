@@ -5,7 +5,7 @@
 \alias{microcredit}
 \title{Morocco microcredit data}
 \format{
-An object of class \code{data.frame} with 5513 rows and 103 columns.
+An object of class \code{data.frame} with 5513 rows and 23 columns.
 }
 \usage{
 microcredit
