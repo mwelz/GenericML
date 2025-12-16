@@ -329,6 +329,16 @@ InputChecks_external_weights <- function(external_weights, num_obs)
 }
 
 
+InputChecks_fixed_effects <- function(fixed_effects, num_obs)
+{
+  if(!is.null(fixed_effects))
+  {
+    if(!is.vector(fixed_effects)) stop("'fixed_effects' must be a vector", call. = FALSE)
+    if(!(length(fixed_effects) == num_obs)) stop("the length of 'fixed_effects' must be be equal to the number of observations")
+  }
+}
+
+
 #' Check if user's OS is a Unix system
 #'
 #' @return

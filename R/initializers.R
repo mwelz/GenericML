@@ -286,6 +286,27 @@ setup_vcov_NoChecks <- function(estimator = "vcovHC",
 } # FUN
 
 
+#' Setup covariance estimator with fixed effects
+#'
+#' This is a simple wrapper for function \code{\link{setup_vcov}()} when fixed effects are involved. Please refer to that function's documentation for details on the behavior. If \code{fixed_effects = NULL}, then the standard homoskedastic least squares covariance estimator will be used. If \code{fixed_effects} is not \code{NULL} but a vector of fixed-effect group membership identifiers, then a cluster-robust covariance matrix estimator will be used where we cluster on the fixed effects identifiers. Depending on the nature of your fixed effects (especially when working with panel data), it may be preferable to cluster on other variables. Such alternative specifications can be made with the wrapped function \code{\link{setup_vcov}()}.
+#'
+#' @param fixed_effects A vector of fixed-effect group identifiers; possibly \code{NULL} for no fixed effects (default)
+#'
+#' @export
+setup_vcov_defaultFE <- function(fixed_effects = NULL)
+{
+  if(is.null(fixed_effects))
+  {
+    out <- setup_vcov()
+  } else
+  {
+    out <- setup_vcov(estimator = "vcovCL",
+                      arguments = list(cluster = fixed_effects))
+  }
+  return(out)
+}
+
+
 # helper function that makes a 'setup_vcov' ready for further use
 # x is of class "setup_vcov"
 setup_vcov_align <- function(x){
