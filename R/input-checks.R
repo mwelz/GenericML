@@ -354,9 +354,10 @@ TrueIfUnix <- function(){
 message_changes <- function()
 {
   message(
-    paste0("Compared to version 0.2.2, there are two changes in the default behavior of GenericML(): ",
+    paste0("Compared to version 0.2.2, there are three changes in the default behavior of GenericML(): ",
            "First, the argument 'monotonize' was added, which, if TRUE (default) ensures monotonicty of GATES parameters. ",
-           "Second, the argument 'equal_variances_CLAN' was deprecated and will be removed in a future release."
+           "Second, the argument 'equal_variances_CLAN' was deprecated and will be removed in a future release. ",
+           "Third, setup_X1() now uses both S and B as regressor rather than only B."
            )
   )
 }

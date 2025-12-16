@@ -4,10 +4,10 @@
 \alias{setup_X1}
 \title{Setup function controlling the matrix \eqn{X_1} in the BLP or GATES regression}
 \usage{
-setup_X1(funs_Z = c("B"), covariates = NULL, fixed_effects = NULL)
+setup_X1(funs_Z = c("B", "S"), covariates = NULL, fixed_effects = NULL)
 }
 \arguments{
-\item{funs_Z}{Character vector controlling the functions of \code{Z} to be included in \eqn{X_1}. Subset of \code{c("S", "B", "p")}, where \code{"p"} corresponds to the propensity scores, \code{"B"} to the proxy baseline estimates, and \code{"S"} to the proxy CATE estimates. Default is \code{"B"}.}
+\item{funs_Z}{Character vector controlling the functions of \code{Z} to be included in \eqn{X_1}. Subset of \code{c("S", "B", "p")}, where \code{"p"} corresponds to the propensity scores, \code{"B"} to the proxy baseline estimates, and \code{"S"} to the proxy CATE estimates. Default is \code{c("B", "S")}.}
 
 \item{covariates}{Optional numeric matrix containing additional covariates to be included in \eqn{X_1}. Default is \code{NULL}.}
 

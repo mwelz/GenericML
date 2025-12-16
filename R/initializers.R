@@ -345,7 +345,7 @@ setup_vcov_subset <- function(x, idx){
 #' @details
 #' The output of this setup function is intended to be used as argument in the functions \code{\link{GenericML}()} and \code{\link{GenericML_single}()} (arguments \code{X1_BLP}, \code{X1_GATES}), as well as \code{\link{BLP}()} and \code{\link{GATES}()} (argument \code{X1_control}).
 #'
-#' @param funs_Z Character vector controlling the functions of \code{Z} to be included in \eqn{X_1}. Subset of \code{c("S", "B", "p")}, where \code{"p"} corresponds to the propensity scores, \code{"B"} to the proxy baseline estimates, and \code{"S"} to the proxy CATE estimates. Default is \code{"B"}.
+#' @param funs_Z Character vector controlling the functions of \code{Z} to be included in \eqn{X_1}. Subset of \code{c("S", "B", "p")}, where \code{"p"} corresponds to the propensity scores, \code{"B"} to the proxy baseline estimates, and \code{"S"} to the proxy CATE estimates. Default is \code{c("B", "S")}.
 #' @param covariates Optional numeric matrix containing additional covariates to be included in \eqn{X_1}. Default is \code{NULL}.
 #' @param fixed_effects Numeric vector of integers that indicates cluster membership of the observations: For each cluster, a fixed effect will be added. Default is \code{NULL} for no fixed effects.
 #'
@@ -386,7 +386,7 @@ setup_vcov_subset <- function(x, idx){
 #' setup_X1(funs_Z = c("B", "p"), covariates = covariates, fixed_effects = NULL)
 #'
 #' @export
-setup_X1 <- function(funs_Z = c("B"),
+setup_X1 <- function(funs_Z = c("B", "S"),
                      covariates = NULL,
                      fixed_effects = NULL){
 
@@ -441,7 +441,7 @@ setup_X1 <- function(funs_Z = c("B"),
 
 
 # same as above, just without input checks
-setup_X1_NoChecks <- function(funs_Z = c("B"),
+setup_X1_NoChecks <- function(funs_Z = c("B", "S"),
                               covariates = NULL,
                               fixed_effects = NULL){
 
