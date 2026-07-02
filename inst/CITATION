@@ -1,32 +1,42 @@
-citHeader("To cite GenericML in publications use:")
-
-citEntry(entry = "Manual",
-  title        = "{GenericML}: Generic Machine Learning Inference",
-  author       = c(person(given = "Max",
- family = "Welz",
- role = c("aut", "cre"),
- email = "welz@ese.eur.nl",
-   comment = c(ORCID = "0000-0003-2945-1860")),
-          person(given = "Andreas",
-         family = "Alfons",
-         role = "aut",
-         email = "alfons@ese.eur.nl",
-         comment = c(ORCID = "0000-0002-2513-3788")),
-          person(given = "Mert",
-         family = "Demirer",
-         role = "aut",
-         email = "mdemirer@mit.edu"),
-          person(given = "Victor",
-         family = "Chernozhukov",
-         role = "aut",
-         email = "vchern@mit.edu")),
+bibentry(
+  bibtype = "Manual",
+  title = "{GenericML}: Generic Machine Learning Inference",
+  author = c(
+    person(
+      given = "Max",
+      family = "Welz",
+      role = c("aut", "cre"),
+      email = "welz@ese.eur.nl",
+      comment = c(ORCID = "0000-0003-2945-1860")
+    ),
+    person(
+      given = "Andreas",
+      family = "Alfons",
+      role = "aut",
+      email = "alfons@ese.eur.nl",
+      comment = c(ORCID = "0000-0002-2513-3788")
+    ),
+    person(
+      given = "Mert",
+      family = "Demirer",
+      role = "aut",
+      email = "mdemirer@mit.edu"
+    ),
+    person(
+      given = "Victor",
+      family = "Chernozhukov",
+      role = "aut",
+      email = "vchern@mit.edu"
+    )
+  ),
   note = "R package version 0.2.3",
-  year = "2022",
+  year = "2026",
   url = "https://CRAN.R-project.org/package=GenericML",
 
-  textVersion  =
-  paste("Max Welz, Andreas Alfons, Mert Demirer and Victor Chernozhukov (2022).",
-        "GenericML: Generic Machine Learning Inference.",
-        "R package version 0.2.3.",
-        "https://CRAN.R-project.org/package=GenericML")
+  textVersion = paste(
+    "Max Welz, Andreas Alfons, Mert Demirer and Victor Chernozhukov (2022).",
+    "GenericML: Generic Machine Learning Inference.",
+    "R package version 0.2.3.",
+    "https://CRAN.R-project.org/package=GenericML"
+  )
 )

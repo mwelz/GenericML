@@ -5,7 +5,7 @@ Authors@R:
     c(person(given = "Max",
            family = "Welz",
            role = c("aut", "cre"),
-           email = "welz@ese.eur.nl",
+           email = "max.welz@uzh.ch",
            comment = c(ORCID = "0000-0003-2945-1860")),
       person(given = "Andreas",
              family = "Alfons",
@@ -21,13 +21,12 @@ Authors@R:
              role = "aut",
              email = "vchern@mit.edu")) 
 Author: Max Welz [aut, cre] (<https://orcid.org/0000-0003-2945-1860>), Andreas Alfons [aut] (<https://orcid.org/0000-0002-2513-3788>), Mert Demirer [aut], Victor Chernozhukov [aut]
-Maintainer: Max Welz <welz@ese.eur.nl>           
-Description: Generic Machine Learning Inference on heterogeneous treatment effects in randomized experiments as proposed in Chernozhukov, Demirer, Duflo and Fernández-Val (2020) <arXiv:1712.04802>. This package's workhorse is the 'mlr3' framework of Lang et al. (2019) <doi:10.21105/joss.01903>, which enables the specification of a wide variety of machine learners. The main functionality, GenericML(), runs Algorithm 1 in Chernozhukov, Demirer, Duflo and Fernández-Val (2020) <arXiv:1712.04802> for a suite of user-specified machine learners. All steps in the algorithm are customizable via setup functions. Methods for printing and plotting are available for objects returned by GenericML(). Parallel computing is supported.
+Maintainer: Max Welz <max.welz@uzh.ch>           
+Description: Generic Machine Learning Inference on heterogeneous treatment effects in randomized experiments as proposed in Chernozhukov, Demirer, Duflo and Fernández-Val (2020) <doi:10.48550/arXiv.1712.04802>. This package's workhorse is the 'mlr3' framework of Lang et al. (2019) <doi:10.21105/joss.01903>, which enables the specification of a wide variety of machine learners. The main functionality, GenericML(), runs Algorithm 1 in Chernozhukov, Demirer, Duflo and Fernández-Val (2020) <doi:10.48550/arXiv.1712.04802> for a suite of user-specified machine learners. All steps in the algorithm are customizable via setup functions. Methods for printing and plotting are available for objects returned by GenericML(). Parallel computing is supported.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
 URL: https://github.com/mwelz/GenericML/
 BugReports: https://github.com/mwelz/GenericML/issues/
 Depends: 
@@ -52,3 +51,4 @@ Suggests:
     nnet,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0
